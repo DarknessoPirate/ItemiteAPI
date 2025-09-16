@@ -1,4 +1,6 @@
 
+using Infrastructure.Extensions;
+
 namespace Api;
 
 public class Program
@@ -8,6 +10,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         
 
+        builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
 
