@@ -15,7 +15,7 @@ public class Category
 
     public int? ParentCategoryId { get; set; } = null;
     public Category? ParentCategory { get; set; } = null;
-    public ICollection<Category>? SubCategories { get; set; } = new List<Category>();
+    public ICollection<Category> SubCategories { get; set; } = new List<Category>();
     
-    public ICollection<ListingBase>? Listings { get; set; } = new List<ListingBase>();
+    public ICollection<ListingBase> Listings { get; set; } = new List<ListingBase>();
 }

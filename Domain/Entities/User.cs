@@ -12,6 +12,6 @@ public class User
     public string? Location { get; set; } = null;
     public string? PhotoUrl { get; set; } = null;
     
-    public ICollection<ListingBase>? OwnedListings { get; set; } = new List<ListingBase>();
-    public ICollection<AuctionListing>? HighestBids { get; set; } = new List<AuctionListing>();
+    public ICollection<ListingBase> OwnedListings { get; set; } = new List<ListingBase>();
+    public ICollection<AuctionListing> HighestBids { get; set; } = new List<AuctionListing>();
 }
