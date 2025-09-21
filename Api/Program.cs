@@ -1,5 +1,8 @@
 
+using Api.Extensions;
+using Application.Extensions;
 using Infrastructure.Extensions;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Api;
 
@@ -10,8 +13,17 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
 
+        builder.ConfigureSerilog();
+
+        builder.Services.AddHttpLogging(logging =>
+        {
+            logging.LoggingFields = HttpLoggingFields.All;
+        });
+        
         builder.Services.AddSwaggerGen();
         builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddApplicationServices();
+        builder.Services.AddApiServices();
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
 
@@ -24,8 +36,11 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseExceptionHandler(_ => { });
+        app.ConfigureSerilogHttpLogging();
         app.UseHttpsRedirection();
-
+        app.UseHttpsRedirection();
+        
         app.UseAuthorization();
 
 
