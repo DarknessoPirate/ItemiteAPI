@@ -18,6 +18,7 @@ public class ListingBase
     public DateTime DateEnds { get; set; } 
     public bool IsArchived { get; set; } = false;
     public bool IsFeatured { get; set; } = false;
+    [MaxLength(500)]
     public string? Description { get; set; } = null;
     public int OwnerId { get; set; }
     public required User Owner { get; set; } = null!;
