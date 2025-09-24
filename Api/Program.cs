@@ -26,6 +26,8 @@ public class Program
         builder.Services.AddApiServices();
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
+        builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; }); // setting to generate api urls in full lowercase 
+
 
         var app = builder.Build();
 
@@ -36,7 +38,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        app.UseExceptionHandler(_ => { });
+                app.UseExceptionHandler(_ => { });
         app.ConfigureSerilogHttpLogging();
         app.UseHttpsRedirection();
         app.UseHttpsRedirection();
