@@ -9,5 +9,6 @@ public class CategoryAutoMapper : Profile
     public CategoryAutoMapper()
     {
         CreateMap<CreateCategoryRequest, Category>();
+        CreateMap<Category, CategoryResponse>();
     }
 }
