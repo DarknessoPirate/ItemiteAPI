@@ -4,6 +4,8 @@ using Application.Features.Categories.CreateCategory;
 using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentValidation;
+using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,8 +21,7 @@ public static class ApplicationExtensions
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
-
-        services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryRequestValidator>();
-        services.AddScoped<IValidator<CreateCategoryCommand>, CreateCategoryCommandValidator>();
+        
+        services.AddValidators(); // extension function to add fluent validators from "Features" subfolder
     }
 }
