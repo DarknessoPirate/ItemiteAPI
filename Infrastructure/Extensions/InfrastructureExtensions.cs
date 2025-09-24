@@ -17,6 +17,7 @@ public static class InfrastructureExtensions
                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
         });
         
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         
     }
