@@ -13,11 +13,44 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         await dbContext.Categories.AddAsync(category);
     }
 
-    public async Task<List<Category>> GetCategories()
+    public Task UpdateCategory(Category category)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteCategory(Category category)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<Category>> GetAllCategories()
     {
         var categories = await dbContext.Categories.ToListAsync();
         
         return categories;
+    }
+
+    public async Task<List<Category>> GetMainCategories()
+    {
+        var mainCategories = 
+            await dbContext.Categories
+            .Where(c => c.ParentCategoryId == null)
+            .ToListAsync();
+        
+        return mainCategories;
+    }
+
+    public async Task<List<Category>> GetSubCategories(int parentCategoryId)
+    {
+        if (!await CategoryExistsById(parentCategoryId)) 
+            throw new NotFoundException($"Parent category with id: {parentCategoryId} not found");
+        
+        var subCategories =
+            await dbContext.Categories
+                .Where(c => c.ParentCategoryId == parentCategoryId)
+                .ToListAsync();
+        
+        return subCategories;
     }
 
     public async Task<Category> GetByNameAsync(string name)
