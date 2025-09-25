@@ -38,7 +38,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
-                app.UseExceptionHandler(_ => { });
+        app.UseExceptionHandler(_ => { });
         app.ConfigureSerilogHttpLogging();
         app.UseHttpsRedirection();
         app.UseHttpsRedirection();
