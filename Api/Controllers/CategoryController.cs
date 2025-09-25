@@ -22,7 +22,7 @@ public class CategoriesController(ISender mediator) : ControllerBase
 
         await mediator.Send(command);
 
-        return Ok();
+        return Created();
     }
 
     [HttpGet("all")]
