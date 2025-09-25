@@ -1,6 +1,7 @@
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Repositories;
+using Infrastructure.Services.Caching;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,14 @@ public static class InfrastructureExtensions
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis")
+                                    ?? throw new InvalidOperationException("Connection 'Redis' not found.");
+            options.InstanceName = "itemite_";
+        });
+
+        services.AddScoped<ICacheService, CacheService>();
     }
 }

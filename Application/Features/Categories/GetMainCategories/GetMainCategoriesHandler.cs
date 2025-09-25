@@ -1,18 +1,27 @@
 using AutoMapper;
 using Domain.DTOs.Category;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Services.Caching;
 using MediatR;
 
 namespace Application.Features.Categories.GetMainCategories;
 
 public class GetMainCategoriesHandler(
     ICategoryRepository categoryRepository,
-    IMapper mapper
-    ) : IRequestHandler<GetMainCategoriesCommand, List<CategoryResponse>> 
+    IMapper mapper,
+    ICacheService cache
+    ) : IRequestHandler<GetMainCategoriesCommand, List<CategoryResponse>>
 {
     public async Task<List<CategoryResponse>> Handle(GetMainCategoriesCommand request, CancellationToken cancellationToken)
     {
+       var cachedMainCategories = await cache.GetAsync<List<CategoryResponse>>("main_categories");
+       if (cachedMainCategories != null)
+       {
+           return cachedMainCategories;
+       }
        var mainCategories = await categoryRepository.GetMainCategories();
-       return mapper.Map<List<CategoryResponse>>(mainCategories);
+       var mappedMainCategories = mapper.Map<List<CategoryResponse>>(mainCategories);
+       await cache.SetAsync("main_categories", mappedMainCategories);
+       return mappedMainCategories;
     }
 }
