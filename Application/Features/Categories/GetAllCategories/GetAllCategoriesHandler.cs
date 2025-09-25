@@ -12,7 +12,6 @@ public class GetAllCategoriesHandler(
     ICacheService cache
     ) : IRequestHandler<GetAllCategoriesCommand, List<CategoryResponse>>
 {
-    private const int CACHE_TIME_IN_MINUTES = 10;
     public async Task<List<CategoryResponse>> Handle(GetAllCategoriesCommand request, CancellationToken cancellationToken)
     {
        var cachedCategories = await cache.GetAsync<List<CategoryResponse>>("all_categories");
@@ -22,7 +21,7 @@ public class GetAllCategoriesHandler(
        }
        var categories = await categoryRepository.GetAllCategories();
        var mappedCategories = mapper.Map<List<CategoryResponse>>(categories);
-       await cache.SetAsync("all_categories", mappedCategories, CACHE_TIME_IN_MINUTES);
+       await cache.SetAsync("all_categories", mappedCategories);
        return mappedCategories;
     }
 }

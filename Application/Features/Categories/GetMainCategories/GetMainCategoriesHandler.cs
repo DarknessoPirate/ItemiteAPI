@@ -12,7 +12,6 @@ public class GetMainCategoriesHandler(
     ICacheService cache
     ) : IRequestHandler<GetMainCategoriesCommand, List<CategoryResponse>>
 {
-    private const int CACHE_TIME_IN_MINUTES = 10;
     public async Task<List<CategoryResponse>> Handle(GetMainCategoriesCommand request, CancellationToken cancellationToken)
     {
        var cachedMainCategories = await cache.GetAsync<List<CategoryResponse>>("main_categories");
@@ -22,7 +21,7 @@ public class GetMainCategoriesHandler(
        }
        var mainCategories = await categoryRepository.GetMainCategories();
        var mappedMainCategories = mapper.Map<List<CategoryResponse>>(mainCategories);
-       await cache.SetAsync("main_categories", mappedMainCategories, CACHE_TIME_IN_MINUTES);
+       await cache.SetAsync("main_categories", mappedMainCategories);
        return mappedMainCategories;
     }
 }

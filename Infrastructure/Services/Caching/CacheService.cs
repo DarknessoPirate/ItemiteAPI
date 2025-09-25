@@ -11,7 +11,7 @@ public class CacheService(IDistributedCache cache) : ICacheService
         return data == null ? default : JsonSerializer.Deserialize<T>(data);
     }
 
-    public async Task SetAsync<T>(string key, T value, int cacheTimeInMinutes)
+    public async Task SetAsync<T>(string key, T value, int cacheTimeInMinutes = 10)
     {
         var options = new DistributedCacheEntryOptions()
         {
