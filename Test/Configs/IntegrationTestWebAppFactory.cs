@@ -34,16 +34,6 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
             RemoveService<DbContextOptions<ItemiteDbContext>>(services);
             RemoveService<ItemiteDbContext>(services);
             RemoveService<IDistributedCache>(services);
-            
-            var redisServices = services.Where(s => 
-                    s.ServiceType.FullName?.Contains("Redis", StringComparison.OrdinalIgnoreCase) == true ||
-                    s.ImplementationType?.FullName?.Contains("Redis", StringComparison.OrdinalIgnoreCase) == true)
-                .ToList();
-            
-            foreach (var service in redisServices)
-            {
-                services.Remove(service);
-            }
 
             services.AddDbContext<ItemiteDbContext>(options =>
             {

@@ -1,4 +1,5 @@
 using Infrastructure.Database;
+using Infrastructure.Services.Caching;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ public class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>
     
     protected readonly ISender Sender;
     protected readonly ItemiteDbContext DbContext;
-    protected readonly IDistributedCache Cache;
+    protected readonly ICacheService Cache;
 
     protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
     {
@@ -20,7 +21,7 @@ public class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>
         
         Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<ItemiteDbContext>();
-        Cache = _scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+        Cache = _scope.ServiceProvider.GetRequiredService<ICacheService>();
     }
 
     // remove all entities for passed entity class 
