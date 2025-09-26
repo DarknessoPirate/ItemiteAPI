@@ -13,9 +13,9 @@ public class CreateCategoryHandler(
     IUnitOfWork unitOfWork,
     IMapper mapper,
     ICacheService cache
-    ) : IRequestHandler<CreateCategoryCommand>
+    ) : IRequestHandler<CreateCategoryCommand, int>
 {
-    public async Task Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
         var category = mapper.Map<Category>(command.CreateCategoryDto);
         await categoryRepository.CreateCategory(category);
@@ -34,5 +34,7 @@ public class CreateCategoryHandler(
             await cache.RemoveAsync("main_categories");
             await cache.RemoveAsync("all_categories");
         }
+
+        return category.Id;
     }            
 }            
