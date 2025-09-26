@@ -20,9 +20,9 @@ public class CategoriesController(ISender mediator) : ControllerBase
             CreateCategoryDto = request
         };
 
-        await mediator.Send(command);
+        int categoryId = await mediator.Send(command);
 
-        return Created();
+        return Created($"api/category/{categoryId}", new { categoryId });
     }
 
     [HttpGet("all")]
