@@ -22,6 +22,7 @@ public class Program
         
         builder.Services.AddSwaggerGen();
         builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.ConfigureIdentity(builder.Configuration);
         builder.Services.AddApplicationServices();
         builder.Services.AddApiServices();
         builder.Services.AddControllers();
@@ -43,6 +44,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseHttpsRedirection();
         
+        app.UseAuthentication();
         app.UseAuthorization();
 
 

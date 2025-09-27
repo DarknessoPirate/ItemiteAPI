@@ -1,7 +1,8 @@
 using System.Text.Json;
+using Infrastructure.Interfaces.Services;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Infrastructure.Services.Caching;
+namespace Infrastructure.Services;
 
 public class CacheService(IDistributedCache cache) : ICacheService
 {

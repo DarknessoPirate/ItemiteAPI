@@ -1,13 +1,14 @@
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Database;
 
-public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options) : DbContext(options)
+public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options) : IdentityDbContext<User, IdentityRole<int>, int>(options)
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<ListingBase> Listings {get;set;}
-    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -23,10 +23,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             if (failures.Count != 0)
             {
                 var errorList = Enumerable.ToList<string>(failures.Select(f => f.ErrorMessage));
-                throw new ValidatorException("One or more validation errors occured")
-                {
-                    Errors = errorList
-                };
+                throw new ValidatorException("One or more validation errors occured", errorList);
             }
         }
 

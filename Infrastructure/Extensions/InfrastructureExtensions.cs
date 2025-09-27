@@ -1,7 +1,8 @@
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Interfaces.Services;
 using Infrastructure.Repositories;
-using Infrastructure.Services.Caching;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,7 +3,7 @@ using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Interfaces.Repositories;
-using Infrastructure.Services.Caching;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 
 namespace Application.Features.Categories.CreateCategory;
