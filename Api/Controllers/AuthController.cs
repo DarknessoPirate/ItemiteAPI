@@ -1,0 +1,20 @@
+using Application.Features.Auth.Register;
+using Domain.Auth;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController(IMediator mediator) : ControllerBase
+{
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        var command = new RegisterCommand {registerDto = request};
+        var userId = await mediator.Send(command);
+        
+        return Ok(new { UserId = userId });
+    }
+}
