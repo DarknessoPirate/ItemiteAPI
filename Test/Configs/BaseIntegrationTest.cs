@@ -1,5 +1,5 @@
 using Infrastructure.Database;
-using Infrastructure.Services.Caching;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;

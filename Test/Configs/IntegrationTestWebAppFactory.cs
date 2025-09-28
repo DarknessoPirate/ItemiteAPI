@@ -1,6 +1,5 @@
 using Api;
 using Infrastructure.Database;
-using Infrastructure.Services.Caching;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
