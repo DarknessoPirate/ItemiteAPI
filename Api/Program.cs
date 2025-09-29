@@ -23,6 +23,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.ConfigureIdentity(builder.Configuration);
+        builder.Services.AddFluentEmail(builder.Configuration);
         builder.Services.AddApplicationServices();
         builder.Services.AddApiServices();
         builder.Services.AddControllers();
