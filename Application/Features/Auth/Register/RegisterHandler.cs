@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.DTOs.Email;
 using Domain.Entities;
 using FluentEmail.Core;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -40,8 +41,16 @@ public class RegisterHandler(
             ToAddress = user.Email!,
             Subject = "Itemite email confirmation",
         };
-        
-        await emailService.SendConfirmationAsync(emailRequest, user.UserName!, confirmationLink);
+
+        try
+        {
+            await emailService.SendConfirmationAsync(emailRequest, user.UserName!, confirmationLink);
+        }
+        catch (Exception)
+        {
+            await userManager.DeleteAsync(user);
+            throw new EmailException("Error while sending confirmation email", []);
+        }
         
         return user.Id;
     }
