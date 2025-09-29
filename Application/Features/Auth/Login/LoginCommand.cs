@@ -5,5 +5,5 @@ namespace Application.Features.Auth.Login;
 
 public class LoginCommand : IRequest<AuthResponse>
 {
-    private LoginRequest loginDto;
+    public LoginRequest loginDto;
 }

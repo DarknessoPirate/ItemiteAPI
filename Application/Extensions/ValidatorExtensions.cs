@@ -1,3 +1,4 @@
+using Application.Features.Auth.Login;
 using Application.Features.Auth.Register;
 using Application.Features.Categories.CreateCategory;
 using FluentValidation;
@@ -11,5 +12,6 @@ public static class ValidatorExtensions
     {
         services.AddScoped<IValidator<CreateCategoryCommand>, CreateCategoryValidator>();
         services.AddScoped<IValidator<RegisterCommand>, RegisterValidator>();
+        services.AddScoped<IValidator<LoginCommand>, LoginValidator>();
     }
 }
