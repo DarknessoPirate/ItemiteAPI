@@ -61,6 +61,29 @@ public class JwtService : IJwtService
             TokenExpirationDate = expirationDate
         };
     }
+    
+    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    {
+        var tokenKey = _jwtSettngs["Key"] ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+        
+        if (securityToken is not JwtSecurityToken jwtSecurityToken || 
+            !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new SecurityTokenException("Invalid token");
+
+        return principal;
+    }
 
     private SigningCredentials GetSigningCredentials()
     {

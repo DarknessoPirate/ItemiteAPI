@@ -4,12 +4,14 @@ using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.Features.Auth.Login;
 
 public class LoginHandler(
     IJwtService jwtService,
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    IConfiguration configuration
     ) : IRequestHandler<LoginCommand, AuthResponse>
 {
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -24,12 +26,23 @@ public class LoginHandler(
         {
             throw new UnauthorizedException("Invalid password");
         }
-
+        
+        // checks the appsettings.json if email confirmation is needed to log in
+        var isEmailConfRequired = configuration.GetValue<bool>("AuthSettings:IsEmailConfirmationRequired");
+        
+        if (isEmailConfRequired)
+        {
+            if (!await userManager.IsEmailConfirmedAsync(user))
+            {
+                throw new UnauthorizedException("Email is not confirmed");
+            }
+        }
+        
         var tokenResponse = jwtService.GenerateToken(user);
         var refreshTokenResponse = jwtService.GenerateRefreshToken();
         
         user.RefreshToken = refreshTokenResponse.Token;
-        user.RefreshTokenExpirationDate = tokenResponse.TokenExpirationDate;
+        user.RefreshTokenExpirationDate = refreshTokenResponse.TokenExpirationDate;
 
         await userManager.UpdateAsync(user);
 

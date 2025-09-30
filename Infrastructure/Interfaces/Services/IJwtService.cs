@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Domain.Auth;
 using Domain.Entities;
 
@@ -7,4 +8,5 @@ public interface IJwtService
 {
     TokenResponse GenerateToken(User user);
     TokenResponse GenerateRefreshToken();
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }
