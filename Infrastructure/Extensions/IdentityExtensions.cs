@@ -13,6 +13,8 @@ public static class IdentityExtensions
 {
     public static void ConfigureIdentity(this IServiceCollection services, IConfiguration configuration)
     {
+        var jwtSettngs = configuration.GetSection("Jwt");
+        
         services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
                     // Password settings
@@ -49,9 +51,9 @@ public static class IdentityExtensions
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = configuration["Jwt:Issuer"],
-                        ValidAudience = configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+                        ValidIssuer = jwtSettngs["Issuer"],
+                        ValidAudience = jwtSettngs["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettngs["Key"]))
                     };
                 }
             );

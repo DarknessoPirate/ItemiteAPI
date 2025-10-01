@@ -7,6 +7,8 @@ public class User : IdentityUser<int>
 {
     public string? Location { get; set; }
     public string? PhotoUrl { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpirationDate { get; set; }
 
     public ICollection<ListingBase> OwnedListings { get; set; } = new List<ListingBase>();
     public ICollection<AuctionListing> HighestBids { get; set; } = new List<AuctionListing>();

@@ -30,5 +30,6 @@ public static class InfrastructureExtensions
         });
 
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<IJwtService, JwtService>();
     }
 }

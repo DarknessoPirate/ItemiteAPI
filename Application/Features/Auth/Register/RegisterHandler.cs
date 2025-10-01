@@ -1,14 +1,20 @@
 using Application.Exceptions;
 using AutoMapper;
+using Domain.DTOs.Email;
 using Domain.Entities;
+using FluentEmail.Core;
+using Infrastructure.Exceptions;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Application.Features.Auth.Register;
 
 public class RegisterHandler(
     UserManager<User> userManager,
-    IMapper mapper
+    IMapper mapper,
+    IEmailService emailService
     ) : IRequestHandler<RegisterCommand, int>
 {
     public async Task<int> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -21,7 +27,32 @@ public class RegisterHandler(
             var errors = result.Errors.Select(e => e.Description).ToList();
             throw new UserRegistrationException("Registration failed", errors);
         }
+
+        var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var queryParam = new Dictionary<string, string>
+        {
+            { "token", emailToken },
+            { "email", user.Email! }
+        };
+
+        var confirmationLink = QueryHelpers.AddQueryString(request.registerDto.EmailVerificationUri, queryParam);
+        var emailRequest = new EmailRequest()
+        {
+            ToAddress = user.Email!,
+            Subject = "Itemite email confirmation",
+        };
+
+        try
+        {
+            await emailService.SendConfirmationAsync(emailRequest, user.UserName!, confirmationLink);
+        }
+        catch (Exception)
+        {
+            await userManager.DeleteAsync(user);
+            throw new EmailException("Error while sending confirmation email", []);
+        }
         
         return user.Id;
     }
+    
 }
