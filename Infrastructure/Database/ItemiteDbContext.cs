@@ -9,6 +9,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options) : Iden
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<ListingBase> Listings {get;set;}
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +39,18 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options) : Iden
             .WithMany(u => u.HighestBids)
             .HasForeignKey(a => a.HighestBidderId)
             .OnDelete(DeleteBehavior.SetNull); // when highest bidder deletes account, set the highest bidder to null
+        
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.ReplacedByToken)
+            .WithOne(rt => rt.ReplacedThisToken)
+            .HasForeignKey<RefreshToken>(rt => rt.ReplacedByTokenId)
+            .OnDelete(DeleteBehavior.Restrict);
         
         base.OnModelCreating(modelBuilder);
     }
