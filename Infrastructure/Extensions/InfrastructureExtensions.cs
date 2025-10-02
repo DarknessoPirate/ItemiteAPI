@@ -1,3 +1,4 @@
+using Infrastructure.Configuration.Seeding;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -31,5 +32,8 @@ public static class InfrastructureExtensions
 
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<IJwtService, JwtService>();
+        services.Configure<SeedSettings>(
+            configuration.GetSection("SeedSettings"));
+        services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
     }
 }

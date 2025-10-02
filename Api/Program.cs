@@ -2,13 +2,14 @@
 using Api.Extensions;
 using Application.Extensions;
 using Infrastructure.Extensions;
+using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.HttpLogging;
 
 namespace Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,23 @@ public class Program
 
 
         var app = builder.Build();
+        
+        
+        // Seed the database
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var seeder = services.GetRequiredService<IDatabaseSeeder>();
+                await seeder.SeedAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while seeding the database");
+            }
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
