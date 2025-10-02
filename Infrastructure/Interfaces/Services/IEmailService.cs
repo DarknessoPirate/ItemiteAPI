@@ -5,5 +5,5 @@ namespace Infrastructure.Interfaces.Services;
 
 public interface IEmailService
 {
-    Task SendConfirmationAsync(EmailRequest emailRequest, string username, string confirmationLink);
+    Task SendConfirmationAsync(User user, string emailToken);
 }

@@ -7,5 +7,4 @@ public class RegisterRequest
     public required string Password { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Location { get; set; }
-    public string EmailVerificationUri { get; set; }
 }
