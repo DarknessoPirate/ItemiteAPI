@@ -3,30 +3,21 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Domain.Auth;
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Services;
 
-public class JwtService : IJwtService
+public class JwtService(IOptions<JwtSettings> jwtSettings) : IJwtService
 {
-    private readonly IConfiguration _configuration;
-    private readonly IConfigurationSection _jwtSettngs;
-    public JwtService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-        _jwtSettngs = _configuration.GetSection("Jwt");
-    }
     
     public TokenResponse GenerateToken(User user)
     {
-        var tokenExipiration = _jwtSettngs["TokenExpirationInMinutes"] ??
-                               throw new ConfigException("TokenExpiration not found in appsettings.json");
-        
-        int tokenExpirationInMinutes = int.Parse(tokenExipiration);
+        var tokenExpirationInMinutes = jwtSettings.Value.TokenExpirationInMinutes;
         
         var signingCredentials = GetSigningCredentials();
         var claims = GenerateClaims(user);
@@ -44,10 +35,7 @@ public class JwtService : IJwtService
 
     public TokenResponse GenerateRefreshToken()
     {
-        var tokenExipiration = _jwtSettngs["RefreshTokenExpirationInMinutes"] ??
-                               throw new ConfigException("RefreshTokenExpiration not found in appsettings.json");
-        
-        int tokenExpirationInMinutes = int.Parse(tokenExipiration);
+        var tokenExpirationInMinutes = jwtSettings.Value.RefreshTokenExpirationInMinutes;
         
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
@@ -64,7 +52,7 @@ public class JwtService : IJwtService
     
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var tokenKey = _jwtSettngs["Key"] ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        var tokenKey = jwtSettings.Value.Key;
         
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -87,7 +75,7 @@ public class JwtService : IJwtService
 
     private SigningCredentials GetSigningCredentials()
     {
-        var tokenKey = _jwtSettngs["Key"] ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        var tokenKey = jwtSettings.Value.Key;
         if (tokenKey.Length < 64) 
             throw new ConfigException("Token key needs to be at least 64 characters long");
         
@@ -109,8 +97,9 @@ public class JwtService : IJwtService
     
     private JwtSecurityToken CreateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims, int minutesToExpiry)
     {
-        var issuer = _jwtSettngs["Issuer"] ?? throw new ConfigException("Cannot access issuer from appsettings.json");
-        var audience = _jwtSettngs["Audience"] ?? throw new ConfigException("Cannot access audience from appsettings.json");
+        var issuer = jwtSettings.Value.Issuer;
+        var audience = jwtSettings.Value.Audience;
+
         var tokenOptions = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,

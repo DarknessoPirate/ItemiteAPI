@@ -1,31 +1,28 @@
-using System.Reflection;
+using Domain.Configs;
 using Domain.DTOs.Email;
 using Domain.Entities;
 using FluentEmail.Core;
-using FluentEmail.Core.Models;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services;
 
 public class EmailService(
     IFluentEmail fluentEmail,
-    IConfiguration configuration
+    IOptions<AuthSettings> authSettings
     ) : IEmailService
 {
     public async Task SendConfirmationAsync(User user, string emailToken)
     {
-        var authSettings = configuration.GetSection("AuthSettings");
         var queryParam = new Dictionary<string, string>
         {
             { "token", emailToken },
             { "email", user.Email! }
         };
 
-        var emailConfirmationUri = authSettings.GetValue<string>("EmailVerificationUri") 
-                                   ?? "https://localhost:4200/confirm-email";
+        var emailConfirmationUri = authSettings.Value.EmailVerificationUri;
         
         var confirmationLink = QueryHelpers.AddQueryString(emailConfirmationUri, queryParam!);
         

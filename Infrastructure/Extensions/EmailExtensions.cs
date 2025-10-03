@@ -9,7 +9,7 @@ namespace Infrastructure.Extensions;
 
 public static class EmailExtensions
 {
-    public static void AddFluentEmail(this IServiceCollection services, ConfigurationManager configuration)
+    public static void AddFluentEmail(this IServiceCollection services, IConfiguration configuration)
     {
         var defaultFromEmail = configuration["EmailSettings:DefaultFromEmail"];
         var host = configuration["SMTPSetting:Host"];

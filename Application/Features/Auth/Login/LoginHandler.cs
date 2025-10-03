@@ -1,17 +1,18 @@
 using Domain.Auth;
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Auth.Login;
 
 public class LoginHandler(
     IJwtService jwtService,
     UserManager<User> userManager,
-    IConfiguration configuration,
+    IOptions<AuthSettings> authSettings,
     IEmailService emailService
     ) : IRequestHandler<LoginCommand, AuthResponse>
 {
@@ -27,18 +28,18 @@ public class LoginHandler(
         {
             throw new UnauthorizedException("Invalid password");
         }
-
-        var authSettings = configuration.GetSection("AuthSettings");
+        
+        var settings = authSettings.Value;
         
         // checks the appsettings.json if email confirmation is needed to log in
-        var isEmailConfRequired = authSettings.GetValue<bool>("IsEmailConfirmationRequired");
+        var isEmailConfRequired = settings.IsEmailConfirmationRequired;
         
         if (isEmailConfRequired && !await userManager.IsEmailConfirmedAsync(user))
         {
             if (user.EmailConfirmationTokenExpirationDate < DateTime.UtcNow)
             {
                 var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                var tokenExpirationInMinutes = authSettings.GetValue<int>("EmailTokenLifespanInMinutes");
+                var tokenExpirationInMinutes = settings.EmailTokenLifespanInMinutes;
                 user.EmailConfirmationTokenExpirationDate = DateTime.UtcNow.AddMinutes(tokenExpirationInMinutes);
                 try
                 {

@@ -1,11 +1,12 @@
 using Application.Exceptions;
 using AutoMapper;
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Auth.Register;
 
@@ -13,7 +14,7 @@ public class RegisterHandler(
     UserManager<User> userManager,
     IMapper mapper,
     IEmailService emailService,
-    IConfiguration configuration
+    IOptions<AuthSettings> authSettings
     ) : IRequestHandler<RegisterCommand, int>
 {
     public async Task<int> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ public class RegisterHandler(
         }
 
         var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var tokenExpirationInMinutes = configuration.GetValue<int>("AuthSettings:EmailTokenLifespanInMinutes");
+        var tokenExpirationInMinutes = authSettings.Value.EmailTokenLifespanInMinutes;
         user.EmailConfirmationTokenExpirationDate = DateTime.UtcNow.AddMinutes(tokenExpirationInMinutes);
 
         try
