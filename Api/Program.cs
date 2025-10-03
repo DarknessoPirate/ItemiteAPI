@@ -1,6 +1,7 @@
 
 using Api.Extensions;
 using Application.Extensions;
+using Domain.Extensions;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.HttpLogging;
@@ -22,6 +23,7 @@ public class Program
         });
         
         builder.Services.AddSwaggerGen();
+        builder.Services.AddConfig(builder.Configuration);
         builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.ConfigureIdentity(builder.Configuration);
         builder.Services.AddFluentEmail(builder.Configuration);
