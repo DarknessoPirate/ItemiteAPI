@@ -14,6 +14,7 @@ public static class IdentityExtensions
     public static void ConfigureIdentity(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtSettngs = configuration.GetSection("Jwt");
+        var authSettings = configuration.GetSection("AuthSettings");
         
         services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
@@ -38,6 +39,10 @@ public static class IdentityExtensions
             )
             .AddEntityFrameworkStores<ItemiteDbContext>()
             .AddDefaultTokenProviders();
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            options.TokenLifespan = TimeSpan.FromMinutes(authSettings.GetValue<int>("EmailTokenLifespanInMinutes")); 
+        });
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
