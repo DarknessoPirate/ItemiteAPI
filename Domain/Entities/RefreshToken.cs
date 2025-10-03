@@ -28,8 +28,8 @@ public class RefreshToken
     public virtual RefreshToken? ReplacedThisToken { get; set; }
 
     // security
-    public string CreatedByIp { get; set; } = string.Empty;
-    public string? RevokedByIp { get; set; }
+    public string CreatedByIp { get; set; } = string.Empty; // user ip
+    public string? RevokedByIp { get; set; } // user ip from where the token was revoked
     public string? DeviceId { get; set; }
     public string? UserAgent { get; set; }
 
