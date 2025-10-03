@@ -22,6 +22,7 @@ public static class InfrastructureExtensions
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         services.AddStackExchangeRedisCache(options =>
         {
@@ -31,9 +32,11 @@ public static class InfrastructureExtensions
         });
 
         services.AddScoped<ICacheService, CacheService>();
-        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<ITokenService, TokenService>();
         services.Configure<SeedSettings>(
             configuration.GetSection("SeedSettings"));
-        services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+        services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 
+        services.AddHttpContextAccessor(); // to access user-agent/ip address/device id in controllers easier
+        services.AddScoped<IRequestContextService, RequestContextService>();
     }
 }

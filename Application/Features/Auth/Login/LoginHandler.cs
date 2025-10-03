@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 namespace Application.Features.Auth.Login;
 
 public class LoginHandler(
-    IJwtService jwtService,
+    ITokenService tokenService,
     UserManager<User> userManager,
     IConfiguration configuration
     ) : IRequestHandler<LoginCommand, AuthResponse>
@@ -37,15 +37,14 @@ public class LoginHandler(
                 throw new UnauthorizedException("Email is not confirmed");
             }
         }
-        
-        var tokenResponse = jwtService.GenerateToken(user);
-        var refreshTokenResponse = jwtService.GenerateRefreshToken();
-        
-        user.RefreshToken = refreshTokenResponse.Token;
-        user.RefreshTokenExpirationDate = refreshTokenResponse.TokenExpirationDate;
 
-        await userManager.UpdateAsync(user);
-
-        return new AuthResponse(user, tokenResponse, refreshTokenResponse);
+        var tokens = await tokenService.GenerateTokenPairAsync(
+            user,
+            request.IpAddress,
+            request.DeviceId,
+            request.UserAgent
+        );
+        
+        return new AuthResponse(user, tokens);
     }
 }
