@@ -4,6 +4,7 @@ using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
 using Domain.Auth;
 using Domain.DTOs.Auth;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IMediator mediator) : ControllerBase
+public class AuthController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -23,19 +24,33 @@ public class AuthController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        var command = new LoginCommand {loginDto = request};
-        var authResponse = await mediator.Send(command);
-        return Ok(authResponse);
+        var command = new LoginCommand
+        {
+            loginDto = request,
+            IpAddress = requestContextService.GetIpAddress(),
+            DeviceId = requestContextService.GetDeviceId(),
+            UserAgent = requestContextService.GetUserAgent()
+        };
+
+        var response = await mediator.Send(command);
+        return Ok(response);
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] TokenPairRequest request)
+    public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] TokenPairRequest request)
     {
-        var command = new RefreshTokenCommand {TokenPair = request};
-        var authResponse = await mediator.Send(command);
-        return Ok(authResponse);
+        var command = new RefreshTokenCommand
+        {
+            TokenPair = request,
+            IpAddress = requestContextService.GetIpAddress(),
+            DeviceId = requestContextService.GetDeviceId(),
+            UserAgent = requestContextService.GetUserAgent()
+        };
+
+        var response = await mediator.Send(command);
+        return Ok(response);
     }
 
     [HttpGet("emailconfirmation")]
