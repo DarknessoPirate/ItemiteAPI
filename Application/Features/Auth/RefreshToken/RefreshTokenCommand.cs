@@ -8,4 +8,7 @@ namespace Application.Features.Auth.RefreshToken;
 public class RefreshTokenCommand : IRequest<AuthResponse>
 {
     public TokenPairRequest TokenPair { get; set; }
+    public string IpAddress { get; set; }
+    public string? DeviceId { get; set; }
+    public string? UserAgent { get; set; }
 }
