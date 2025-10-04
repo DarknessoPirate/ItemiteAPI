@@ -2,11 +2,13 @@ using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
+using Application.Features.Auth.ResetPassword;
 using Domain.Auth;
 using Domain.DTOs.Auth;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ForgotPasswordRequest = Microsoft.AspNetCore.Identity.Data.ForgotPasswordRequest;
 
 namespace Api.Controllers;
 
@@ -53,7 +55,7 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Ok(response);
     }
 
-    [HttpGet("emailconfirmation")]
+    [HttpGet("confirm-email")]
     public async Task<IActionResult> EmailConfirmation([FromQuery] string email, [FromQuery] string token)
     {
         var command = new EmailConfirmationCommand
@@ -64,6 +66,30 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
                 Token = token
             }
         };
+        await mediator.Send(command);
+        return Ok();
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var command = new ForgotPasswordCommand
+        {
+            forgotPasswordDto = request
+        };
+        
+        await mediator.Send(command);
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var command = new ResetPasswordCommand
+        {
+            resetPasswordRequest = request
+        };
+        
         await mediator.Send(command);
         return Ok();
     }
