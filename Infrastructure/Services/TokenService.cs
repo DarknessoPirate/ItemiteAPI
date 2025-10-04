@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Domain.Auth;
+using Domain.Configs;
 using Domain.DTOs.Auth;
 using Domain.Entities;
 using Infrastructure.Exceptions;
@@ -10,30 +11,18 @@ using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Services;
 
-public class TokenService : ITokenService
-{
-    private readonly IConfiguration _configuration;
-    private readonly IConfigurationSection _jwtSettngs;
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly UserManager<User> _userManager;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public TokenService(IConfiguration configuration, IRefreshTokenRepository refreshTokenRepository,
+public class TokenService(
+        IRefreshTokenRepository refreshTokenRepository,
         UserManager<User> userManager,
-        IUnitOfWork unitOfWork
-    )
-    {
-        _configuration = configuration;
-        _refreshTokenRepository = refreshTokenRepository;
-        _userManager = userManager;
-        _unitOfWork = unitOfWork;
-        _jwtSettngs = _configuration.GetSection("Jwt");
-    }
-
+        IUnitOfWork unitOfWork,
+        IOptions<JwtSettings> jwtSettings
+    ) : ITokenService
+{
     public async Task<TokenPairResponse> GenerateTokenPairAsync(User user, string ipAddress, string? deviceId,
         string? userAgent)
     {
@@ -68,7 +57,7 @@ public class TokenService : ITokenService
             throw new InvalidTokenException("Invalid access token - missing JTI claim");
         }
 
-        var storedRefreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+        var storedRefreshToken = await refreshTokenRepository.GetByTokenAsync(refreshToken);
 
         if (storedRefreshToken == null)
         {
@@ -92,7 +81,7 @@ public class TokenService : ITokenService
             throw new InvalidTokenException("Token reuse detected, all tokens have been revoked");
         }
 
-        var user = await _userManager.FindByIdAsync(storedRefreshToken.UserId.ToString());
+        var user = await userManager.FindByIdAsync(storedRefreshToken.UserId.ToString());
         if (user == null)
         {
             throw new NotFoundException("User not found");
@@ -107,8 +96,8 @@ public class TokenService : ITokenService
         storedRefreshToken.RevokedByIp = ipAddress;
         storedRefreshToken.ReplacedByTokenId = newRefreshToken.Id;
 
-        _refreshTokenRepository.Update(storedRefreshToken);
-        await _unitOfWork.SaveChangesAsync();
+        refreshTokenRepository.Update(storedRefreshToken);
+        await unitOfWork.SaveChangesAsync();
 
         var tokens = new TokenPairResponse
         {
@@ -125,7 +114,7 @@ public class TokenService : ITokenService
 
     public async Task RevokeTokenAsync(string token, string revokedByIp)
     {
-        var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+        var refreshToken = await refreshTokenRepository.GetByTokenAsync(token);
 
         if (refreshToken == null)
             throw new NotFoundException("Token not found");
@@ -137,33 +126,33 @@ public class TokenService : ITokenService
         refreshToken.RevokedAt = DateTime.UtcNow;
         refreshToken.RevokedByIp = revokedByIp;
 
-        _refreshTokenRepository.Update(refreshToken);
-        await _unitOfWork.SaveChangesAsync();
+        refreshTokenRepository.Update(refreshToken);
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task RevokeAllUserTokensAsync(int userId, string revokedByIp)
     {
-        var activeTokens = await _refreshTokenRepository.GetAllActiveTokensForUserAsync(userId);
+        var activeTokens = await refreshTokenRepository.GetAllActiveTokensForUserAsync(userId);
 
         foreach (var token in activeTokens)
         {
             token.IsRevoked = true;
             token.RevokedAt = DateTime.UtcNow;
             token.RevokedByIp = revokedByIp;
-            _refreshTokenRepository.Update(token);
+            refreshTokenRepository.Update(token);
         }
 
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task RevokeTokenChainAsync(string token, string revokedByIp)
     {
-        var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
+        var refreshToken = await refreshTokenRepository.GetByTokenAsync(token);
 
         if (refreshToken == null)
             throw new NotFoundException("Refresh token not found");
 
-        var tokenChain = await _refreshTokenRepository.GetTokenChainAsync(refreshToken.Id);
+        var tokenChain = await refreshTokenRepository.GetTokenChainAsync(refreshToken.Id);
 
         foreach (var tkn in tokenChain)
         {
@@ -172,11 +161,11 @@ public class TokenService : ITokenService
                 tkn.IsRevoked = true;
                 tkn.RevokedAt = DateTime.UtcNow;
                 tkn.RevokedByIp = revokedByIp;
-                _refreshTokenRepository.Update(tkn);
+                refreshTokenRepository.Update(tkn);
             }
         }
 
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     private async Task<RefreshToken> CreateRefreshTokenAsync(User user, string jwtId, string createdByIp,
@@ -196,18 +185,15 @@ public class TokenService : ITokenService
             UserAgent = userAgent
         };
 
-        await _refreshTokenRepository.CreateAsync(refreshToken);
-        await _unitOfWork.SaveChangesAsync();
+        await refreshTokenRepository.CreateAsync(refreshToken);
+        await unitOfWork.SaveChangesAsync();
 
         return refreshToken;
     }
 
     private AccessTokenDTO GenerateJwtToken(User user)
     {
-        var tokenExipiration = _jwtSettngs["AccessTokenExpirationInMinutes"] ??
-                               throw new ConfigException("AccessTokenExpiration not found in appsettings.json");
-
-        int tokenExpirationInMinutes = int.Parse(tokenExipiration);
+        var tokenExpirationInMinutes = jwtSettings.Value.AccessTokenExpirationInMinutes;
 
         var signingCredentials = GetSigningCredentials();
         var claims = GenerateClaims(user);
@@ -225,10 +211,7 @@ public class TokenService : ITokenService
 
     private RefreshTokenDTO GenerateRefreshToken()
     {
-        var tokenExpiration = _jwtSettngs["RefreshTokenExpirationInMinutes"] ??
-                              throw new ConfigException("RefreshTokenExpiration not found in appsettings.json");
-
-        int tokenExpirationInMinutes = int.Parse(tokenExpiration);
+        var tokenExpirationInMinutes = jwtSettings.Value.RefreshTokenExpirationInMinutes;
 
         var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
@@ -245,8 +228,8 @@ public class TokenService : ITokenService
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var tokenKey = _jwtSettngs["Key"] ?? throw new ConfigException("Cannot access token key from appsettings.json");
-
+        var tokenKey = jwtSettings.Value.Key ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -269,7 +252,8 @@ public class TokenService : ITokenService
 
     private SigningCredentials GetSigningCredentials()
     {
-        var tokenKey = _jwtSettngs["Key"] ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        var tokenKey = jwtSettings.Value.Key ?? throw new ConfigException("Cannot access token key from appsettings.json");
+        
         if (tokenKey.Length < 64)
             throw new ConfigException("Token key needs to be at least 64 characters long");
 
@@ -293,9 +277,9 @@ public class TokenService : ITokenService
     private JwtSecurityToken CreateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims,
         int minutesToExpiry)
     {
-        var issuer = _jwtSettngs["Issuer"] ?? throw new ConfigException("Cannot access issuer from appsettings.json");
-        var audience = _jwtSettngs["Audience"] ??
-                       throw new ConfigException("Cannot access audience from appsettings.json");
+        var issuer = jwtSettings.Value.Issuer ?? throw new ConfigException("Cannot access issuer from appsettings.json");
+        var audience = jwtSettings.Value.Audience ?? throw new ConfigException("Cannot access audience from appsettings.json");
+        
         var tokenOptions = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,

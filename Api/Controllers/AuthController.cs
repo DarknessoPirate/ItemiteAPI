@@ -53,7 +53,7 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Ok(response);
     }
 
-    [HttpGet("emailconfirmation")]
+    [HttpGet("confirm-email")]
     public async Task<IActionResult> EmailConfirmation([FromQuery] string email, [FromQuery] string token)
     {
         var command = new EmailConfirmationCommand
