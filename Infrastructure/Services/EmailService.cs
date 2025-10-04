@@ -43,4 +43,34 @@ public class EmailService(
             throw new EmailException("Error while sending confirmation email", sendResponse.ErrorMessages.ToList());
         }
     }
+
+    public async Task SendPasswordResetTokenAsync(User user, string passwordResetToken)
+    {
+        var queryParam = new Dictionary<string, string>
+        {
+            { "token", passwordResetToken },
+            { "email", user.Email! }
+        };
+
+        var passwordResetUri = authSettings.Value.PasswordResetUri;
+        
+        var passwordResetLink = QueryHelpers.AddQueryString(passwordResetUri, queryParam!);
+        
+        var template = "Helpers/EmailTemplates/PasswordReset.cshtml";
+        
+        var sendResponse = await fluentEmail
+            .To(user.Email!)
+            .Subject("Itemite password reset")
+            .UsingTemplateFromFile(template, new EmailConfirmationModel
+            {
+                UserName = user.UserName!,
+                ConfirmationLink = passwordResetLink
+            })
+            .SendAsync();
+
+        if (!sendResponse.Successful)
+        {
+            throw new EmailException("Error while sending reset password email", sendResponse.ErrorMessages.ToList());
+        }
+    }
 }

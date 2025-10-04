@@ -120,7 +120,7 @@ public class TokenService(
             throw new NotFoundException("Token not found");
 
         if (!refreshToken.IsActive)
-            throw new BadRequestException("Token is not active");
+            throw new BadRequestException("Token is not active", []);
 
         refreshToken.IsRevoked = true;
         refreshToken.RevokedAt = DateTime.UtcNow;

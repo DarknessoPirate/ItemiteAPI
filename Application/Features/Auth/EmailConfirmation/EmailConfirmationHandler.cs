@@ -20,7 +20,7 @@ public class EmailConfirmationHandler(
         
         if (user.EmailConfirmed)
         {
-            throw new BadRequestException("Email already confirmed");
+            throw new BadRequestException("Email already confirmed", []);
         }
         
         var decodedToken = WebUtility.UrlDecode(request.EmailConfirmationRequest.Token);
