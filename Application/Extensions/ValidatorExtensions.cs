@@ -2,6 +2,7 @@ using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
+using Application.Features.Auth.ResetPassword;
 using Application.Features.Categories.CreateCategory;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,5 +18,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<LoginCommand>, LoginValidator>();
         services.AddScoped<IValidator<RefreshTokenCommand>, RefreshTokenValidator>();
         services.AddScoped<IValidator<EmailConfirmationCommand>, EmailConfirmationValidator>();
+        services.AddScoped<IValidator<ResetPasswordCommand>, ResetPasswordValidator>();
     }
 }
