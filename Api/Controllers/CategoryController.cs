@@ -1,9 +1,11 @@
 using Application.Features.Categories.CreateCategory;
+using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetAllCategories;
 using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
 using Domain.DTOs.Category;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -53,5 +55,19 @@ public class CategoriesController(ISender mediator) : ControllerBase
         var result = await mediator.Send(command);
         
         return Ok(result);
+    }
+
+    [HttpDelete("{categoryId:int}")]
+    public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)
+    {
+        var command = new DeleteCategoryCommand
+        {
+            CategoryId = categoryId,
+            DeleteFullTree = deleteFullTree
+        };
+        
+        await mediator.Send(command);
+
+        return NoContent();
     }
 }

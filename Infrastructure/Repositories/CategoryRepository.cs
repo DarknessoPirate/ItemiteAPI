@@ -18,9 +18,9 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         throw new NotImplementedException();
     }
 
-    public Task DeleteCategory(Category category)
+    public void DeleteCategory(Category category)
     {
-        throw new NotImplementedException();
+        dbContext.Categories.Remove(category);
     }
 
     public async Task<List<Category>> GetAllCategories()
@@ -85,5 +85,12 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         var exists = await dbContext.Categories.AnyAsync(x => x.Name == name);
         
         return exists;
+    }
+
+    public async Task<bool> IsParentCategory(int categoryId)
+    {
+        var isParent = await dbContext.Categories.AnyAsync(x => x.ParentCategoryId == categoryId);
+        
+        return isParent;
     }
 }

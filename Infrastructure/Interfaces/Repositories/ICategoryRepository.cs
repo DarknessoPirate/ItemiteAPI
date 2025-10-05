@@ -6,7 +6,7 @@ public interface ICategoryRepository
 {
     Task CreateCategory(Category category);
     Task UpdateCategory(Category category);
-    Task DeleteCategory(Category category);
+    void DeleteCategory(Category category);
     Task<List<Category>> GetAllCategories();
     Task<List<Category>> GetMainCategories();
     Task<List<Category>> GetSubCategories(int parentCategoryId);
@@ -14,4 +14,5 @@ public interface ICategoryRepository
     Task<Category> GetByIdAsync(int parentId);
     Task<bool> CategoryExistsById(int categoryId);
     Task<bool> CategoryExistsByName(string name);
+    Task<bool> IsParentCategory(int categoryId);
 }

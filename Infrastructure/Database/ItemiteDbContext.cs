@@ -17,7 +17,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options) : Iden
             .HasOne(c => c.ParentCategory)
             .WithMany(c => c.SubCategories)
             .HasForeignKey(c => c.ParentCategoryId)
-            .OnDelete(DeleteBehavior.Restrict); // don't allow the deletion of parent categories
+            .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<ListingBase>()
             .HasDiscriminator<string>("ListingType")

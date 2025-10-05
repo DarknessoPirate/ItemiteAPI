@@ -439,7 +439,7 @@ namespace Infrastructure.Database.Migrations
                     b.HasOne("Domain.Entities.Category", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ParentCategory");
                 });
