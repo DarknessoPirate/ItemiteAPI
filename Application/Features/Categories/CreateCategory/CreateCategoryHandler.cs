@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentValidation;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -18,6 +19,23 @@ public class CreateCategoryHandler(
     public async Task<int> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
         var category = mapper.Map<Category>(command.CreateCategoryDto);
+        var dto = command.CreateCategoryDto;
+        
+        var categoryExists = await categoryRepository.CategoryExistsByName(dto.Name);
+        if (categoryExists)
+            throw new BadRequestException("Category with that name already exists");
+        
+        if (dto.ParentCategoryId != null)
+        {
+            var parentCategory = await categoryRepository.GetByIdAsync(dto.ParentCategoryId!.Value);
+            if(parentCategory == null)
+                throw new NotFoundException("Parent category not found");
+            
+            // if parent has a root reference set the new category root to the same id, if not the parent is the root
+            category.RootCategoryId = parentCategory.RootCategoryId ?? parentCategory.Id; 
+        }
+
+
         await categoryRepository.CreateCategory(category);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
