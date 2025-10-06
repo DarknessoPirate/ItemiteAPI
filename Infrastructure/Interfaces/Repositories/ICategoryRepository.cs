@@ -5,7 +5,7 @@ namespace Infrastructure.Interfaces.Repositories;
 public interface ICategoryRepository
 {
     Task CreateCategory(Category category);
-    Task UpdateCategory(Category category);
+    void UpdateCategory(Category category);
     void DeleteCategory(Category category);
     Task<List<Category>> GetAllCategories();
     Task<List<Category>> GetMainCategories();
@@ -15,5 +15,6 @@ public interface ICategoryRepository
     Task<Category> GetByIdAsync(int parentId);
     Task<bool> CategoryExistsById(int categoryId);
     Task<bool> CategoryExistsByName(string name);
+    Task<bool> CategoryExistsByNameExcludingId(string name, int excludeId);
     Task<bool> IsParentCategory(int categoryId);
 }

@@ -4,6 +4,7 @@ using Application.Features.Categories.GetAllCategories;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
+using Application.Features.Categories.UpdateCategory;
 using Domain.DTOs.Category;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -72,6 +73,21 @@ public class CategoriesController(ISender mediator) : ControllerBase
         
         return Ok(result);
     }
+
+    [HttpPut("{categoryId:int}")]
+    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromBody] UpdateCategoryRequest updateCategoryRequest)
+    {
+        var command = new UpdateCategoryCommand
+        {
+            CategoryId = categoryId,
+            dto = updateCategoryRequest
+        };
+
+        var result = await mediator.Send(command);
+        
+        return Ok(result);
+    }
+    
     
     [HttpDelete("{categoryId:int}")]
     public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)

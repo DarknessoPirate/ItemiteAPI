@@ -13,9 +13,9 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         await dbContext.Categories.AddAsync(category);
     }
 
-    public Task UpdateCategory(Category category)
+    public void UpdateCategory(Category category)
     {
-        throw new NotImplementedException();
+        dbContext.Categories.Update(category);
     }
 
     public void DeleteCategory(Category category)
@@ -26,44 +26,44 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
     public async Task<List<Category>> GetAllCategories()
     {
         var categories = await dbContext.Categories.ToListAsync();
-        
+
         return categories;
     }
 
     public async Task<List<Category>> GetMainCategories()
     {
-        var mainCategories = 
+        var mainCategories =
             await dbContext.Categories
-            .Where(c => c.ParentCategoryId == null)
-            .ToListAsync();
-        
+                .Where(c => c.ParentCategoryId == null)
+                .ToListAsync();
+
         return mainCategories;
     }
 
     public async Task<List<Category>> GetSubCategories(int parentCategoryId)
     {
-        if (!await CategoryExistsById(parentCategoryId)) 
+        if (!await CategoryExistsById(parentCategoryId))
             throw new NotFoundException($"Parent category with id: {parentCategoryId} not found");
-        
+
         var subCategories =
             await dbContext.Categories
                 .Where(c => c.ParentCategoryId == parentCategoryId)
                 .ToListAsync();
-        
+
         return subCategories;
     }
 
     public async Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId)
     {
         var categories = await dbContext.Categories.Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
-        
+
         return categories;
     }
 
     public async Task<Category> GetByNameAsync(string name)
     {
         var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == name);
-        
+
         if (category == null)
             throw new NotFoundException($"Category '{name}' not found");
 
@@ -76,28 +76,36 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
         if (category == null)
             throw new NotFoundException($"Category with id: {categoryId} not found");
-        
+
         return category;
     }
 
     public async Task<bool> CategoryExistsById(int categoryId)
     {
         var exists = await dbContext.Categories.AnyAsync(x => x.Id == categoryId);
-        
+
         return exists;
     }
 
     public async Task<bool> CategoryExistsByName(string name)
     {
         var exists = await dbContext.Categories.AnyAsync(x => x.Name == name);
-        
+
+        return exists;
+    }
+
+    public async Task<bool> CategoryExistsByNameExcludingId(string name, int excludeId)
+    {
+        var exists = await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.Id != excludeId);
+
         return exists;
     }
 
     public async Task<bool> IsParentCategory(int categoryId)
     {
         var isParent = await dbContext.Categories.AnyAsync(x => x.ParentCategoryId == categoryId);
-        
+
         return isParent;
     }
 }
