@@ -4,6 +4,7 @@ using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -13,7 +14,8 @@ public class LoginHandler(
     ITokenService tokenService,
     UserManager<User> userManager,
     IOptions<AuthSettings> authSettings,
-    IEmailService emailService
+    IEmailService emailService,
+    IHttpContextAccessor contextAccessor
     ) : IRequestHandler<LoginCommand, AuthResponse>
 {
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -64,6 +66,10 @@ public class LoginHandler(
             request.UserAgent
         );
         
-        return new AuthResponse(user, tokens);
+        var authResponse = new AuthResponse(user, tokens);
+        
+        tokenService.SetTokensInsideCookie(authResponse, contextAccessor.HttpContext!);
+
+        return authResponse;
     }
 }

@@ -5,13 +5,15 @@ using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Auth.LoginGoogleCallback;
 
 public class LoginGoogleCallbackHandler(
         UserManager<User> userManager,
-        ITokenService tokenService
+        ITokenService tokenService,
+        IHttpContextAccessor contextAccessor
         ) : IRequestHandler<LoginGoogleCallbackCommand, AuthResponse>
 {
     public async Task<AuthResponse> Handle(LoginGoogleCallbackCommand request, CancellationToken cancellationToken)
@@ -54,6 +56,10 @@ public class LoginGoogleCallbackHandler(
             request.UserAgent
         );
         
-        return new AuthResponse(user, tokens);
+        var authResponse = new AuthResponse(user, tokens);
+        
+        tokenService.SetTokensInsideCookie(authResponse, contextAccessor.HttpContext!);
+
+        return authResponse;
     }
 }

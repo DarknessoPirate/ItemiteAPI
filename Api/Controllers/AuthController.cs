@@ -70,35 +70,16 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
             UserAgent = requestContextService.GetUserAgent()
         };
         
-        var response = await mediator.Send(command);
-        
-        Response.Cookies.Append("accessToken", response.Tokens.AccessToken.Token, new CookieOptions 
-        {
-            Path = "/",
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Lax,
-            Expires = response.Tokens.AccessToken.TokenExpirationDate
-        });
-
-        Response.Cookies.Append("refreshToken", response.Tokens.RefreshToken.Token, new CookieOptions 
-        { 
-            Path = "/",
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Lax,
-            Expires = response.Tokens.RefreshToken.TokenExpirationDate
-        });
+        await mediator.Send(command);
         
         return Redirect(command.ReturnUrl);
     }
     
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] TokenPairRequest request)
+    public async Task<ActionResult<AuthResponse>> RefreshToken()
     {
         var command = new RefreshTokenCommand
         {
-            TokenPair = request,
             IpAddress = requestContextService.GetIpAddress(),
             DeviceId = requestContextService.GetDeviceId(),
             UserAgent = requestContextService.GetUserAgent()
