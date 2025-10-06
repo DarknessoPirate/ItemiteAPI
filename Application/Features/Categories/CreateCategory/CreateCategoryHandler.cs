@@ -41,17 +41,14 @@ public class CreateCategoryHandler(
 
         
         // remove cache after adding new entity for getting fresh data 
-        if (command.CreateCategoryDto.ParentCategoryId.HasValue)
-        {
-            
-            await cache.RemoveAsync($"sub_categories_{command.CreateCategoryDto.ParentCategoryId.Value}");
-            await cache.RemoveAsync("all_categories");
-        }
+        if (category.ParentCategoryId != null)
+            await cache.RemoveAsync($"sub_categories_{category.ParentCategoryId.Value}");
+        else if (category.RootCategoryId != null)
+            await cache.RemoveAsync($"category_tree_{category.RootCategoryId.Value}");
         else
-        {
             await cache.RemoveAsync("main_categories");
-            await cache.RemoveAsync("all_categories");
-        }
+        
+        await cache.RemoveAsync("all_categories");
 
         return category.Id;
     }            
