@@ -53,6 +53,13 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         return subCategories;
     }
 
+    public async Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId)
+    {
+        var categories = await dbContext.Categories.Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
+        
+        return categories;
+    }
+
     public async Task<Category> GetByNameAsync(string name)
     {
         var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == name);

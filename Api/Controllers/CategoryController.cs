@@ -1,6 +1,7 @@
 using Application.Features.Categories.CreateCategory;
 using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetAllCategories;
+using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
 using Domain.DTOs.Category;
@@ -27,6 +28,7 @@ public class CategoriesController(ISender mediator) : ControllerBase
         return Created($"api/category/{categoryId}", new { categoryId });
     }
 
+    // TODO : PROBABL REMOVE OR PRIVATE LATER WHEN NOT NEEDED
     [HttpGet("all")]
     public async Task<ActionResult<List<CategoryResponse>>> GetAllCategories()
     {
@@ -45,6 +47,7 @@ public class CategoriesController(ISender mediator) : ControllerBase
         return Ok(result);
     }
 
+    // TODO: PROBABLY REMOVE OR PRIVATE LATER 
     [HttpGet("sub/{parentId:int}")]
     public async Task<ActionResult<List<CategoryResponse>>> GetSubCategories(int parentId)
     {
@@ -57,6 +60,19 @@ public class CategoriesController(ISender mediator) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("tree/{rootCategoryId:int}")]
+    public async Task<ActionResult<List<CategoryTreeResponse>>> GetCategoryTree(int rootCategoryId)
+    {
+        var command = new GetCategoryTreeCommand
+        {
+            RootCategoryId = rootCategoryId
+        };
+
+        var result = await mediator.Send(command);
+        
+        return Ok(result);
+    }
+    
     [HttpDelete("{categoryId:int}")]
     public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)
     {
