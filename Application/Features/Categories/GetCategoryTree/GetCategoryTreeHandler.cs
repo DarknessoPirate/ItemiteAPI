@@ -2,17 +2,23 @@ using AutoMapper;
 using Domain.DTOs.Category;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 
 namespace Application.Features.Categories.GetCategoryTree;
 
 public class GetCategoryTreeHandler(
     ICategoryRepository categoryRepository,
+    ICacheService cacheService,
     IMapper mapper
 ) : IRequestHandler<GetCategoryTreeCommand, CategoryTreeResponse>
 {
     public async Task<CategoryTreeResponse> Handle(GetCategoryTreeCommand request, CancellationToken cancellationToken)
     {
+        var cachedTree = await cacheService.GetAsync<CategoryTreeResponse>($"category_tree_{request.RootCategoryId}");
+        if (cachedTree != null)
+            return cachedTree;
+        
         var rootCategory = await categoryRepository.GetByIdAsync(request.RootCategoryId);
 
         if (rootCategory == null)
@@ -45,6 +51,8 @@ public class GetCategoryTreeHandler(
                 parent.SubCategories.Add(categoryDictionary[subCategory.Id]);
             }
         }
+        
+        await cacheService.SetAsync($"category_tree_{request.RootCategoryId}", treeRoot);
 
         return treeRoot;
     }

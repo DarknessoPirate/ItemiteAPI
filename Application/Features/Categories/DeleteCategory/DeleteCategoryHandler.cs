@@ -9,7 +9,7 @@ namespace Application.Features.Categories.DeleteCategory;
 
 public class DeleteCategoryHandler(
     ICategoryRepository categoryRepository,
-    ICacheService cacheService,
+    ICacheService cache,
     IUnitOfWork unitOfWork,
     ILogger<DeleteCategoryHandler> logger
 ) : IRequestHandler<DeleteCategoryCommand>
@@ -34,6 +34,15 @@ public class DeleteCategoryHandler(
             logger.LogError(e, "Failed to delete category with id: {CategoryId}", request.CategoryId);
             throw;
         }
+        finally
+        {
+            await cache.RemoveAsync("all_categories");
+            if (categoryToDelete.RootCategoryId.HasValue)
+                await cache.RemoveAsync($"category_tree_{categoryToDelete.RootCategoryId.Value}");
+            if (categoryToDelete.ParentCategoryId == null)
+                await cache.RemoveAsync("main_categories");
+        }
+        
     }
     
 }
