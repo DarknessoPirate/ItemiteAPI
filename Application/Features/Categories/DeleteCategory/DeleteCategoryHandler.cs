@@ -38,10 +38,12 @@ public class DeleteCategoryHandler(
         finally
         {
             await cache.RemoveAsync(CacheKeys.ALL_CATEGORIES);
-            await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{categoryToDelete.Id}");
-            
-            if (categoryToDelete.RootCategoryId.HasValue)
+            if (categoryToDelete.ParentCategoryId.HasValue && categoryToDelete.RootCategoryId.HasValue)
+            {
+                await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{categoryToDelete.ParentCategoryId.Value}");
+                await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{request.CategoryId}");
                 await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{categoryToDelete.RootCategoryId.Value}");
+            }
             if (categoryToDelete.ParentCategoryId == null)
                 await cache.RemoveAsync(CacheKeys.MAIN_CATEGORIES);
         }

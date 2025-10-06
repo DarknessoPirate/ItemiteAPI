@@ -39,13 +39,13 @@ public class CreateCategoryHandler(
 
         await categoryRepository.CreateCategory(category);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
         
         // remove cache after adding new entity for getting fresh data 
-        if (category.ParentCategoryId != null)
+        if (category.ParentCategoryId != null && category.RootCategoryId != null)
+        {
             await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{category.ParentCategoryId.Value}");
-        else if (category.RootCategoryId != null)
             await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{category.RootCategoryId.Value}");
+        }
         else
             await cache.RemoveAsync(CacheKeys.MAIN_CATEGORIES);
         
