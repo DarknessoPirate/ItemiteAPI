@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Configs;
 using Domain.DTOs.Category;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -14,14 +15,14 @@ public class GetMainCategoriesHandler(
 {
     public async Task<List<CategoryResponse>> Handle(GetMainCategoriesCommand request, CancellationToken cancellationToken)
     {
-       var cachedMainCategories = await cache.GetAsync<List<CategoryResponse>>("main_categories");
+       var cachedMainCategories = await cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
        if (cachedMainCategories != null)
        {
            return cachedMainCategories;
        }
        var mainCategories = await categoryRepository.GetMainCategories();
        var mappedMainCategories = mapper.Map<List<CategoryResponse>>(mainCategories);
-       await cache.SetAsync("main_categories", mappedMainCategories);
+       await cache.SetAsync(CacheKeys.MAIN_CATEGORIES, mappedMainCategories);
        return mappedMainCategories;
     }
 }

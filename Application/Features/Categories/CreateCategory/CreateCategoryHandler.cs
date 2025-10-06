@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Configs;
 using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentValidation;
@@ -42,13 +43,13 @@ public class CreateCategoryHandler(
         
         // remove cache after adding new entity for getting fresh data 
         if (category.ParentCategoryId != null)
-            await cache.RemoveAsync($"sub_categories_{category.ParentCategoryId.Value}");
+            await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{category.ParentCategoryId.Value}");
         else if (category.RootCategoryId != null)
-            await cache.RemoveAsync($"category_tree_{category.RootCategoryId.Value}");
+            await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{category.RootCategoryId.Value}");
         else
-            await cache.RemoveAsync("main_categories");
+            await cache.RemoveAsync(CacheKeys.MAIN_CATEGORIES);
         
-        await cache.RemoveAsync("all_categories");
+        await cache.RemoveAsync(CacheKeys.ALL_CATEGORIES);
 
         return category.Id;
     }            

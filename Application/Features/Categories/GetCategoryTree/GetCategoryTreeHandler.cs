@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Configs;
 using Domain.DTOs.Category;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -9,13 +10,13 @@ namespace Application.Features.Categories.GetCategoryTree;
 
 public class GetCategoryTreeHandler(
     ICategoryRepository categoryRepository,
-    ICacheService cacheService,
+    ICacheService cache,
     IMapper mapper
 ) : IRequestHandler<GetCategoryTreeCommand, CategoryTreeResponse>
 {
     public async Task<CategoryTreeResponse> Handle(GetCategoryTreeCommand request, CancellationToken cancellationToken)
     {
-        var cachedTree = await cacheService.GetAsync<CategoryTreeResponse>($"category_tree_{request.RootCategoryId}");
+        var cachedTree = await cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{request.RootCategoryId}");
         if (cachedTree != null)
             return cachedTree;
         
@@ -52,7 +53,7 @@ public class GetCategoryTreeHandler(
             }
         }
         
-        await cacheService.SetAsync($"category_tree_{request.RootCategoryId}", treeRoot);
+        await cache.SetAsync($"{CacheKeys.CATEGORY_TREE}{request.RootCategoryId}", treeRoot);
 
         return treeRoot;
     }

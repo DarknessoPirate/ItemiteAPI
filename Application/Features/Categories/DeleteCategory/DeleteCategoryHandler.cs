@@ -1,3 +1,4 @@
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -36,13 +37,13 @@ public class DeleteCategoryHandler(
         }
         finally
         {
-            await cache.RemoveAsync("all_categories");
+            await cache.RemoveAsync(CacheKeys.ALL_CATEGORIES);
+            await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{categoryToDelete.Id}");
+            
             if (categoryToDelete.RootCategoryId.HasValue)
-                await cache.RemoveAsync($"category_tree_{categoryToDelete.RootCategoryId.Value}");
+                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{categoryToDelete.RootCategoryId.Value}");
             if (categoryToDelete.ParentCategoryId == null)
-                await cache.RemoveAsync("main_categories");
+                await cache.RemoveAsync(CacheKeys.MAIN_CATEGORIES);
         }
-        
     }
-    
 }
