@@ -112,10 +112,28 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         return await dbContext.Categories.AnyAsync(c => c.Name == name && c.RootCategoryId == rootCategoryId);
     }
 
+    public async Task<bool> CategoryExistsByNameInTreeExcludingId(string name, int rootCategoryId, int excludeId)
+    {
+        // check if the root category itself has this name (excluding current category)
+        var rootCategory = await dbContext.Categories.FirstOrDefaultAsync(x => x.Id == rootCategoryId);
+        if (rootCategory != null && rootCategory.Name == name && rootCategory.Id != excludeId)
+            return true;
+
+        // check if name exists in any subcategories of this tree (excluding current category)
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.RootCategoryId == rootCategoryId && x.Id != excludeId);
+    }
+
     public async Task<bool> RootCategoryExistsByName(string name)
     {
         return await dbContext.Categories
             .AnyAsync(x => x.Name == name && x.ParentCategoryId == null);
+    }
+
+    public async Task<bool> RootCategoryExistsByNameExcludingId(string name, int excludeId)
+    {
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.ParentCategoryId == null && x.Id != excludeId);
     }
 
     public async Task<bool> IsParentCategory(int categoryId)
