@@ -2,5 +2,5 @@ namespace Infrastructure.Configuration.Seeding;
 
 public class InitialUsersData
 {
-    public List<InitialUserSettings> Users { get; set; } = new();
+    public List<InitialUser> Users { get; set; } = new();
 }

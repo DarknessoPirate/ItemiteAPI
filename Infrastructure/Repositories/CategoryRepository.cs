@@ -102,6 +102,22 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         return exists;
     }
 
+    public async Task<bool> CategoryExistsByNameInTree(string name, int rootCategoryId)
+    {
+        var rootCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.Id == rootCategoryId);
+
+        if (rootCategory != null && rootCategory.Name == name)
+            return true;
+
+        return await dbContext.Categories.AnyAsync(c => c.Name == name && c.RootCategoryId == rootCategoryId);
+    }
+
+    public async Task<bool> RootCategoryExistsByName(string name)
+    {
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.ParentCategoryId == null);
+    }
+
     public async Task<bool> IsParentCategory(int categoryId)
     {
         var isParent = await dbContext.Categories.AnyAsync(x => x.ParentCategoryId == categoryId);

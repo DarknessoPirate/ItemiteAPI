@@ -16,5 +16,7 @@ public interface ICategoryRepository
     Task<bool> CategoryExistsById(int categoryId);
     Task<bool> CategoryExistsByName(string name);
     Task<bool> CategoryExistsByNameExcludingId(string name, int excludeId);
+    Task<bool> CategoryExistsByNameInTree(string name, int rootCategoryId);
+    Task<bool> RootCategoryExistsByName(string name);
     Task<bool> IsParentCategory(int categoryId);
 }

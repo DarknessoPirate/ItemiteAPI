@@ -25,6 +25,7 @@ public class UpdateCategoryHandler(
         if (categoryToUpdate == null)
             throw new NotFoundException($"Category with id {request.CategoryId} not found");
 
+        // TODO: CHECK FOR NAME UNIQUENESS IN MAIN CATEGORIES AND IN TREE ALSO
         var nameExists = await categoryRepository.CategoryExistsByNameExcludingId(request.dto.Name, request.CategoryId);
         if (nameExists)
             throw new BadRequestException($"Category with name {request.dto.Name} already exists");

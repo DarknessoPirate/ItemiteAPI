@@ -1,6 +1,6 @@
 namespace Infrastructure.Configuration.Seeding;
 
-public class InitialUserSettings
+public class InitialUser
 {
     public string Email { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
