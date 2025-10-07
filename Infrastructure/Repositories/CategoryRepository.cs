@@ -60,6 +60,27 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         return categories;
     }
 
+    public async Task<List<Category>> GetDescendantsByCategoryId(int parentCategoryId)
+    {
+        var descendants = new List<Category>();
+
+        // Get direct children
+        var directChildren = await dbContext.Categories
+            .Where(c => c.ParentCategoryId == parentCategoryId)
+            .ToListAsync();
+
+        descendants.AddRange(directChildren);
+
+        // Recursively get descendants of each child
+        foreach (var child in directChildren)
+        {
+            var childDescendants = await GetDescendantsByCategoryId(child.Id);
+            descendants.AddRange(childDescendants);
+        }
+
+        return descendants;
+    }
+
     public async Task<Category> GetByNameAsync(string name)
     {
         var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == name);

@@ -11,6 +11,7 @@ public interface ICategoryRepository
     Task<List<Category>> GetMainCategories();
     Task<List<Category>> GetSubCategories(int parentCategoryId);
     Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId);
+    Task<List<Category>> GetDescendantsByCategoryId(int parentCategoryId);
     Task<Category> GetByNameAsync(string name);
     Task<Category> GetByIdAsync(int parentId);
     Task<bool> CategoryExistsById(int categoryId);
