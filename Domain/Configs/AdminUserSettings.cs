@@ -1,4 +1,4 @@
-namespace Infrastructure.Configuration.Seeding;
+namespace Domain.Configs;
 
 public class AdminUserSettings
 {

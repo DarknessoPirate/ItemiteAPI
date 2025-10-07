@@ -1,8 +1,10 @@
-namespace Infrastructure.Configuration.Seeding;
+namespace Domain.Configs;
 
 public class SeedSettings
 {
     public bool SeedingEnabled { get; set; } = false;
+    public bool ClearCategories { get; set; } = false;
+    public bool CreateInitialCategories { get; set; } = false;
     public bool CreateInitialRoles { get; set; } = false;
     public bool ClearRoles { get; set; } = false;
     public bool CreateInitialUsers { get; set; } = false;
