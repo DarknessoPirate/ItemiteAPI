@@ -1,5 +1,7 @@
 using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
+using Application.Features.Auth.LoginGoogle;
+using Application.Features.Auth.LoginGoogleCallback;
 using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
@@ -7,6 +9,8 @@ using Domain.Auth;
 using Domain.DTOs.Auth;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using ForgotPasswordRequest = Microsoft.AspNetCore.Identity.Data.ForgotPasswordRequest;
 
@@ -40,12 +44,42 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Ok(response);
     }
 
+    [HttpGet("login/google")]
+    public async Task<IActionResult> LoginGoogle([FromQuery] string returnUrl)
+    {
+        var command = new LoginGoogleCommand {ReturnUrl = returnUrl};
+        var authProperties = await mediator.Send(command);
+        return Challenge(authProperties, "Google");
+    }
+    
+    [HttpGet("login/google/callback", Name = "LoginGoogleCallback")]
+    public async Task<IActionResult> LoginGoogleCallback([FromQuery] string returnUrl)
+    {
+        var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+        if (!result.Succeeded)
+        {
+            return Unauthorized();
+        }
+        
+        var command = new LoginGoogleCallbackCommand
+        {
+            ReturnUrl = returnUrl,
+            ClaimsPrincipal = result.Principal,
+            IpAddress = requestContextService.GetIpAddress(),
+            DeviceId = requestContextService.GetDeviceId(),
+            UserAgent = requestContextService.GetUserAgent()
+        };
+        
+        await mediator.Send(command);
+        
+        return Redirect(command.ReturnUrl);
+    }
+    
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] TokenPairRequest request)
+    public async Task<ActionResult<AuthResponse>> RefreshToken()
     {
         var command = new RefreshTokenCommand
         {
-            TokenPair = request,
             IpAddress = requestContextService.GetIpAddress(),
             DeviceId = requestContextService.GetDeviceId(),
             UserAgent = requestContextService.GetUserAgent()

@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251006155038_authProviderInUserTable")]
+    partial class authProviderInUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,9 +61,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("RootCategoryId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -445,7 +445,7 @@ namespace Infrastructure.Database.Migrations
                     b.HasOne("Domain.Entities.Category", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
                 });

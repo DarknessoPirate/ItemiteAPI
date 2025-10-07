@@ -19,7 +19,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<CreateCategoryCommand>, CreateCategoryValidator>();
         services.AddScoped<IValidator<RegisterCommand>, RegisterValidator>();
         services.AddScoped<IValidator<LoginCommand>, LoginValidator>();
-        services.AddScoped<IValidator<RefreshTokenCommand>, RefreshTokenValidator>();
         services.AddScoped<IValidator<EmailConfirmationCommand>, EmailConfirmationValidator>();
         services.AddScoped<IValidator<ResetPasswordCommand>, ResetPasswordValidator>();
         services.AddScoped<IValidator<DeleteCategoryCommand>, DeleteCategoryValidator>();
