@@ -2,6 +2,7 @@ using Application.Exceptions;
 using AutoMapper;
 using Domain.Configs;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -31,6 +32,7 @@ public class RegisterHandler(
         var emailToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var tokenExpirationInMinutes = authSettings.Value.EmailTokenLifespanInMinutes;
         user.EmailConfirmationTokenExpirationDate = DateTime.UtcNow.AddMinutes(tokenExpirationInMinutes);
+        user.AuthProvider = AuthProvider.Email;
 
         try
         {

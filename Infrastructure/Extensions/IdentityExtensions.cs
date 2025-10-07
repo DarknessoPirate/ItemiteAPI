@@ -1,6 +1,8 @@
 using System.Text;
 using Domain.Entities;
 using Infrastructure.Database;
+using Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +17,7 @@ public static class IdentityExtensions
     {
         var jwtSettngs = configuration.GetSection("Jwt");
         var authSettings = configuration.GetSection("AuthSettings");
+        var googleOAuthSettings = configuration.GetSection("GoogleOAuth");
         
         services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
@@ -47,6 +50,16 @@ public static class IdentityExtensions
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddCookie().AddGoogle(options =>
+            {
+                var clientId = googleOAuthSettings.GetValue<string>("ClientId") ?? throw new ConfigException("ClientId missing in appsettings.json");
+                var clientSecret = googleOAuthSettings.GetValue<string>("ClientSecret") ?? throw new ConfigException("ClientSecret missing in appsettings.json");
+                
+                options.ClientId = clientId;
+                options.ClientSecret = clientSecret;
+                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
                 {
@@ -59,6 +72,14 @@ public static class IdentityExtensions
                         ValidIssuer = jwtSettngs["Issuer"],
                         ValidAudience = jwtSettngs["Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettngs["Key"]))
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            context.Token = context.Request.Cookies["accessToken"];
+                            return Task.CompletedTask;
+                        }
                     };
                 }
             );

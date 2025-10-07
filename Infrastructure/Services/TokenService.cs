@@ -9,8 +9,8 @@ using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -166,6 +166,32 @@ public class TokenService(
         }
 
         await unitOfWork.SaveChangesAsync();
+    }
+
+    public void SetTokensInsideCookie(TokenPairResponse tokenPair, HttpContext httpContext)
+    {
+        var accessToken = tokenPair.AccessToken;
+        var refreshToken = tokenPair.RefreshToken;
+        
+        httpContext.Response.Cookies.Append("accessToken", accessToken.Token, new CookieOptions
+        {
+            Path = "/",
+            Expires = accessToken.TokenExpirationDate,
+            HttpOnly = true,
+            IsEssential = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+        });
+        
+        httpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
+        {
+            Path = "/",
+            Expires = refreshToken.TokenExpirationDate,
+            HttpOnly = true,
+            IsEssential = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+        });
     }
 
     private async Task<RefreshToken> CreateRefreshTokenAsync(User user, string jwtId, string createdByIp,
