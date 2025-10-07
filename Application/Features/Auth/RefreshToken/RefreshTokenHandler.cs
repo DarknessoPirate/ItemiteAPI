@@ -1,5 +1,6 @@
-using Domain.Auth;
+using AutoMapper;
 using Domain.DTOs.Auth;
+using Domain.DTOs.User;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -10,10 +11,11 @@ namespace Application.Features.Auth.RefreshToken;
 
 public class RefreshTokenHandler(
         ITokenService tokenService,
-        IHttpContextAccessor contextAccessor
-    ) : IRequestHandler<RefreshTokenCommand, AuthResponse>
+        IHttpContextAccessor contextAccessor,
+        IMapper mapper
+    ) : IRequestHandler<RefreshTokenCommand, UserBasicResponse>
 {
-    public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<UserBasicResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var httpContext = contextAccessor.HttpContext!;
         
@@ -34,10 +36,10 @@ public class RefreshTokenHandler(
             request.UserAgent
         );
         
-        var authResponse = new AuthResponse(user, tokens);
+        // var authResponse = new AuthResponse(user, tokens);
             
-        tokenService.SetTokensInsideCookie(authResponse, httpContext);
+        tokenService.SetTokensInsideCookie(tokens, httpContext);
 
-        return authResponse;
+        return mapper.Map<UserBasicResponse>(user);
     }
 }

@@ -168,10 +168,10 @@ public class TokenService(
         await unitOfWork.SaveChangesAsync();
     }
 
-    public void SetTokensInsideCookie(AuthResponse authResponse, HttpContext httpContext)
+    public void SetTokensInsideCookie(TokenPairResponse tokenPair, HttpContext httpContext)
     {
-        var accessToken = authResponse.Tokens.AccessToken;
-        var refreshToken = authResponse.Tokens.RefreshToken;
+        var accessToken = tokenPair.AccessToken;
+        var refreshToken = tokenPair.RefreshToken;
         
         httpContext.Response.Cookies.Append("accessToken", accessToken.Token, new CookieOptions
         {

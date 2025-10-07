@@ -14,5 +14,5 @@ public interface ITokenService
     Task RevokeTokenAsync(string token, string revokedByIp);
     Task RevokeAllUserTokensAsync(int userId, string revokedByIp);
     Task RevokeTokenChainAsync(string token, string revokedByIp);
-    void SetTokensInsideCookie(AuthResponse authResponse, HttpContext httpContext);
+    void SetTokensInsideCookie(TokenPairResponse tokenPair, HttpContext httpContext);
 }

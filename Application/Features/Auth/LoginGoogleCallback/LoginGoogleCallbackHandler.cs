@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Domain.Auth;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -14,9 +14,9 @@ public class LoginGoogleCallbackHandler(
         UserManager<User> userManager,
         ITokenService tokenService,
         IHttpContextAccessor contextAccessor
-        ) : IRequestHandler<LoginGoogleCallbackCommand, AuthResponse>
+        ) : IRequestHandler<LoginGoogleCallbackCommand>
 {
-    public async Task<AuthResponse> Handle(LoginGoogleCallbackCommand request, CancellationToken cancellationToken)
+    public async Task Handle(LoginGoogleCallbackCommand request, CancellationToken cancellationToken)
     {
         if (request.ClaimsPrincipal == null)
         {
@@ -56,10 +56,6 @@ public class LoginGoogleCallbackHandler(
             request.UserAgent
         );
         
-        var authResponse = new AuthResponse(user, tokens);
-        
-        tokenService.SetTokensInsideCookie(authResponse, contextAccessor.HttpContext!);
-
-        return authResponse;
+        tokenService.SetTokensInsideCookie(tokens, contextAccessor.HttpContext!);
     }
 }

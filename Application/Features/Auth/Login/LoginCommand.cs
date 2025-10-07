@@ -1,9 +1,10 @@
 using Domain.Auth;
+using Domain.DTOs.User;
 using MediatR;
 
 namespace Application.Features.Auth.Login;
 
-public class LoginCommand : IRequest<AuthResponse>
+public class LoginCommand : IRequest<UserBasicResponse>
 {
     public LoginRequest loginDto;
     public string IpAddress { get; set; }
