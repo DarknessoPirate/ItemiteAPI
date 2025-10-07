@@ -1,9 +1,12 @@
+using AutoMapper;
 using Domain.Auth;
 using Domain.Configs;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -13,10 +16,12 @@ public class LoginHandler(
     ITokenService tokenService,
     UserManager<User> userManager,
     IOptions<AuthSettings> authSettings,
-    IEmailService emailService
-    ) : IRequestHandler<LoginCommand, AuthResponse>
+    IEmailService emailService,
+    IHttpContextAccessor contextAccessor,
+    IMapper mapper
+    ) : IRequestHandler<LoginCommand, UserBasicResponse>
 {
-    public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<UserBasicResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByEmailAsync(request.loginDto.Email);
         if (user == null)
@@ -64,6 +69,10 @@ public class LoginHandler(
             request.UserAgent
         );
         
-        return new AuthResponse(user, tokens);
+        // var authResponse = new AuthResponse(user, tokens);
+        
+        tokenService.SetTokensInsideCookie(tokens, contextAccessor.HttpContext!);
+
+        return mapper.Map<UserBasicResponse>(user);
     }
 }

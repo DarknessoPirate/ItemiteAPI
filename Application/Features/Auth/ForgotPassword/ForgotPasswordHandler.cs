@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -17,6 +18,11 @@ public class ForgotPasswordHandler(
         if (user == null)
         {
             throw new NotFoundException("User not found");
+        }
+
+        if (user.AuthProvider == AuthProvider.Google)
+        {
+            throw new BadRequestException("This account uses google login", []);
         }
         
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
