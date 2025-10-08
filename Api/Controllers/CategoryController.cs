@@ -80,7 +80,7 @@ public class CategoriesController(ISender mediator) : ControllerBase
         var command = new UpdateCategoryCommand
         {
             CategoryId = categoryId,
-            dto = updateCategoryRequest
+            Dto = updateCategoryRequest
         };
 
         var result = await mediator.Send(command);

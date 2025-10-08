@@ -28,34 +28,34 @@ public class UpdateCategoryHandler(
         Category? parentCategory = null;
 
         // check if modifying to or was root category
-        if (request.dto.ParentCategoryId == null)
+        if (request.Dto.ParentCategoryId == null)
         {
             var rootExists =
-                await categoryRepository.RootCategoryExistsByNameExcludingId(request.dto.Name, request.CategoryId);
+                await categoryRepository.RootCategoryExistsByNameExcludingId(request.Dto.Name, request.CategoryId);
             if (rootExists)
-                throw new BadRequestException($"A root category with name '{request.dto.Name}' already exists");
+                throw new BadRequestException($"A root category with name '{request.Dto.Name}' already exists");
         }
         else
         {
             // check if parent exists
-            parentCategory = await categoryRepository.GetByIdAsync(request.dto.ParentCategoryId.Value);
+            parentCategory = await categoryRepository.GetByIdAsync(request.Dto.ParentCategoryId.Value);
             if (parentCategory == null)
-                throw new NotFoundException($"Parent category with id {request.dto.ParentCategoryId} not found");
+                throw new NotFoundException($"Parent category with id {request.Dto.ParentCategoryId} not found");
 
             // find the root of the tree
             var rootCategoryId = parentCategory.RootCategoryId ?? parentCategory.Id;
 
             // Check if name exists in this tree (excluding current category)
             var nameExistsInTree = await categoryRepository.CategoryExistsByNameInTreeExcludingId(
-                request.dto.Name, rootCategoryId, request.CategoryId);
+                request.Dto.Name, rootCategoryId, request.CategoryId);
             if (nameExistsInTree)
                 throw new BadRequestException(
-                    $"A category with name '{request.dto.Name}' already exists in this category tree");
+                    $"A category with name '{request.Dto.Name}' already exists in this category tree");
         }
 
 
         // Check for circular reference
-        var currentParentId = request.dto.ParentCategoryId;
+        var currentParentId = request.Dto.ParentCategoryId;
         while (currentParentId != null)
         {
             if (currentParentId == request.CategoryId)
@@ -69,14 +69,14 @@ public class UpdateCategoryHandler(
         var oldParentCategoryId = categoryToUpdate.ParentCategoryId;
         var oldRootCategoryId = categoryToUpdate.RootCategoryId;
         
-        categoryToUpdate.Name = request.dto.Name;
-        categoryToUpdate.Description = request.dto.Description;
-        categoryToUpdate.ImageUrl = request.dto.ImageUrl;
-        categoryToUpdate.ParentCategoryId = request.dto.ParentCategoryId;
+        categoryToUpdate.Name = request.Dto.Name;
+        categoryToUpdate.Description = request.Dto.Description;
+        categoryToUpdate.ImageUrl = request.Dto.ImageUrl;
+        categoryToUpdate.ParentCategoryId = request.Dto.ParentCategoryId;
         
 
         // set root category ID based on new parent
-        if (request.dto.ParentCategoryId != null && parentCategory != null) // Use stored parent
+        if (request.Dto.ParentCategoryId != null && parentCategory != null) // Use stored parent
         {
             categoryToUpdate.RootCategoryId = parentCategory.RootCategoryId ?? parentCategory.Id;
         }
@@ -88,7 +88,7 @@ public class UpdateCategoryHandler(
         
         List<Category> descendantsToUpdate;
         // Scenario 1: Subcategory → Root (was a child, now becomes root)
-        if (oldParentCategoryId != null && request.dto.ParentCategoryId == null)
+        if (oldParentCategoryId != null && request.Dto.ParentCategoryId == null)
         {
             // Get all descendants following parent hierarchy
             descendantsToUpdate = await categoryRepository.GetDescendantsByCategoryId(categoryToUpdate.Id);
@@ -131,10 +131,24 @@ public class UpdateCategoryHandler(
             await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{categoryToUpdate.Id}");
             if (categoryToUpdate.ParentCategoryId == null)
                 await cache.RemoveAsync($"{CacheKeys.MAIN_CATEGORIES}");
-            if (categoryToUpdate.RootCategoryId == null)
-                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{categoryToUpdate.Id}");
             else
-                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{categoryToUpdate.RootCategoryId.Value}");
+            {
+                // remove sub_categories cache from oldParentId and newParentId
+                await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{categoryToUpdate.ParentCategoryId}");
+                await cache.RemoveAsync($"{CacheKeys.SUB_CATEGORIES}{oldParentCategoryId}");
+            }
+
+            // if rootCategoryId is new, remove cache from old root and new root
+            if (oldRootCategoryId != categoryToUpdate.RootCategoryId)
+            {
+                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{categoryToUpdate.RootCategoryId}");
+                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{oldRootCategoryId}");
+            }
+            // if rootCategoryId stays the same remove cache from that tree
+            else
+            {
+                await cache.RemoveAsync($"{CacheKeys.CATEGORY_TREE}{oldRootCategoryId}");
+            }
 
             return mapper.Map<CategoryResponse>(categoryToUpdate);
         }
