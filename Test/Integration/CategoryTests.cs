@@ -1,11 +1,15 @@
 using Application.Exceptions;
 using Application.Features.Categories.CreateCategory;
+using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetAllCategories;
+using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
+using Domain.Configs;
 using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentAssertions;
+using Infrastructure.Exceptions;
 using Test.Configs;
 using Xunit;
 
@@ -19,7 +23,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
 
     [Theory]
     [InlineData("", "test", "test.jpg", null)]
-    [InlineData("test", "", "test.jpg", 10)]
+    [InlineData("test", "", "test.jpg", -1)]
     [InlineData("x", "test", "test.jpg", null)]
     public async Task CreateCategory_ShouldThrow_ValidatorException(string name, string description, string imageUrl, int? parentCategoryId)
     {
@@ -35,6 +39,47 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         };
         
         await Assert.ThrowsAsync<ValidatorException>(() => Sender.Send(command));
+    }
+    
+    [Theory]
+    [InlineData("test1", "test", "test.jpg", 10)]
+    [InlineData("test2", "test", "test.jpg", 20)]
+    [InlineData("test3", "test", "test.jpg", 30)]
+    public async Task CreateCategory_ShouldThrow_NotFoundException(string name, string description, string imageUrl, int? parentCategoryId)
+    {
+        var command = new CreateCategoryCommand()
+        {
+            CreateCategoryDto = new CreateCategoryRequest()
+            {
+                Name = name,
+                Description = description,
+                ImageUrl = imageUrl,
+                ParentCategoryId = parentCategoryId
+            }
+        };
+        
+        await Assert.ThrowsAsync<NotFoundException>(() => Sender.Send(command));
+    }
+    
+    [Theory]
+    [InlineData("test1", "test", "test.jpg", null)]
+    [InlineData("test2", "test", "test.jpg", null)]
+    [InlineData("test3", "test", "test.jpg",1)]
+    public async Task CreateCategory_ShouldThrow_BadRequestException(string name, string description, string imageUrl, int? parentCategoryId)
+    {
+        await AddTestCategories();
+        var command = new CreateCategoryCommand()
+        {
+            CreateCategoryDto = new CreateCategoryRequest()
+            {
+                Name = name,
+                Description = description,
+                ImageUrl = imageUrl,
+                ParentCategoryId = parentCategoryId
+            }
+        };
+        
+        await Assert.ThrowsAsync<BadRequestException>(() => Sender.Send(command));
     }
 
     [Theory]
@@ -58,6 +103,47 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         var categoty = DbContext.Categories.FirstOrDefault(c => c.Id == createdCategoryId);
         categoty.Should().NotBeNull();
     }
+    
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public async Task DeleteCategory_ShouldThrow_NotFoundException(int categoryId)
+    {
+        var command = new DeleteCategoryCommand()
+        {
+            CategoryId = categoryId
+        };
+        
+        await Assert.ThrowsAsync<NotFoundException>(() => Sender.Send(command));
+    }
+    
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(null)]
+    [InlineData(-100)]
+    public async Task DeleteCategory_ShouldThrow_ValidationException(int categoryId)
+    {
+        var command = new DeleteCategoryCommand()
+        {
+            CategoryId = categoryId
+        };
+        
+        await Assert.ThrowsAsync<ValidatorException>(() => Sender.Send(command));
+    }
+    
+    [Fact]
+    public async Task DeleteCategory_ShouldThrow_BadRequestException()
+    {
+        var savedCategoriesIds = await AddTestCategories();
+        var command = new DeleteCategoryCommand()
+        {
+            CategoryId = savedCategoriesIds[0]
+        };
+        
+        await Assert.ThrowsAsync<BadRequestException>(() => Sender.Send(command));
+    }
+
 
     [Fact]
     public async Task GetAllCategories_ShouldReturn_AllCategories()
@@ -112,7 +198,23 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
     }
     
     [Fact]
-    public async Task Category_ComplexCacheTest()
+    public async Task GetCategoryTree_ShouldReturn_CategoryTree()
+    {
+        var addedCateogoriesIds = await AddTestCategories();
+
+        var getCategoryTreeCommand = new GetCategoryTreeCommand()
+        {
+            RootCategoryId = addedCateogoriesIds[0]
+        };
+        var categoryTree = await Sender.Send(getCategoryTreeCommand);
+        
+        categoryTree.Should().NotBeNull();
+        categoryTree.Name.Should().Be("test1");
+        categoryTree.SubCategories.First().Name.Should().Be("test3");
+    }
+    
+    [Fact]
+    public async Task CreateCategory_ComplexCacheTest()
     {
         var addedCategoryIds = await AddTestCategories();
 
@@ -122,18 +224,26 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             ParentCategoryId = addedCategoryIds[0]
         };
+        var getCategoryTreeCommand = new GetCategoryTreeCommand()
+        {
+            RootCategoryId = addedCategoryIds[0]
+        };
         
         // add cache for all categories
         var allCategoriesFromDb = await Sender.Send(getAllCommand);
-        var allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("all_categories");
+        var allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
         
         // add cache for main categories
         var mainCategoriesFromDb = await Sender.Send(getMainCommand);
-        var mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("main_categories");
+        var mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
         
         // add cache for sub categories
         var subCategoriesFromDb = await Sender.Send(getSubCommand);
-        var subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"sub_categories_{getSubCommand.ParentCategoryId}");
+        var subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        
+        // add cache for category tree
+        var categoryTreeFromDb = await Sender.Send(getCategoryTreeCommand);
+        var categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
         
         allCategoriesFromCache.Should().NotBeNull();
         allCategoriesFromCache.Count.Should().Be(3);
@@ -146,6 +256,9 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         subCategoriesFromCache.Should().NotBeNull();
         subCategoriesFromCache.Count.Should().Be(1);
         subCategoriesFromDb.Should().BeEquivalentTo(subCategoriesFromCache);
+        
+        categoryTreeFromCache.Should().NotBeNull();
+        categoryTreeFromDb.Should().BeEquivalentTo(categoryTreeFromCache);
         
         var newMainCategoryCommand = new CreateCategoryCommand()
         {
@@ -160,20 +273,22 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         // should remove cache for keys "all_categories" and "main_categories"
         await Sender.Send(newMainCategoryCommand);
         
-        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("all_categories");
-        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("main_categories");
-        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"sub_categories_{getSubCommand.ParentCategoryId}");
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
+        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
         
         allCategoriesFromCache.Should().BeNull();
         mainCategoriesFromCache.Should().BeNull();
         subCategoriesFromCache.Should().NotBeNull();
+        categoryTreeFromCache.Should().NotBeNull();
         
         // add cache again
         await Sender.Send(getAllCommand);
         await Sender.Send(getMainCommand);
         
-        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("all_categories");
-        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("main_categories");
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
         
         allCategoriesFromCache.Should().NotBeNull();
         mainCategoriesFromCache.Should().NotBeNull();
@@ -189,16 +304,114 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             }
         };
         
-        // should remove cache for keys "all_categories" and "sub_categories_{parrentId}"
+        // should remove cache for keys "all_categories", "sub_categories_{parrentId} and "category_tree_{rootCategoryId}"
         await Sender.Send(newSubCategoryCommand);
         
-        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("all_categories");
-        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>("main_categories");
-        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"sub_categories_{getSubCommand.ParentCategoryId}");
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
+        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
         
         allCategoriesFromCache.Should().BeNull();
         mainCategoriesFromCache.Should().NotBeNull();
         subCategoriesFromCache.Should().BeNull();
+        categoryTreeFromCache.Should().BeNull();
+
+    }
+    
+    [Fact]
+    public async Task DeleteCategory_ComplexCacheTest()
+    {
+        var addedCategoryIds = await AddTestCategories();
+
+        var getAllCommand = new GetAllCategoriesCommand();
+        var getMainCommand = new GetMainCategoriesCommand();
+        var getSubCommand = new GetSubCategoriesCommand()
+        {
+            ParentCategoryId = addedCategoryIds[0]
+        };
+        var getCategoryTreeCommand = new GetCategoryTreeCommand()
+        {
+            RootCategoryId = addedCategoryIds[0]
+        };
+        
+        // add cache for all categories
+        var allCategoriesFromDb = await Sender.Send(getAllCommand);
+        var allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        
+        // add cache for main categories
+        var mainCategoriesFromDb = await Sender.Send(getMainCommand);
+        var mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
+        
+        // add cache for sub categories
+        var subCategoriesFromDb = await Sender.Send(getSubCommand);
+        var subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        
+        // add cache for category tree
+        var categoryTreeFromDb = await Sender.Send(getCategoryTreeCommand);
+        var categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
+        
+        allCategoriesFromCache.Should().NotBeNull();
+        allCategoriesFromCache.Count.Should().Be(3);
+        allCategoriesFromDb.Should().BeEquivalentTo(allCategoriesFromCache);
+        
+        mainCategoriesFromCache.Should().NotBeNull();
+        mainCategoriesFromCache.Count.Should().Be(2);
+        mainCategoriesFromDb.Should().BeEquivalentTo(mainCategoriesFromCache);
+        
+        subCategoriesFromCache.Should().NotBeNull();
+        subCategoriesFromCache.Count.Should().Be(1);
+        subCategoriesFromDb.Should().BeEquivalentTo(subCategoriesFromCache);
+        
+        categoryTreeFromCache.Should().NotBeNull();
+        categoryTreeFromDb.Should().BeEquivalentTo(categoryTreeFromCache);
+        
+        var deleteCategoryCommand = new DeleteCategoryCommand()
+        {
+            CategoryId = addedCategoryIds[2]
+        };
+        
+        // should remove cache for keys "all_categories" and "sub_categories and category_tree"
+        await Sender.Send(deleteCategoryCommand);
+        
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
+        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
+        
+        allCategoriesFromCache.Should().BeNull();
+        mainCategoriesFromCache.Should().NotBeNull();
+        subCategoriesFromCache.Should().BeNull();
+        categoryTreeFromCache.Should().BeNull();
+        
+        // add cache again
+        await Sender.Send(getAllCommand);
+        await Sender.Send(getSubCommand);
+        await Sender.Send(getCategoryTreeCommand);
+        
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        subCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>($"{CacheKeys.SUB_CATEGORIES}{getSubCommand.ParentCategoryId}");
+        categoryTreeFromCache = await Cache.GetAsync<CategoryTreeResponse>($"{CacheKeys.CATEGORY_TREE}{getCategoryTreeCommand.RootCategoryId}");
+        
+        allCategoriesFromCache.Should().NotBeNull();
+        subCategoriesFromCache.Should().NotBeNull();
+        categoryTreeFromCache.Should().NotBeNull();
+        
+        deleteCategoryCommand = new DeleteCategoryCommand()
+        {
+           CategoryId = addedCategoryIds[1]
+        };
+        
+        // should remove cache for keys "all_categories", and main_categories"
+        await Sender.Send(deleteCategoryCommand);
+        
+        allCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.ALL_CATEGORIES);
+        mainCategoriesFromCache = await Cache.GetAsync<List<CategoryResponse>>(CacheKeys.MAIN_CATEGORIES);
+        
+        allCategoriesFromCache.Should().BeNull();
+        mainCategoriesFromCache.Should().BeNull();
+        subCategoriesFromCache.Should().NotBeNull();
+        categoryTreeFromCache.Should().NotBeNull();
 
     }
     
