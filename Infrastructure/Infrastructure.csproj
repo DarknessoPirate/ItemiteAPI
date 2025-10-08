@@ -38,15 +38,4 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Configuration\Seeding\initial-categories-example.json" />
-      <Content Include="Configuration\Seeding\initial-categories-example.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Configuration\Seeding\initial-users-example.json" />
-      <Content Include="Configuration\Seeding\initial-users-example.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
 </Project>
