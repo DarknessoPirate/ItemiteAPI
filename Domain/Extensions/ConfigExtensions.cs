@@ -13,5 +13,6 @@ public static class ConfigExtensions
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
         services.Configure<GoogleOAuthSettings>(configuration.GetSection("GoogleOAuth"));
+        services.Configure<SeedSettings>(configuration.GetSection("SeedSettings"));
     }
 }

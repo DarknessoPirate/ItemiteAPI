@@ -1,7 +1,9 @@
+using Domain.Configs;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Configuration;
 using Infrastructure.Configuration.Seeding;
+using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,8 +14,10 @@ using Microsoft.Extensions.Options;
 namespace Infrastructure.Services;
 
 public class DatabaseSeeder(
+    ICategoryRepository categoryRepository,
     RoleManager<IdentityRole<int>> roleManager,
     UserManager<User> userManager,
+    IUnitOfWork unitOfWork,
     IOptions<SeedSettings> seedSettings,
     IWebHostEnvironment environment, // for checking if we are in dev (if in prod, clearing is not allowed)
     ILogger<DatabaseSeeder> logger
@@ -46,7 +50,21 @@ public class DatabaseSeeder(
             return;
         }
 
+
         // Clearing db options
+
+        if (settings.ClearCategories)
+        {
+            if (environment.IsDevelopment())
+            {
+                await ClearCategoriesAsync();
+            }
+            else
+            {
+                logger.LogWarning("Skipping ClearCategories - not allowed in Production environment");
+            }
+        }
+
         if (settings.ClearUsers)
         {
             if (environment.IsDevelopment())
@@ -77,6 +95,17 @@ public class DatabaseSeeder(
 
         logger.LogInformation("Starting database seeding...");
 
+        if (settings.CreateInitialCategories)
+        {
+            if (environment.IsProduction())
+            {
+                logger.LogWarning(
+                    "Creating initial categories in PRODUCTION environment - ensure this is intentional!");
+            }
+
+            await CreateInitialCategoriesAsync();
+        }
+
         if (settings.CreateInitialRoles)
             await CreateRolesAsync();
 
@@ -97,6 +126,76 @@ public class DatabaseSeeder(
 
 
         logger.LogInformation("Database seeding completed");
+    }
+
+    public async Task CreateInitialCategoriesAsync()
+    {
+        logger.LogInformation("Creating initial categories...");
+        var categoriesData = LoadInitialCategoriesData();
+
+        if (categoriesData.Categories.Count == 0)
+        {
+            logger.LogWarning("No initial categories found in config file");
+            return;
+        }
+
+        // check for duplicates in root categories
+        var rootNameGroups = categoriesData.Categories.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase).ToList();
+        var duplicateRoots = rootNameGroups.Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        if (duplicateRoots.Any())
+        {
+            logger.LogWarning(
+                "Duplicate root category names found in JSON: {Names}. Only the first occurrence will be processed.",
+                string.Join(", ", duplicateRoots));
+        }
+
+        // take only the first occurrence of each root category name
+        var uniqueCategories = rootNameGroups.Select(g => g.First()).ToList();
+
+        foreach (var categoryData in uniqueCategories)
+        {
+            // validate tree before creating
+            if (!ValidateCategoryTree(categoryData))
+            {
+                logger.LogError("Validation failed for category tree starting with '{Name}'. Skipping this tree.",
+                    categoryData.Name);
+                continue;
+            }
+
+            // checks if root category with the name already exists, if it exists, skip the whole tree creation of that category
+            if (await categoryRepository.RootCategoryExistsByName(categoryData.Name))
+            {
+                logger.LogInformation("Root category '{Name}' already exists, skipping entire tree", categoryData.Name);
+                continue;
+            }
+
+            // recursively create the subcategories if it has any
+            await CreateCategoryTreeRecursive(categoryData, null, null);
+        }
+
+        logger.LogInformation("Initial categories creation completed");
+    }
+
+    public async Task ClearCategoriesAsync()
+    {
+        logger.LogInformation("Clearing categories...");
+        var categories = await categoryRepository.GetAllCategories();
+
+        if (categories.Count == 0)
+        {
+            logger.LogInformation("No categories found to clear");
+            return;
+        }
+
+        logger.LogInformation("Found {Count} categories to clear", categories.Count);
+
+        foreach (var category in categories)
+        {
+            categoryRepository.DeleteCategory(category);
+        }
+
+        await unitOfWork.SaveChangesAsync();
+        logger.LogInformation("Categories clearing completed");
     }
 
     public async Task CreateRolesAsync()
@@ -363,13 +462,126 @@ public class DatabaseSeeder(
         }
     }
 
+    private async Task CreateCategoryTreeRecursive(InitialCategory categoryData, int? parentId, int? rootId)
+    {
+        if (string.IsNullOrWhiteSpace(categoryData.Name))
+        {
+            logger.LogWarning("Skipping category with empty name");
+            return;
+        }
+
+        if (categoryData.Name.Length < 2 || categoryData.Name.Length > 50)
+        {
+            logger.LogError("Category name '{Name}' must be between 2 and 50 characters. Skipping.", categoryData.Name);
+            return;
+        }
+
+        if (categoryData.Description?.Length > 100)
+        {
+            logger.LogError("Category '{Name}' description exceeds 100 characters. Skipping.", categoryData.Name);
+            return;
+        }
+
+
+        // might happen if partial failure occured when using seeder and json didn't change 
+        if (rootId != null)
+        {
+            if (await categoryRepository.CategoryExistsByNameInTree(categoryData.Name, rootId.Value))
+            {
+                logger.LogError("Category '{Name}' already exists in this tree. Skipping.", categoryData.Name);
+                return;
+            }
+        }
+
+        var newCategory = new Category
+        {
+            Name = categoryData.Name,
+            Description = categoryData.Description,
+            ImageUrl = categoryData.ImageUrl,
+            ParentCategoryId = parentId,
+            RootCategoryId = rootId
+        };
+
+        await categoryRepository.CreateCategory(newCategory);
+        await unitOfWork.SaveChangesAsync();
+
+        logger.LogInformation("Category '{Name}' created successfully with ID {Id}", newCategory.Name, newCategory.Id);
+
+        // if this is the first category use its id as root for the children, if rootId variable is already initialized use it instead
+        var currentRootId = rootId ?? newCategory.Id;
+
+        if (categoryData.SubCategories.Count > 0)
+        {
+            logger.LogInformation("Creating {Count} subcategories for '{Name}'", categoryData.SubCategories.Count,
+                newCategory.Name);
+
+            foreach (var subCategoryData in categoryData.SubCategories)
+            {
+                await CreateCategoryTreeRecursive(subCategoryData, newCategory.Id, currentRootId);
+            }
+        }
+    }
+
+    private bool ValidateCategoryTree(InitialCategory categoryData, HashSet<string>? namesInTree = null)
+    {
+        namesInTree ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (namesInTree.Contains(categoryData.Name))
+        {
+            logger.LogError(
+                "Duplicate category name '{Name}' found within the same tree, skipping the whole tree, fix the json first",
+                categoryData.Name);
+            return false;
+        }
+
+        namesInTree.Add(categoryData.Name);
+
+        if (categoryData.SubCategories.Count > 0)
+        {
+            foreach (var subCategory in categoryData.SubCategories)
+            {
+                if (!ValidateCategoryTree(subCategory, namesInTree))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private InitialCategoriesData LoadInitialCategoriesData()
+    {
+        var jsonPath = Path.Combine(AppContext.BaseDirectory, "Configuration", "Seeding", "initial-categories.json");
+
+        if (!File.Exists(jsonPath))
+        {
+            logger.LogWarning(
+                "initial-categories.json file not found at '{Path}' See the example file and create the config file properly",
+                jsonPath);
+            return new InitialCategoriesData();
+        }
+
+        try
+        {
+            var jsonContent = File.ReadAllText(jsonPath);
+            var categoriesData = System.Text.Json.JsonSerializer.Deserialize<InitialCategoriesData>(jsonContent);
+            return categoriesData ?? new InitialCategoriesData();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load initial categories from JSON file");
+            return new InitialCategoriesData();
+        }
+    }
+
     private InitialUsersData LoadInitialUsersData()
     {
         var jsonPath = Path.Combine(AppContext.BaseDirectory, "Configuration", "Seeding", "initial-users.json");
 
         if (!File.Exists(jsonPath))
         {
-            logger.LogWarning("initial-users.json file not found at '{Path}'", jsonPath);
+            logger.LogWarning(
+                "initial-users.json file not found at '{Path}'. See the example file and create the config file properly",
+                jsonPath);
             return new InitialUsersData();
         }
 

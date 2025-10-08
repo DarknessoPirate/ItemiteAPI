@@ -1,0 +1,100 @@
+{
+  "Categories": [
+    {
+      "Name": "Electronics",
+      "Description": "Electronic devices and gadgets",
+      "ImageUrl": "https://example.com/electronics.jpg",
+      "SubCategories": [
+        {
+          "Name": "Computers",
+          "Description": "Desktop and laptop computers",
+          "ImageUrl": null,
+          "SubCategories": [
+            {
+              "Name": "Laptops",
+              "Description": "Portable computers",
+              "ImageUrl": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Desktops",
+              "Description": "Stationary computers",
+              "ImageUrl": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Phones",
+          "Description": "Mobile phones and smartphones",
+          "ImageUrl": null,
+          "SubCategories": [
+            {
+              "Name": "Smartphones",
+              "Description": null,
+              "ImageUrl": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Feature Phones",
+              "Description": null,
+              "ImageUrl": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Audio",
+          "Description": "Audio equipment",
+          "ImageUrl": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Clothing",
+      "Description": "Apparel and fashion items",
+      "ImageUrl": null,
+      "SubCategories": [
+        {
+          "Name": "Men's Clothing",
+          "Description": "Clothing for men",
+          "ImageUrl": null,
+          "SubCategories": [
+            {
+              "Name": "Shirts",
+              "Description": null,
+              "ImageUrl": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Pants",
+              "Description": null,
+              "ImageUrl": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Women's Clothing",
+          "Description": "Clothing for women",
+          "ImageUrl": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Home & Garden",
+      "Description": "Home improvement and garden supplies",
+      "ImageUrl": null,
+      "SubCategories": [
+        {
+          "Name": "Furniture",
+          "Description": "Home furniture",
+          "ImageUrl": null,
+          "SubCategories": []
+        }
+      ]
+    }
+  ]
+}

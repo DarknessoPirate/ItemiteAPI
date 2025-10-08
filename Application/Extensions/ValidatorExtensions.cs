@@ -4,6 +4,9 @@ using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
 using Application.Features.Categories.CreateCategory;
+using Application.Features.Categories.DeleteCategory;
+using Application.Features.Categories.GetCategoryTree;
+using Application.Features.Categories.UpdateCategory;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,5 +21,8 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<LoginCommand>, LoginValidator>();
         services.AddScoped<IValidator<EmailConfirmationCommand>, EmailConfirmationValidator>();
         services.AddScoped<IValidator<ResetPasswordCommand>, ResetPasswordValidator>();
+        services.AddScoped<IValidator<DeleteCategoryCommand>, DeleteCategoryValidator>();
+        services.AddScoped<IValidator<GetCategoryTreeCommand>, GetCategoryTreeValidator>();
+        services.AddScoped<IValidator<UpdateCategoryCommand>, UpdateCategoryValidator>();
     }
 }

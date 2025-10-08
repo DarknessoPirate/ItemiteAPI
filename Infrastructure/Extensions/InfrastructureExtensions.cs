@@ -1,3 +1,4 @@
+using Domain.Configs;
 using Infrastructure.Configuration.Seeding;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
@@ -33,8 +34,6 @@ public static class InfrastructureExtensions
 
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITokenService, TokenService>();
-        services.Configure<SeedSettings>(
-            configuration.GetSection("SeedSettings"));
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 
         services.AddHttpContextAccessor(); // to access user-agent/ip address/device id in controllers easier
         services.AddScoped<IRequestContextService, RequestContextService>();

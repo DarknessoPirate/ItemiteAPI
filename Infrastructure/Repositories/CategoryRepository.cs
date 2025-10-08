@@ -13,50 +13,78 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         await dbContext.Categories.AddAsync(category);
     }
 
-    public Task UpdateCategory(Category category)
+    public void UpdateCategory(Category category)
     {
-        throw new NotImplementedException();
+        dbContext.Categories.Update(category);
     }
 
-    public Task DeleteCategory(Category category)
+    public void DeleteCategory(Category category)
     {
-        throw new NotImplementedException();
+        dbContext.Categories.Remove(category);
     }
 
     public async Task<List<Category>> GetAllCategories()
     {
         var categories = await dbContext.Categories.ToListAsync();
-        
+
         return categories;
     }
 
     public async Task<List<Category>> GetMainCategories()
     {
-        var mainCategories = 
+        var mainCategories =
             await dbContext.Categories
-            .Where(c => c.ParentCategoryId == null)
-            .ToListAsync();
-        
+                .Where(c => c.ParentCategoryId == null)
+                .ToListAsync();
+
         return mainCategories;
     }
 
     public async Task<List<Category>> GetSubCategories(int parentCategoryId)
     {
-        if (!await CategoryExistsById(parentCategoryId)) 
+        if (!await CategoryExistsById(parentCategoryId))
             throw new NotFoundException($"Parent category with id: {parentCategoryId} not found");
-        
+
         var subCategories =
             await dbContext.Categories
                 .Where(c => c.ParentCategoryId == parentCategoryId)
                 .ToListAsync();
-        
+
         return subCategories;
+    }
+
+    public async Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId)
+    {
+        var categories = await dbContext.Categories.Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
+
+        return categories;
+    }
+
+    public async Task<List<Category>> GetDescendantsByCategoryId(int parentCategoryId)
+    {
+        var descendants = new List<Category>();
+
+        // Get direct children
+        var directChildren = await dbContext.Categories
+            .Where(c => c.ParentCategoryId == parentCategoryId)
+            .ToListAsync();
+
+        descendants.AddRange(directChildren);
+
+        // Recursively get descendants of each child
+        foreach (var child in directChildren)
+        {
+            var childDescendants = await GetDescendantsByCategoryId(child.Id);
+            descendants.AddRange(childDescendants);
+        }
+
+        return descendants;
     }
 
     public async Task<Category> GetByNameAsync(string name)
     {
         var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == name);
-        
+
         if (category == null)
             throw new NotFoundException($"Category '{name}' not found");
 
@@ -69,21 +97,70 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
         if (category == null)
             throw new NotFoundException($"Category with id: {categoryId} not found");
-        
+
         return category;
     }
 
     public async Task<bool> CategoryExistsById(int categoryId)
     {
         var exists = await dbContext.Categories.AnyAsync(x => x.Id == categoryId);
-        
+
         return exists;
     }
 
     public async Task<bool> CategoryExistsByName(string name)
     {
         var exists = await dbContext.Categories.AnyAsync(x => x.Name == name);
-        
+
         return exists;
+    }
+
+    public async Task<bool> CategoryExistsByNameExcludingId(string name, int excludeId)
+    {
+        var exists = await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.Id != excludeId);
+
+        return exists;
+    }
+
+    public async Task<bool> CategoryExistsByNameInTree(string name, int rootCategoryId)
+    {
+        var rootCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.Id == rootCategoryId);
+
+        if (rootCategory != null && rootCategory.Name == name)
+            return true;
+
+        return await dbContext.Categories.AnyAsync(c => c.Name == name && c.RootCategoryId == rootCategoryId);
+    }
+
+    public async Task<bool> CategoryExistsByNameInTreeExcludingId(string name, int rootCategoryId, int excludeId)
+    {
+        // check if the root category itself has this name (excluding current category)
+        var rootCategory = await dbContext.Categories.FirstOrDefaultAsync(x => x.Id == rootCategoryId);
+        if (rootCategory != null && rootCategory.Name == name && rootCategory.Id != excludeId)
+            return true;
+
+        // check if name exists in any subcategories of this tree (excluding current category)
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.RootCategoryId == rootCategoryId && x.Id != excludeId);
+    }
+
+    public async Task<bool> RootCategoryExistsByName(string name)
+    {
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.ParentCategoryId == null);
+    }
+
+    public async Task<bool> RootCategoryExistsByNameExcludingId(string name, int excludeId)
+    {
+        return await dbContext.Categories
+            .AnyAsync(x => x.Name == name && x.ParentCategoryId == null && x.Id != excludeId);
+    }
+
+    public async Task<bool> IsParentCategory(int categoryId)
+    {
+        var isParent = await dbContext.Categories.AnyAsync(x => x.ParentCategoryId == categoryId);
+
+        return isParent;
     }
 }
