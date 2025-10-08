@@ -5,6 +5,7 @@ using Application.Features.Categories.GetAllCategories;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
+using Application.Features.Categories.UpdateCategory;
 using Domain.Configs;
 using Domain.DTOs.Category;
 using Domain.Entities;
@@ -144,6 +145,109 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         await Assert.ThrowsAsync<BadRequestException>(() => Sender.Send(command));
     }
 
+    [Theory]
+    [InlineData(100)]
+    [InlineData(1)]
+    [InlineData(40)]
+    public async Task UpdateCategory_ShouldThrow_NotFoundException(int categoryId)
+    {
+        var command = new UpdateCategoryCommand()
+        {
+            CategoryId = categoryId,
+            Dto = new UpdateCategoryRequest()
+            {
+                Name = "test",
+                Description = "test",
+                ImageUrl = "test.jpg",
+                ParentCategoryId = null
+            }
+        };
+        await Assert.ThrowsAsync<NotFoundException>(() => Sender.Send(command));
+    }
+
+    [Theory]
+    [InlineData(1, "t", "test", "test.jpg", null)]
+    [InlineData(-1, "test", "test", "test.jpg", null)]
+    [InlineData(2, "", "test", "test.jpg", null)]
+    public async Task UpdateCategory_ShouldThrow_ValidationException(int categoryId, string name, string description, string imageUrl, int? parentCategoryId)
+    {
+        var command = new UpdateCategoryCommand()
+        {
+            CategoryId = categoryId,
+            Dto = new UpdateCategoryRequest()
+            {
+                Name = name,
+                Description = description,
+                ImageUrl = imageUrl,
+                ParentCategoryId = parentCategoryId
+            }
+        };
+        await Assert.ThrowsAsync<ValidatorException>(() => Sender.Send(command));
+    }
+    
+    [Fact]
+    public async Task UpdateCategory_ShouldThrow_BadRequestException()
+    {
+        var savedCategoriesIds = await AddTestCategories();
+        var command = new UpdateCategoryCommand()
+        {
+            CategoryId = savedCategoriesIds[2],
+            Dto = new UpdateCategoryRequest()
+            {
+                // same name as parent
+                Name = "test1",
+                Description = "test",
+                ImageUrl = "image.jpg",
+                ParentCategoryId = savedCategoriesIds[0]
+            }
+        };
+        await Assert.ThrowsAsync<BadRequestException>(() => Sender.Send(command));
+        
+        var command2 = new UpdateCategoryCommand()
+        {
+            CategoryId = savedCategoriesIds[0],
+            Dto = new UpdateCategoryRequest()
+            {
+                Name = "test1",
+                Description = "test",
+                ImageUrl = "image.jpg",
+                // categoryId = ParentCategoryId 
+                ParentCategoryId = savedCategoriesIds[0]
+            }
+        };
+        await Assert.ThrowsAsync<BadRequestException>(() => Sender.Send(command2));
+    }
+    
+    [Fact]
+    public async Task UpdateCategory_ShouldUpdateCategoryInDatabase()
+    {
+        var savedCategoriesIds = await AddTestCategories();
+        var command = new UpdateCategoryCommand()
+        {
+            CategoryId = savedCategoriesIds[2],
+            Dto = new UpdateCategoryRequest()
+            {
+                Name = "test_modified",
+                Description = "test_desc_modified",
+                ImageUrl = "image_modified.jpg",
+                ParentCategoryId = savedCategoriesIds[1]
+            }
+        };
+
+        var updatedCategory = await Sender.Send(command);
+        updatedCategory.Name.Should().Be("test_modified");
+        updatedCategory.Description.Should().Be("test_desc_modified");
+        updatedCategory.ImageUrl.Should().Be("image_modified.jpg");
+
+        var getSubCategoriesCommand = new GetSubCategoriesCommand
+        {
+            ParentCategoryId = savedCategoriesIds[1]
+        };
+        var subCategories = await Sender.Send(getSubCategoriesCommand);
+        subCategories.Select(c => c.Id).Contains(savedCategoriesIds[2])
+            .Should().BeTrue();
+        
+    }
 
     [Fact]
     public async Task GetAllCategories_ShouldReturn_AllCategories()
