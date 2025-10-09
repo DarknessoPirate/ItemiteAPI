@@ -81,6 +81,19 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         return descendants;
     }
 
+    public async Task<List<Category>> GetAllParentsRelatedToCategory(Category category)
+    {
+        var relatedParents = new List<Category>();
+        
+        var parent = await dbContext.Categories.FirstOrDefaultAsync(c => c.Id == category.ParentCategoryId);
+        while (parent != null)
+        {
+            relatedParents.Add(parent);
+            parent = await dbContext.Categories.FirstOrDefaultAsync(c => c.Id == parent.ParentCategoryId);
+        }
+        return relatedParents;
+    }
+
     public async Task<Category> GetByNameAsync(string name)
     {
         var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == name);

@@ -1,5 +1,4 @@
-using Domain.Configs;
-using Infrastructure.Configuration.Seeding;
+using Domain.Entities;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -24,6 +23,8 @@ public static class InfrastructureExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IListingRepository<ProductListing>, ListingRepository<ProductListing>>();
+        services.AddScoped<IListingRepository<AuctionListing>, ListingRepository<AuctionListing>>();
 
         services.AddStackExchangeRedisCache(options =>
         {
@@ -32,6 +33,7 @@ public static class InfrastructureExtensions
             options.InstanceName = "itemite_";
         });
 
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 
