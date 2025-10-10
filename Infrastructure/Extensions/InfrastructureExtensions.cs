@@ -7,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure.Extensions;
 
@@ -31,6 +32,13 @@ public static class InfrastructureExtensions
             options.Configuration = configuration.GetConnectionString("Redis")
                                     ?? throw new InvalidOperationException("Connection 'Redis' not found.");
             options.InstanceName = "itemite_";
+        });
+        
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var connectionString = configuration.GetConnectionString("Redis")
+                                   ?? throw new InvalidOperationException("Connection 'Redis' not found.");
+            return ConnectionMultiplexer.Connect(connectionString);
         });
 
         services.AddScoped<ICurrentUserService, CurrentUserService>();

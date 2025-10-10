@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -14,7 +15,8 @@ public class CreateProductListingHandler(
         ICategoryRepository categoryRepository,
         UserManager<User> userManager,
         IMapper mapper,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        ICacheService cacheService
         ) : IRequestHandler<CreateProductListingCommand, int>
 {
     public async Task<int> Handle(CreateProductListingCommand request, CancellationToken cancellationToken)
@@ -48,6 +50,8 @@ public class CreateProductListingHandler(
         
         await productListingRepository.CreateListingAsync(productListing);
         await unitOfWork.SaveChangesAsync();
+
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
         
         return productListing.Id;
     }
