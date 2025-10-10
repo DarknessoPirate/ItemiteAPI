@@ -29,14 +29,13 @@ public class DeleteProductListingHandler(
         {
             productListingRepository.DeleteListing(listingToDelete);
             await unitOfWork.SaveChangesAsync();
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+            await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error when deleting product listing {listingToDelete.Id}: {ex.Message}");
             throw;
         }
-
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
-        await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
     }
 }

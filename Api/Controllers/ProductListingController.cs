@@ -2,6 +2,7 @@ using Application.Features.ProductListings.CreateProductListing;
 using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
 using Application.Features.ProductListings.GetProductListing;
+using Application.Features.ProductListings.UpdateProductListing;
 using Domain.DTOs.ProductListing;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,15 +14,6 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class ProductListingController(IMediator mediator) : ControllerBase
 {
-    [Authorize]
-    [HttpPost]
-    public async Task<IActionResult> CreateProductListing([FromBody] CreateProductListingRequest request)
-    {
-        var command = new CreateProductListingCommand { ProductListingDto = request };
-        var createdProductListingId = await mediator.Send(command);
-        return Ok(new {createdProductListingId} );
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetProductListings([FromQuery] GetPaginatedProductListingsQuery query)
     {
@@ -36,6 +28,15 @@ public class ProductListingController(IMediator mediator) : ControllerBase
         var listing = await mediator.Send(productListingQuery);
         return Ok(listing);
     }
+    
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CreateProductListing([FromBody] CreateProductListingRequest request)
+    {
+        var command = new CreateProductListingCommand { ProductListingDto = request };
+        var createdProductListingId = await mediator.Send(command);
+        return Ok(new {createdProductListingId} );
+    }
 
     [Authorize]
     [HttpDelete("{listingId}")]
@@ -44,5 +45,18 @@ public class ProductListingController(IMediator mediator) : ControllerBase
         var command = new DeleteProductListingCommand {ListingId = listingId};
         await mediator.Send(command);
         return NoContent();
+    }
+    
+    [Authorize]
+    [HttpPut("{listingId}")]
+    public async Task<IActionResult> UpdateProductListing([FromBody] UpdateProductListingRequest request, [FromRoute] int listingId)
+    {
+        var command = new UpdateProductListingCommand
+        {
+            UpdateDto = request,
+            ListingId = listingId
+        };
+        var updatedProductListing = await mediator.Send(command);
+        return Ok(updatedProductListing);
     }
 }

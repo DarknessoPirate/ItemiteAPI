@@ -14,7 +14,6 @@ public class CreateProductListingHandler(
         ICurrentUserService currentUser,
         IListingRepository<ProductListing> productListingRepository,
         ICategoryRepository categoryRepository,
-        UserManager<User> userManager,
         IMapper mapper,
         IUnitOfWork unitOfWork,
         ICacheService cacheService,
@@ -41,12 +40,6 @@ public class CreateProductListingHandler(
         directParents.Add(category);
         
         productListing.Categories = directParents;
-
-        if (request.ProductListingDto.Location == null)
-        {
-            var user = await userManager.FindByEmailAsync(currentUser.GetEmail());
-            productListing.Location = user.Location;
-        }
         
         // TODO: handle images upload (CloudinaryService needed)
 

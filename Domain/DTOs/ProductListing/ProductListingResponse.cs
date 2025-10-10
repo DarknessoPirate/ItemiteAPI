@@ -17,4 +17,5 @@ public class ProductListingResponse
     public string? Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }
     public List<string>? ImagesUrls { get; set; }
+    public string? MainImageUrl { get; set; }
 }

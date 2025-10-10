@@ -44,6 +44,11 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         await dbContext.Set<T>().AddAsync(listing);
     }
 
+    public void UpdateListing(T listing)
+    {
+        dbContext.Set<T>().Update(listing);
+    }
+
     public void DeleteListing(T listing)
     {
         dbContext.Set<T>().Remove(listing);
