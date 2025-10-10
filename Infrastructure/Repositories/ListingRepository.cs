@@ -13,13 +13,18 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return listings;
     }
 
-    public IQueryable<ProductListing> GetProductListingsQueryable()
+    public IQueryable<T> GetListingsQueryable()
     {
-       return dbContext.Set<ProductListing>().Include(p => p.Categories);
+       return dbContext.Set<T>().Include(p => p.Categories);
     }
 
     public async Task CreateListingAsync(T listing)
     {
         await dbContext.Set<T>().AddAsync(listing);
+    }
+
+    public void DeleteListing(T listing)
+    {
+        dbContext.Set<T>().Remove(listing);
     }
 }

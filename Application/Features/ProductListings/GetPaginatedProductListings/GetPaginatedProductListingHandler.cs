@@ -28,7 +28,7 @@ public class GetPaginatedProductListingHandler(
             return cachedListingProducts;
         }
         
-        var queryableProductListings = repository.GetProductListingsQueryable();
+        var queryableProductListings = repository.GetListingsQueryable();
         
         queryableProductListings = HandleProductListingFiltering(request, queryableProductListings);
         queryableProductListings = HandleProductListingSorting(request, queryableProductListings);
