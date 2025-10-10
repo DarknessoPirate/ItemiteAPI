@@ -11,5 +11,6 @@ public class UserAutoMapper : Profile
    {
       CreateMap<RegisterRequest, User>();
       CreateMap<User, UserBasicResponse>();
+      CreateMap<User, UserResponse>();
    }
 }

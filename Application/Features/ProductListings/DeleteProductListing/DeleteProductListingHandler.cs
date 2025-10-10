@@ -37,5 +37,6 @@ public class DeleteProductListingHandler(
         }
 
         await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+        await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
     }
 }

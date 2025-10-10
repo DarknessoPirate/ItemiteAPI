@@ -1,6 +1,7 @@
 using Application.Features.ProductListings.CreateProductListing;
 using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
+using Application.Features.ProductListings.GetProductListing;
 using Domain.DTOs.ProductListing;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,8 +25,16 @@ public class ProductListingController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetProductListings([FromQuery] GetPaginatedProductListingsQuery query)
     {
-        var categories = await mediator.Send(query);
-        return Ok(categories);
+        var productListings = await mediator.Send(query);
+        return Ok(productListings);
+    }
+
+    [HttpGet("{listingId}")]
+    public async Task<IActionResult> GetProductListingById(int listingId)
+    {
+        var productListingQuery = new GetProductListingQuery {ListingId = listingId};
+        var listing = await mediator.Send(productListingQuery);
+        return Ok(listing);
     }
 
     [Authorize]

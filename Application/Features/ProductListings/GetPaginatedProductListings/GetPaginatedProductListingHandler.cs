@@ -76,25 +76,32 @@ public class GetPaginatedProductListingHandler(
     private IQueryable<ProductListing> HandleProductListingSorting(GetPaginatedProductListingsQuery request,
         IQueryable<ProductListing> queryableProductListings)
     {
+        IOrderedQueryable<ProductListing> orderedQuery = 
+            queryableProductListings.OrderByDescending(p => p.IsFeatured);
+        
         if (request.SortBy == SortBy.Price)
         {
-            queryableProductListings = request.SortDirection == SortDirection.Ascending ? 
-                queryableProductListings.OrderBy(p => p.Price) :
-                queryableProductListings.OrderByDescending(p => p.Price);
+            orderedQuery = request.SortDirection == SortDirection.Ascending ? 
+                orderedQuery.ThenBy(p => p.Price) :
+                orderedQuery.ThenByDescending(p => p.Price);
         }
         else if (request.SortBy == SortBy.CreationDate)
         {
-            queryableProductListings = request.SortDirection == SortDirection.Ascending ? 
-                queryableProductListings.OrderBy(p => p.DateCreated) :
-                queryableProductListings.OrderByDescending(p => p.DateCreated);
+            orderedQuery = request.SortDirection == SortDirection.Ascending ? 
+                orderedQuery.ThenBy(p => p.DateCreated) :
+                orderedQuery.ThenByDescending(p => p.DateCreated);
         }
         else if (request.SortBy == SortBy.Views)
         {
-            queryableProductListings = request.SortDirection == SortDirection.Ascending ? 
-                queryableProductListings.OrderBy(p => p.Views) :
-                queryableProductListings.OrderByDescending(p => p.Views);
+            orderedQuery = request.SortDirection == SortDirection.Ascending ? 
+                orderedQuery.ThenBy(p => p.Views) :
+                orderedQuery.ThenByDescending(p => p.Views);
         }
-        
-        return queryableProductListings;
+        else
+        {
+            orderedQuery = orderedQuery.ThenByDescending(p => p.DateCreated);
+        }
+    
+        return orderedQuery;
     }
 }
