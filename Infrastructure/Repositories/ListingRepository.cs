@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Database;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,19 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return listings;
     }
 
-    public IQueryable<T> GetListingsQueryable()
+    public IQueryable<T> GetListingsQueryableWithCategories()
     {
        return dbContext.Set<T>().Include(p => p.Categories);
+    }
+
+    public async Task<T> GetListingByIdAsync(int listingId)
+    {
+        var listing = await dbContext.Set<T>().FirstOrDefaultAsync(l => l.Id == listingId);
+        if (listing == null)
+        {
+            throw new NotFoundException($"Listing with Id: {listingId} not found");
+        }
+        return listing;
     }
 
     public async Task CreateListingAsync(T listing)

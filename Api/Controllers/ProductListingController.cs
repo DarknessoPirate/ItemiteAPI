@@ -1,4 +1,5 @@
 using Application.Features.ProductListings.CreateProductListing;
+using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
 using Domain.DTOs.ProductListing;
 using MediatR;
@@ -25,5 +26,14 @@ public class ProductListingController(IMediator mediator) : ControllerBase
     {
         var categories = await mediator.Send(query);
         return Ok(categories);
+    }
+
+    [Authorize]
+    [HttpDelete("{listingId}")]
+    public async Task<IActionResult> DeleteProductListing([FromRoute] int listingId)
+    {
+        var command = new DeleteProductListingCommand {ListingId = listingId};
+        await mediator.Send(command);
+        return NoContent();
     }
 }

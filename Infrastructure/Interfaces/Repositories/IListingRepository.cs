@@ -5,7 +5,8 @@ namespace Infrastructure.Interfaces.Repositories;
 public interface IListingRepository<T> where T : ListingBase
 {
     Task<List<T>> GetAllListingsAsync();
-    IQueryable<T> GetListingsQueryable();
+    IQueryable<T> GetListingsQueryableWithCategories();
+    Task<T> GetListingByIdAsync(int listingId);
     Task CreateListingAsync(T listing);
     void DeleteListing(T listing);
 }

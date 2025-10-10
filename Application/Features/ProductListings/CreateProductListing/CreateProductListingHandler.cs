@@ -6,6 +6,7 @@ using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Features.ProductListings.CreateProductListing;
 
@@ -16,7 +17,8 @@ public class CreateProductListingHandler(
         UserManager<User> userManager,
         IMapper mapper,
         IUnitOfWork unitOfWork,
-        ICacheService cacheService
+        ICacheService cacheService,
+        ILogger<CreateProductListingHandler> logger
         ) : IRequestHandler<CreateProductListingCommand, int>
 {
     public async Task<int> Handle(CreateProductListingCommand request, CancellationToken cancellationToken)
@@ -47,11 +49,20 @@ public class CreateProductListingHandler(
         }
         
         // TODO: handle images upload (CloudinaryService needed)
-        
-        await productListingRepository.CreateListingAsync(productListing);
-        await unitOfWork.SaveChangesAsync();
 
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+        try
+        {
+            await productListingRepository.CreateListingAsync(productListing);
+            await unitOfWork.SaveChangesAsync();
+
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error when creating new product listing: {ex.Message}");
+            throw;
+        }
+        
         
         return productListing.Id;
     }
