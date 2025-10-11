@@ -7,4 +7,5 @@ public class UpdateProductListingCommand : IRequest<ProductListingBasicResponse>
 {
     public UpdateProductListingRequest UpdateDto { get; set; }
     public int ListingId { get; set; }
+    public int UserId { get; set; }
 }

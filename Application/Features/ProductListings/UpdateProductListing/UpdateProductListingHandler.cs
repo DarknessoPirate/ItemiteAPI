@@ -16,7 +16,6 @@ public class UpdateProductListingHandler(
     ICategoryRepository categoryRepository,
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUser,
     IMapper mapper,
     ILogger<UpdateProductListingHandler> logger
     ) : IRequestHandler<UpdateProductListingCommand, ProductListingBasicResponse>
@@ -29,7 +28,7 @@ public class UpdateProductListingHandler(
             throw new NotFoundException("Product listing with id " + request.ListingId + " not found");
         }
         
-        if (productListingToUpdate.OwnerId != currentUser.GetId())
+        if (productListingToUpdate.OwnerId != request.UserId)
         {
             throw new ForbiddenException("You are not allowed to update this product");
         }

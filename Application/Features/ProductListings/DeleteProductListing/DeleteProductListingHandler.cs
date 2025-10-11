@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 namespace Application.Features.ProductListings.DeleteProductListing;
 
 public class DeleteProductListingHandler(
-    ICurrentUserService currentUser,
     IListingRepository<ProductListing> productListingRepository,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
@@ -20,7 +19,7 @@ public class DeleteProductListingHandler(
     public async Task Handle(DeleteProductListingCommand request, CancellationToken cancellationToken)
     {
         var listingToDelete = await productListingRepository.GetListingByIdAsync(request.ListingId);
-        if (listingToDelete.OwnerId != currentUser.GetId())
+        if (listingToDelete.OwnerId != request.UserId)
         {
             throw new ForbiddenException("You are not allowed to delete this listing");
         }

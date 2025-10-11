@@ -40,8 +40,7 @@ public static class InfrastructureExtensions
                                    ?? throw new InvalidOperationException("Connection 'Redis' not found.");
             return ConnectionMultiplexer.Connect(connectionString);
         });
-
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 

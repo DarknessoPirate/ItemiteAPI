@@ -5,13 +5,11 @@ using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.ProductListings.CreateProductListing;
 
 public class CreateProductListingHandler(
-        ICurrentUserService currentUser,
         IListingRepository<ProductListing> productListingRepository,
         ICategoryRepository categoryRepository,
         IMapper mapper,
@@ -23,7 +21,7 @@ public class CreateProductListingHandler(
     public async Task<int> Handle(CreateProductListingCommand request, CancellationToken cancellationToken)
     {
         var productListing = mapper.Map<ProductListing>(request.ProductListingDto);
-        productListing.OwnerId = currentUser.GetId();
+        productListing.OwnerId = request.UserId;
         
         var category = await categoryRepository.GetByIdAsync(request.ProductListingDto.CategoryId);
         if (category == null)

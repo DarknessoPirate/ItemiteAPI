@@ -14,21 +14,20 @@ public class GetProductListingHandler(
     ICacheService cache,
     IMapper mapper,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUser,
     ILogger<GetProductListingHandler> logger
     ) : IRequestHandler<GetProductListingQuery, ProductListingResponse>
 {
     public async Task<ProductListingResponse> Handle(GetProductListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTINGS}{request.ListingId}");
+            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;
         }
         
         var listing = await productListingRepository.GetListingWithCategoriesAndOwnerByIdAsync(request.ListingId);
-        if (listing.OwnerId != currentUser.GetId())
+        if (listing.OwnerId != request.UserId)
         {
             try
             {
