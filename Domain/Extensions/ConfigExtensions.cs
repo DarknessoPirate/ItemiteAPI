@@ -14,6 +14,6 @@ public static class ConfigExtensions
         services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
         services.Configure<GoogleOAuthSettings>(configuration.GetSection("GoogleOAuth"));
         services.Configure<SeedSettings>(configuration.GetSection("SeedSettings"));
-        services.Configure<SeedSettings>(configuration.GetSection("CloudinarySettings"));
+        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
     }
 }

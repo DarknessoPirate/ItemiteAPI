@@ -1,6 +1,8 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Configs;
+using Domain.DTOs.File;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
@@ -19,19 +21,35 @@ public class MediaService : IMediaService
         _cloudinary = new Cloudinary(account);
     }
 
-    public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+    public async Task<ImageUploadResult> UploadPhotoAsync(FileWrapper file)
     {
         if (file == null || file.Length == 0)
         {
             throw new CloudinaryException("Empty file provided");
         }
 
+        if (file.Length > SupportedFileTypes.MaxFileSize)
+        {
+            throw new CloudinaryException(
+                $"File size exceeds maximum allowed size of {SupportedFileTypes.MaxFileSize / (1024 * 1024)}MB");
+        }
+
+        if (!SupportedFileTypes.IsSupportedMimeType(file.ContentType))
+        {
+            throw new CloudinaryException($"Unsupported file type: {file.ContentType}");
+        }
+
+        var fileType = SupportedFileTypes.GetFileTypeFromMimeType(file.ContentType);
+        if (fileType != FileType.Image)
+        {
+            throw new CloudinaryException("Only image files are allowed for profile photos");
+        }
+
         try
         {
-            await using var stream = file.OpenReadStream();
             var uploadParams = new ImageUploadParams
             {
-                File = new FileDescription(file.FileName, stream),
+                File = new FileDescription(file.FileName, file.FileStream),
                 Folder = "Itemite/Images"
             };
 

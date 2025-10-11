@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -10,6 +12,19 @@ public class RequestContextService : IRequestContextService
     public RequestContextService(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
+    }
+
+    public int GetUserId()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        var userIdClaim = httpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedException("User not authenticated");
+        }
+
+        return userId;
     }
 
     public string GetIpAddress()
@@ -37,7 +52,9 @@ public class RequestContextService : IRequestContextService
     {
         var httpContext = _httpContextAccessor.HttpContext;
         // Device ID is typically sent by client in a custom header
-        return httpContext?.Request.Headers["X-Device-Id"].FirstOrDefault(); // the "X-Device-Id" is a custom header, we can rename it in the client app to whatever
+        return
+            httpContext?.Request.Headers["X-Device-Id"]
+                .FirstOrDefault(); // the "X-Device-Id" is a custom header, we can rename it in the client app to whatever
         // TODO: check from client and implement if needed
     }
 }

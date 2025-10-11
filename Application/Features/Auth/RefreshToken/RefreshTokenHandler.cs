@@ -11,7 +11,7 @@ namespace Application.Features.Auth.RefreshToken;
 
 public class RefreshTokenHandler(
         ITokenService tokenService,
-        IHttpContextAccessor contextAccessor,
+        IHttpContextAccessor contextAccessor, // TODO: change this shi 🗣️🔥
         IMapper mapper
     ) : IRequestHandler<RefreshTokenCommand, UserBasicResponse>
 {

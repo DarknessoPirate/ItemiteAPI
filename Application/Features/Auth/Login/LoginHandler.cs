@@ -17,7 +17,7 @@ public class LoginHandler(
     UserManager<User> userManager,
     IOptions<AuthSettings> authSettings,
     IEmailService emailService,
-    IHttpContextAccessor contextAccessor,
+    IHttpContextAccessor contextAccessor, // TODO: change this shi 🗣️🔥
     IMapper mapper
     ) : IRequestHandler<LoginCommand, UserBasicResponse>
 {
