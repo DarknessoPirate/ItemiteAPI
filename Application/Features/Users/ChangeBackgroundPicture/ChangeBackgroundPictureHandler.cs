@@ -32,7 +32,7 @@ public class ChangeBackgroundPictureHandler(
 
         var existingUser = await userRepository.GetUserWithBackgroundPhotoAsync(request.UserId);
         if (existingUser == null)
-            throw new NotFoundException("User not found");
+            throw new BadRequestException("User not found");
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         string? uploadPhotoPublicId = null;

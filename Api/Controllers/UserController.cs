@@ -1,5 +1,6 @@
 using Application.Features.Users.ChangeBackgroundPicture;
 using Application.Features.Users.ChangeProfilePicture;
+using Application.Features.Users.RemoveBackgroundPicture;
 using Domain.DTOs.File;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -39,5 +40,18 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
 
         var photoUrl = await mediator.Send(command);
         return Ok(new { PhotoUrl = photoUrl });
+    }
+
+    [HttpDelete("profile/background")]
+    public async Task<IActionResult> DeleteBackgroundPicture()
+    {
+        var command = new RemoveBackgroundPictureCommand
+        {
+            UserId = requestContextService.GetUserId()
+        };
+        
+        await mediator.Send(command);
+
+        return NoContent();
     }
 }

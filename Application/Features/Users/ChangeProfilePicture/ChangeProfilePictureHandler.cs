@@ -32,7 +32,7 @@ public class ChangeProfilePictureHandler(
 
         var existingUser = await userRepository.GetUserWithProfilePhotoAsync(request.UserId);
         if (existingUser == null)
-            throw new NotFoundException("User not found");
+            throw new BadRequestException("User not found");
 
         await unitOfWork.BeginTransactionAsync();
         string? uploadPhotoPublicId = null;
