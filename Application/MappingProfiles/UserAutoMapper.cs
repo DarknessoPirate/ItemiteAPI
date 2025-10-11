@@ -11,6 +11,8 @@ public class UserAutoMapper : Profile
    {
       CreateMap<RegisterRequest, User>();
       CreateMap<User, UserBasicResponse>();
-      CreateMap<User, UserResponse>();
+      CreateMap<User, UserResponse>()
+         .ForMember(u => u.PhotoUrl, o =>
+            o.MapFrom(u => u.ProfilePhoto.Url));
    }
 }

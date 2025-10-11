@@ -21,7 +21,8 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<T> GetListingWithCategoriesAndOwnerByIdAsync(int listingId)
     {
-        var listing = await dbContext.Set<T>().Include(p => p.Categories).Include(p => p.Owner).FirstOrDefaultAsync(l => l.Id == listingId);
+        var listing = await dbContext.Set<T>().Include(p => p.Categories)
+            .Include(p => p.Owner).ThenInclude(u => u.ProfilePhoto).FirstOrDefaultAsync(l => l.Id == listingId);
         if (listing == null)
         {
             throw new NotFoundException($"Listing with Id: {listingId} not found");
