@@ -1,3 +1,4 @@
+using Application.Features.Users.ChangeBackgroundPicture;
 using Application.Features.Users.ChangeProfilePicture;
 using Domain.DTOs.File;
 using Infrastructure.Interfaces.Services;
@@ -21,8 +22,22 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
             UserId = requestContextService.GetUserId(),
             File = new FileWrapper(file.FileName, file.Length, file.ContentType, file.OpenReadStream())
         };
-        
+
         var photoUrl = await mediator.Send(command);
-        return Ok(new {PhotoUrl = photoUrl});
+        return Ok(new { PhotoUrl = photoUrl });
+    }
+
+    [HttpPost("profile/background")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ChangeBackgroundPicture(IFormFile file)
+    {
+        var command = new ChangeBackgroundPictureCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            File = new FileWrapper(file.FileName, file.Length, file.ContentType, file.OpenReadStream())
+        };
+
+        var photoUrl = await mediator.Send(command);
+        return Ok(new { PhotoUrl = photoUrl });
     }
 }
