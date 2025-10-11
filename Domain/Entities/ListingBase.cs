@@ -14,7 +14,7 @@ public class ListingBase
     [MaxLength(200)]
     public string Location { get; set; } = string.Empty;
     public int Views { get; set; } = 0;
-    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     public DateTime DateEnds { get; set; } 
     public bool IsArchived { get; set; } = false;
     public bool IsFeatured { get; set; } = false;

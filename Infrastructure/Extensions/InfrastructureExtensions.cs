@@ -1,5 +1,4 @@
-using Domain.Configs;
-using Infrastructure.Configuration.Seeding;
+using Domain.Entities;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -8,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure.Extensions;
 
@@ -24,6 +24,8 @@ public static class InfrastructureExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IListingRepository<ProductListing>, ListingRepository<ProductListing>>();
+        services.AddScoped<IListingRepository<AuctionListing>, ListingRepository<AuctionListing>>();
 
         services.AddStackExchangeRedisCache(options =>
         {
@@ -31,7 +33,15 @@ public static class InfrastructureExtensions
                                     ?? throw new InvalidOperationException("Connection 'Redis' not found.");
             options.InstanceName = "itemite_";
         });
+        
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var connectionString = configuration.GetConnectionString("Redis")
+                                   ?? throw new InvalidOperationException("Connection 'Redis' not found.");
+            return ConnectionMultiplexer.Connect(connectionString);
+        });
 
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 

@@ -7,6 +7,8 @@ using Application.Features.Categories.CreateCategory;
 using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.UpdateCategory;
+using Application.Features.ProductListings.GetPaginatedProductListings;
+using Application.Features.ProductListings.UpdateProductListing;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,5 +26,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<DeleteCategoryCommand>, DeleteCategoryValidator>();
         services.AddScoped<IValidator<GetCategoryTreeCommand>, GetCategoryTreeValidator>();
         services.AddScoped<IValidator<UpdateCategoryCommand>, UpdateCategoryValidator>();
+        services.AddScoped<IValidator<GetPaginatedProductListingsQuery>, GetPaginatedProductListingsValidator>();
+        services.AddScoped<IValidator<UpdateProductListingCommand>, UpdateProductListingValidator>();
     }
 }
