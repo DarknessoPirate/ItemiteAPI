@@ -23,4 +23,6 @@ public class ListingBase
     public int OwnerId { get; set; }
     public required User Owner { get; set; } = null!;
     public ICollection<Category> Categories { get; set; } = new List<Category>();
+    
+    public ICollection<ListingPhoto> ListingPhotos { get; set; } = new List<ListingPhoto>();
 }

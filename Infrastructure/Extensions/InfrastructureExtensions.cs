@@ -47,5 +47,8 @@ public static class InfrastructureExtensions
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 
         services.AddHttpContextAccessor(); // to access user-agent/ip address/device id in controllers easier
         services.AddScoped<IRequestContextService, RequestContextService>();
+        services.AddScoped<IMediaService, MediaService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPhotoRepository, PhotoRepository>();
     }
 }

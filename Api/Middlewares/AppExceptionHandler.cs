@@ -9,6 +9,7 @@ public class AppExceptionHandler : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        // TODO: split into debug and general message fields
         int statusCode;
         string message;
         List<string> errorList = [];
