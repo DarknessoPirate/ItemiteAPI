@@ -15,7 +15,7 @@ public class EmailConfirmationHandler(
         var user = await userManager.FindByEmailAsync(request.EmailConfirmationRequest.Email);
         if (user == null)
         {
-            throw new NotFoundException("User not found");
+            throw new BadRequestException("User not found");
         }
         
         if (user.EmailConfirmed)

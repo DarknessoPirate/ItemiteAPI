@@ -1,8 +1,11 @@
 using Application.Features.Users.ChangeBackgroundPicture;
+using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeProfilePicture;
+using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.RemoveBackgroundPicture;
 using Application.Features.Users.RemoveProfilePicture;
 using Domain.DTOs.File;
+using Domain.DTOs.User;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +65,38 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         var command = new RemoveBackgroundPictureCommand
         {
             UserId = requestContextService.GetUserId()
+        };
+
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpPut("settings/email")]
+    public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
+    {
+        var command = new ChangeEmailCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            changeEmailRequest = request
+        };
+
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpGet("settings/email/confirm")]
+    public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token, [FromQuery] string currentEmail)
+    {
+        var command = new ConfirmEmailChangeCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            request = new ConfirmEmailChangeRequest
+            {
+                Token = token,
+                CurrentEmail = currentEmail
+            }
         };
 
         await mediator.Send(command);

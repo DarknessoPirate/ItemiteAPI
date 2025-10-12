@@ -8,6 +8,8 @@ public class User : IdentityUser<int>
 {
     public string? Location { get; set; }
     public DateTime? EmailConfirmationTokenExpirationDate { get; set; }
+    public string? PendingNewEmail { get; set; }
+    public DateTime? EmailChangeTokenExpirationDate { get; set; }
     public AuthProvider AuthProvider { get; set; }
     
     public int? ProfilePhotoId { get; set; }

@@ -8,6 +8,7 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Application.Features.Auth.Login;
@@ -18,7 +19,8 @@ public class LoginHandler(
     IOptions<AuthSettings> authSettings,
     IEmailService emailService,
     IHttpContextAccessor contextAccessor, // TODO: change this shi 🗣️🔥
-    IMapper mapper
+    IMapper mapper,
+    ILogger<LoginHandler> logger
     ) : IRequestHandler<LoginCommand, UserBasicResponse>
 {
     public async Task<UserBasicResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -26,7 +28,7 @@ public class LoginHandler(
         var user = await userManager.FindByEmailAsync(request.loginDto.Email);
         if (user == null)
         {
-            throw new NotFoundException("User not found");
+            throw new BadRequestException("User not found");
         }
 
         if (!await userManager.CheckPasswordAsync(user, request.loginDto.Password))
@@ -51,9 +53,10 @@ public class LoginHandler(
                     await emailService.SendConfirmationAsync(user, emailToken);
                     await userManager.UpdateAsync(user);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw new EmailException("Error while sending confirmation email", []);
+                    logger.LogError(ex,$"Error while sending email confirmation token: {ex.Message}");
+                    throw new EmailException("Error while sending confirmation email");
                 }
                 throw new UnauthorizedException("Email is not confirmed. New confirmation link has been sent.");
             }
