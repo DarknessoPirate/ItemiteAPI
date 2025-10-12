@@ -30,7 +30,10 @@ public class CreateProductListingValidator : AbstractValidator<CreateProductList
             .NotNull().WithMessage("Images array is null")
             .NotEmpty().WithMessage("Images array is empty")
             .Must(images => images.Count > 0).WithMessage("Images array must contain at least one image");
+        RuleFor(x => x.ProductListingDto.ImageOrders)
+            .Must(orders => orders.Contains(1)).WithMessage("Image orders must contain 1 for being main image");
         RuleFor(x => x)
             .Must(x => x.Images.Count == x.ProductListingDto.ImageOrders.Count).WithMessage("Image orders count must be equal to number of images");
+       
     }
 }

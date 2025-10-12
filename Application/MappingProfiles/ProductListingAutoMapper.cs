@@ -11,15 +11,19 @@ public class ProductListingAutoMapper : Profile
         CreateMap<CreateProductListingRequest, ProductListing>();
         CreateMap<ProductListing, ProductListingBasicResponse>()
             .ForMember(p => p.Categories, o =>
-                o.MapFrom(p => p.Categories));
-        // TODO: map mainImageUrl from list of Images (Cloudinary service needed)
+                o.MapFrom(p => p.Categories))
+            .ForMember(p => p.MainImageUrl, o =>
+                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url));
 
         CreateMap<ProductListing, ProductListingResponse>()
             .ForMember(p => p.Categories, o =>
                 o.MapFrom(p => p.Categories))
             .ForMember(p => p.Owner, o =>
-                o.MapFrom(p => p.Owner));
-        // TODO: map imagesUrls from list of Images (Cloudinary service needed)
+                o.MapFrom(p => p.Owner))
+            .ForMember(p => p.MainImageUrl, o =>
+                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
+            .ForMember(p => p.ImagesUrls, o =>
+                o.MapFrom(p => p.ListingPhotos.Select(p => p.Photo.Url)));
 
     }
 }

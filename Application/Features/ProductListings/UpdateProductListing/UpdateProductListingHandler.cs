@@ -22,7 +22,7 @@ public class UpdateProductListingHandler(
 {
     public async Task<ProductListingBasicResponse> Handle(UpdateProductListingCommand request, CancellationToken cancellationToken)
     {
-        var productListingToUpdate = await productListingRepository.GetListingWithCategoriesAndOwnerByIdAsync(request.ListingId);
+        var productListingToUpdate = await productListingRepository.GetListingByIdAsync(request.ListingId);
         if (productListingToUpdate == null)
         {
             throw new NotFoundException("Product listing with id " + request.ListingId + " not found");

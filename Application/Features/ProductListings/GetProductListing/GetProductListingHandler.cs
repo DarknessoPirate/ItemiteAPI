@@ -26,7 +26,7 @@ public class GetProductListingHandler(
             return cachedListing;
         }
         
-        var listing = await productListingRepository.GetListingWithCategoriesAndOwnerByIdAsync(request.ListingId);
+        var listing = await productListingRepository.GetListingByIdAsync(request.ListingId);
         if (listing.OwnerId != request.UserId)
         {
             try

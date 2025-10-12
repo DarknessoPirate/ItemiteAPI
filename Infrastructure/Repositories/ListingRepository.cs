@@ -14,15 +14,17 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return listings;
     }
 
-    public IQueryable<T> GetListingsQueryableWithCategories()
+    public IQueryable<T> GetListingsQueryable()
     {
-       return dbContext.Set<T>().Include(p => p.Categories);
+       return dbContext.Set<T>().Include(p => p.Categories)
+           .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
     }
 
-    public async Task<T> GetListingWithCategoriesAndOwnerByIdAsync(int listingId)
+    public async Task<T> GetListingByIdAsync(int listingId)
     {
         var listing = await dbContext.Set<T>().Include(p => p.Categories)
-            .Include(p => p.Owner).ThenInclude(u => u.ProfilePhoto).FirstOrDefaultAsync(l => l.Id == listingId);
+            .Include(p => p.Owner).ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         if (listing == null)
         {
             throw new NotFoundException($"Listing with Id: {listingId} not found");
