@@ -3,6 +3,7 @@ using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
 using Application.Features.ProductListings.GetProductListing;
 using Application.Features.ProductListings.UpdateProductListing;
+using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -36,15 +37,22 @@ public class ProductListingController(IMediator mediator, IRequestContextService
     
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateProductListing([FromBody] CreateProductListingRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateProductListing([FromForm] CreateProductListingRequest request, [FromForm] List<IFormFile> images)
     {
+        var fileWrappers = new List<FileWrapper>();
+        foreach (var image in images)
+        {
+            fileWrappers.Add(new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()));
+        }
         var command = new CreateProductListingCommand
         {
             ProductListingDto = request,
+            Images = fileWrappers,
             UserId = requestContextService.GetUserId()
         };
         var createdProductListingId = await mediator.Send(command);
-        return Ok(new {createdProductListingId} );
+        return Created($"api/productlisting/{createdProductListingId}", new {createdProductListingId} );
     }
 
     [Authorize]

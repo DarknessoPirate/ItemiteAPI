@@ -10,7 +10,5 @@ public class CreateProductListingRequest
     public decimal Price { get; set; }
     public bool? IsNegotiable { get; set; } = false;
     public int CategoryId { get; set; }
-    
-    // public List<FileWrapper> Images { get; set; }
-    // public FileWrapper MainImage {get; set;}
+    public List<int> ImageOrders { get; set; }
 }
