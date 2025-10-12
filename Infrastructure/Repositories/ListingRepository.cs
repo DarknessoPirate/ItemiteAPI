@@ -30,9 +30,9 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return listing;
     }
     
-    public async Task<T> GetListingByIdAsync(int listingId)
+    public async Task<T> GetListingWithPhotosByIdAsync(int listingId)
     {
-        var listing = await dbContext.Set<T>().FirstOrDefaultAsync(l => l.Id == listingId);
+        var listing = await dbContext.Set<T>().Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         if (listing == null)
         {
             throw new NotFoundException($"Listing with Id: {listingId} not found");
