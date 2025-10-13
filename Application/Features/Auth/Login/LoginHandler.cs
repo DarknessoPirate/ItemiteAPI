@@ -33,7 +33,7 @@ public class LoginHandler(
 
         if (!await userManager.CheckPasswordAsync(user, request.loginDto.Password))
         {
-            throw new UnauthorizedException("Invalid password");
+            throw new UnauthorizedException("Invalid credentials");
         }
         
         var settings = authSettings.Value;

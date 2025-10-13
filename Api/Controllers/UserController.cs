@@ -1,5 +1,6 @@
 using Application.Features.Users.ChangeBackgroundPicture;
 using Application.Features.Users.ChangeEmail;
+using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangeProfilePicture;
 using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.RemoveBackgroundPicture;
@@ -10,14 +11,15 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class UserController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
+    [Authorize]
     [HttpPost("profile/picture")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ChangeProfilePicture(IFormFile file)
@@ -32,6 +34,7 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         return Ok(new { PhotoUrl = photoUrl });
     }
 
+    [Authorize]
     [HttpDelete("profile/picture")]
     public async Task<IActionResult> DeleteProfilePicture()
     {
@@ -45,6 +48,7 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         return NoContent();
     }
 
+    [Authorize]
     [HttpPost("profile/background")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ChangeBackgroundPicture(IFormFile file)
@@ -59,6 +63,7 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         return Ok(new { PhotoUrl = photoUrl });
     }
 
+    [Authorize]
     [HttpDelete("profile/background")]
     public async Task<IActionResult> DeleteBackgroundPicture()
     {
@@ -72,7 +77,8 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         return NoContent();
     }
 
-    [HttpPut("settings/email")]
+    [Authorize]
+    [HttpPut("settings/change-email")]
     public async Task<IActionResult> ChangeEmail(ChangeEmailRequest request)
     {
         var command = new ChangeEmailCommand
@@ -86,16 +92,36 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         return NoContent();
     }
 
-    [HttpGet("settings/email/confirm")]
+    [Authorize]
+    [HttpGet("settings/confirm-email-change")]
     public async Task<IActionResult> ConfirmEmailChange([FromQuery] string token, [FromQuery] string currentEmail)
     {
         var command = new ConfirmEmailChangeCommand
         {
             UserId = requestContextService.GetUserId(),
-            request = new ConfirmEmailChangeRequest
+            request = new ChangeEmailConfirmRequest
             {
                 Token = token,
                 CurrentEmail = currentEmail
+            }
+        };
+
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("settings/change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        var command = new ChangePasswordCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            dto = new ChangePasswordRequest
+            {
+                OldPassword = request.OldPassword,
+                NewPassword = request.NewPassword
             }
         };
 

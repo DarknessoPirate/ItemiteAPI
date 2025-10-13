@@ -6,7 +6,7 @@ public class ConfirmEmailChangeValidator : AbstractValidator<ConfirmEmailChangeC
 {
     public ConfirmEmailChangeValidator()
     {
-        RuleFor(x => x.UserId).GreaterThan(0).WithMessage("Valid user ID is required");
+        RuleFor(x => x.UserId).NotEmpty().WithMessage("Valid user ID is required");
         
         RuleFor(x => x.request.Token)
             .NotEmpty().WithMessage("Valid token is required");

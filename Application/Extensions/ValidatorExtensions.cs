@@ -10,6 +10,7 @@ using Application.Features.Categories.UpdateCategory;
 using Application.Features.ProductListings.GetPaginatedProductListings;
 using Application.Features.ProductListings.UpdateProductListing;
 using Application.Features.Users.ChangeEmail;
+using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ConfirmEmailChange;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,5 +33,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<UpdateProductListingCommand>, UpdateProductListingValidator>();
         services.AddScoped<IValidator<ChangeEmailCommand>, ChangeEmailValidator>();
         services.AddScoped<IValidator<ConfirmEmailChangeCommand>, ConfirmEmailChangeValidator>();
+        services.AddScoped<IValidator<ChangePasswordCommand>, ChangePasswordValidator>();
     }
 }

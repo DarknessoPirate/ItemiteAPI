@@ -6,7 +6,7 @@ public class ChangeEmailValidator : AbstractValidator<ChangeEmailCommand>
 {
     public ChangeEmailValidator()
     {
-        RuleFor(r => r.UserId).NotEmpty();
+        RuleFor(r => r.UserId).NotEmpty().WithMessage("Incorrect user ID");
         
         RuleFor(r => r.changeEmailRequest.NewEmail)
             .NotEmpty().WithMessage("New email cannot be empty")
