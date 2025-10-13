@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Domain.DTOs.Auth;
 
-public class TokenPairResponse
+public class TokenPair
 {
     public AccessTokenDTO AccessToken { get; set; }
     public RefreshTokenDTO RefreshToken { get; set; }

@@ -23,7 +23,7 @@ public class TokenService(
         IOptions<JwtSettings> jwtSettings
     ) : ITokenService
 {
-    public async Task<TokenPairResponse> GenerateTokenPairAsync(User user, string ipAddress, string? deviceId,
+    public async Task<TokenPair> GenerateTokenPairAsync(User user, string ipAddress, string? deviceId,
         string? userAgent)
     {
         var accessToken = GenerateJwtToken(user);
@@ -31,7 +31,7 @@ public class TokenService(
 
         var refreshToken = await CreateRefreshTokenAsync(user, jwtId, ipAddress, deviceId, userAgent);
 
-        return new TokenPairResponse
+        return new TokenPair
         {
             AccessToken = accessToken,
             RefreshToken = new RefreshTokenDTO
@@ -44,7 +44,7 @@ public class TokenService(
 
     // this also returns the user, either it returns it here or we will have to parse the token to get the id and fetch the user again in the handler
     // this is cursed but the other solution is even more cursed imo
-    public async Task<(TokenPairResponse tokens, User user)> RefreshTokenAsync(string expiredAccessToken,
+    public async Task<(TokenPair tokens, User user)> RefreshTokenAsync(string expiredAccessToken,
         string refreshToken,
         string ipAddress,
         string? deviceId, string? userAgent)
@@ -99,7 +99,7 @@ public class TokenService(
         refreshTokenRepository.Update(storedRefreshToken);
         await unitOfWork.SaveChangesAsync();
 
-        var tokens = new TokenPairResponse
+        var tokens = new TokenPair
         {
             AccessToken = newAccessToken,
             RefreshToken = new RefreshTokenDTO
@@ -168,7 +168,7 @@ public class TokenService(
         await unitOfWork.SaveChangesAsync();
     }
 
-    public void SetTokensInsideCookie(TokenPairResponse tokenPair, HttpContext httpContext)
+    public void SetTokensInsideCookie(TokenPair tokenPair, HttpContext httpContext)
     {
         var accessToken = tokenPair.AccessToken;
         var refreshToken = tokenPair.RefreshToken;

@@ -8,9 +8,9 @@ public class AuthResponse
     public int Id { get; set; }
     public string Username { get; set; }
     public string Email { get; set; }
-    public TokenPairResponse Tokens { get; set; }
+    public TokenPair Tokens { get; set; }
 
-    public AuthResponse(User user, TokenPairResponse tokens)
+    public AuthResponse(User user, TokenPair tokens)
     {
         Id = user.Id;
         Email = user.Email!;

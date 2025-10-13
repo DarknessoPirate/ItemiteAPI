@@ -12,8 +12,9 @@ public interface ICategoryRepository
     Task<List<Category>> GetSubCategories(int parentCategoryId);
     Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId);
     Task<List<Category>> GetDescendantsByCategoryId(int parentCategoryId);
+    Task<List<Category>> GetAllParentsRelatedToCategory(Category category);
     Task<Category> GetByNameAsync(string name);
-    Task<Category> GetByIdAsync(int parentId);
+    Task<Category> GetByIdAsync(int categoryId);
     Task<bool> CategoryExistsById(int categoryId);
     Task<bool> CategoryExistsByName(string name);
     Task<bool> CategoryExistsByNameExcludingId(string name, int excludeId);

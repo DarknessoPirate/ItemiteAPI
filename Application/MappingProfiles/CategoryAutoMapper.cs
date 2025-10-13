@@ -12,5 +12,6 @@ public class CategoryAutoMapper : Profile
         CreateMap<Category, CategoryResponse>();
         CreateMap<Category, CategoryTreeResponse>()
             .ForMember(c => c.SubCategories, opt => opt.Ignore());
+        CreateMap<Category, CategoryBasicResponse>();
     }
 }
