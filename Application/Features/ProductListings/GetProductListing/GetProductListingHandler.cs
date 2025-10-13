@@ -27,7 +27,7 @@ public class GetProductListingHandler(
         }
         
         var listing = await productListingRepository.GetListingByIdAsync(request.ListingId);
-        if (listing.OwnerId != request.UserId)
+        if (request.UserId != null && listing.OwnerId != request.UserId)
         {
             try
             {
@@ -42,6 +42,17 @@ public class GetProductListingHandler(
         }
         
         var mappedListing = mapper.Map<ProductListingResponse>(listing);
+        
+        var listingImages = listing.ListingPhotos;
+        var listingImageResponses = listingImages.Select(x => new ProductListingImageResponse
+        {
+            ImageOrder = x.Order,
+            ImageUrl = x.Photo.Url,
+            ImageId = x.PhotoId
+        }).ToList();
+        
+        mappedListing.Images = listingImageResponses;
+        
         await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
         
         return mappedListing;

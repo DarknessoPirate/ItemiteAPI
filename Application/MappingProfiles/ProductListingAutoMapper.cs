@@ -21,9 +21,6 @@ public class ProductListingAutoMapper : Profile
             .ForMember(p => p.Owner, o =>
                 o.MapFrom(p => p.Owner))
             .ForMember(p => p.MainImageUrl, o =>
-                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
-            .ForMember(p => p.ImagesUrls, o =>
-                o.MapFrom(p => p.ListingPhotos.Select(p => p.Photo.Url)));
-
+                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url));
     }
 }

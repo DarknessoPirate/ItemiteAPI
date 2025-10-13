@@ -29,7 +29,7 @@ public class ProductListingController(IMediator mediator, IRequestContextService
         var productListingQuery = new GetProductListingQuery
         {
             ListingId = listingId,
-            UserId = requestContextService.GetUserId()
+            UserId = requestContextService.GetUserIdNullable()
         };
         var listing = await mediator.Send(productListingQuery);
         return Ok(listing);
@@ -69,13 +69,20 @@ public class ProductListingController(IMediator mediator, IRequestContextService
     }
     
     [Authorize]
+    [Consumes("multipart/form-data")]
     [HttpPut("{listingId}")]
-    public async Task<IActionResult> UpdateProductListing([FromBody] UpdateProductListingRequest request, [FromRoute] int listingId)
+    public async Task<IActionResult> UpdateProductListing([FromForm] UpdateProductListingRequest request, [FromForm] List<IFormFile> newImages,[FromRoute] int listingId)
     {
+        var fileWrappers = new List<FileWrapper>();
+        foreach (var image in newImages)
+        {
+            fileWrappers.Add(new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()));
+        }
         var command = new UpdateProductListingCommand
         {
             UpdateDto = request,
             ListingId = listingId,
+            NewImages = fileWrappers,
             UserId = requestContextService.GetUserId()
         };
         var updatedProductListing = await mediator.Send(command);

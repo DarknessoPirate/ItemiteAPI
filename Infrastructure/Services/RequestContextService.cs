@@ -27,6 +27,14 @@ public class RequestContextService : IRequestContextService
         return userId;
     }
 
+    public int? GetUserIdNullable()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        var userIdClaim = httpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        return string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
+    }
+
     public string GetIpAddress()
     {
         var httpContext = _httpContextAccessor.HttpContext;
