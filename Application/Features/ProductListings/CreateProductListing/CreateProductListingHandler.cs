@@ -15,6 +15,8 @@ public class CreateProductListingHandler(
         IMapper mapper,
         IUnitOfWork unitOfWork,
         ICacheService cacheService,
+        IMediaService mediaService,
+        IPhotoRepository photoRepository,
         ILogger<CreateProductListingHandler> logger
         ) : IRequestHandler<CreateProductListingCommand, int>
 {
@@ -39,17 +41,54 @@ public class CreateProductListingHandler(
         
         productListing.Categories = directParents;
         
-        // TODO: handle images upload (CloudinaryService needed)
-
+        var savedPhotosPublicIds = new List<string>();
+        var listingPhotos = new List<ListingPhoto>();
+        await unitOfWork.BeginTransactionAsync();
         try
         {
+            int orderIndex = 0;
+            foreach (var image in request.Images)
+            {
+                var uploadResult = await mediaService.UploadPhotoAsync(image);
+                if (uploadResult.Error != null)
+                {
+                    foreach (var savedPhoto in savedPhotosPublicIds)
+                    {
+                        await mediaService.DeleteImageAsync(savedPhoto);
+                    }
+                    throw new CloudinaryException(uploadResult.Error.Message);
+                }
+                savedPhotosPublicIds.Add(uploadResult.PublicId);
+                var photo = new Photo
+                {
+                    Url = uploadResult.SecureUrl.AbsoluteUri,
+                    PublicId = uploadResult.PublicId
+                };
+                photoRepository.AddPhotoAsync(photo);
+                
+                var listingPhoto = new ListingPhoto
+                {
+                    Photo = photo,
+                    Order = request.ProductListingDto.ImageOrders[orderIndex],
+                };
+                listingPhotos.Add(listingPhoto);
+                orderIndex++;
+            }
+
+            productListing.ListingPhotos = listingPhotos;
             await productListingRepository.CreateListingAsync(productListing);
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.CommitTransactionAsync();
 
             await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
         }
         catch (Exception ex)
         {
+            foreach (var savedPhotos in savedPhotosPublicIds)
+            {
+                await mediaService.DeleteImageAsync(savedPhotos);
+            }
+
+            await unitOfWork.RollbackTransactionAsync();
             logger.LogError(ex, $"Error when creating new product listing: {ex.Message}");
             throw;
         }

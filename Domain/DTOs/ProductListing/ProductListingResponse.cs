@@ -16,6 +16,6 @@ public class ProductListingResponse
     public UserResponse? Owner { get; set; }
     public string? Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }
-    public List<string>? ImagesUrls { get; set; }
+    public List<ProductListingImageResponse>? Images { get; set; }
     public string? MainImageUrl { get; set; }
 }

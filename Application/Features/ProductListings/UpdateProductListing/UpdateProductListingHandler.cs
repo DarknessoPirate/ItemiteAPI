@@ -14,6 +14,8 @@ namespace Application.Features.ProductListings.UpdateProductListing;
 public class UpdateProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
     ICategoryRepository categoryRepository,
+    IPhotoRepository photoRepository,
+    IMediaService mediaService,
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
@@ -22,7 +24,7 @@ public class UpdateProductListingHandler(
 {
     public async Task<ProductListingBasicResponse> Handle(UpdateProductListingCommand request, CancellationToken cancellationToken)
     {
-        var productListingToUpdate = await productListingRepository.GetListingWithCategoriesAndOwnerByIdAsync(request.ListingId);
+        var productListingToUpdate = await productListingRepository.GetListingByIdAsync(request.ListingId);
         if (productListingToUpdate == null)
         {
             throw new NotFoundException("Product listing with id " + request.ListingId + " not found");
@@ -54,19 +56,98 @@ public class UpdateProductListingHandler(
         directParents.Add(category);
         
         productListingToUpdate.Categories = directParents;
-        
-        // TODO: handle images upload (CloudinaryService needed)
-        
+
+        await unitOfWork.BeginTransactionAsync();
         try
         {
+            if (request.UpdateDto.PhotoIdsToDelete != null && request.UpdateDto.PhotoIdsToDelete.Any())
+            {
+                var photosToDelete = productListingToUpdate.ListingPhotos
+                    .Where(lp => request.UpdateDto.PhotoIdsToDelete.Contains(lp.PhotoId))
+                    .ToList();
+
+                foreach (var listingPhoto in photosToDelete)
+                {
+                    var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
+                    if (deletionResult.Error != null)
+                    {
+                        throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
+                    }
+                    await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
+                    productListingToUpdate.ListingPhotos.Remove(listingPhoto);
+                }
+            }
+            
+            if (request.UpdateDto.ExistingPhotoIds != null && request.UpdateDto.ExistingPhotoOrders != null)
+            {
+                for (int i = 0; i < request.UpdateDto.ExistingPhotoIds.Count; i++)
+                {
+                    var photoId = request.UpdateDto.ExistingPhotoIds[i];
+                    var newOrder = request.UpdateDto.ExistingPhotoOrders[i];
+        
+                    var listingPhoto = productListingToUpdate.ListingPhotos
+                        .FirstOrDefault(lp => lp.PhotoId == photoId);
+        
+                    if (listingPhoto != null)
+                    {
+                        listingPhoto.Order = newOrder;
+                    }
+                }
+            }
+            
+            if (request.NewImages != null && request.NewImages.Any())
+            {
+                var savedPhotosPublicIds = new List<string>();
+    
+                for (int i = 0; i < request.NewImages.Count; i++)
+                {
+                    var image = request.NewImages[i];
+                    var uploadResult = await mediaService.UploadPhotoAsync(image);
+        
+                    if (uploadResult.Error != null)
+                    {
+                        foreach (var savedPhoto in savedPhotosPublicIds)
+                        {
+                            await mediaService.DeleteImageAsync(savedPhoto);
+                        }
+                        throw new CloudinaryException(uploadResult.Error.Message);
+                    }
+        
+                    savedPhotosPublicIds.Add(uploadResult.PublicId);
+        
+                    var photo = new Photo
+                    {
+                        Url = uploadResult.SecureUrl.AbsoluteUri,
+                        PublicId = uploadResult.PublicId
+                    };
+        
+                    await photoRepository.AddPhotoAsync(photo);
+                    
+                    int order = request.UpdateDto.NewImagesOrder != null && request.UpdateDto.NewImagesOrder.Count > i
+                        ? request.UpdateDto.NewImagesOrder[i]
+                        : productListingToUpdate.ListingPhotos.Max(lp => lp.Order) + i + 1;
+        
+                    var listingPhoto = new ListingPhoto
+                    {
+                        Photo = photo,
+                        Order = order
+                    };
+        
+                    productListingToUpdate.ListingPhotos.Add(listingPhoto);
+                }
+            }
+
             productListingRepository.UpdateListing(productListingToUpdate);
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.CommitTransactionAsync();
+
             await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+
             return mapper.Map<ProductListingBasicResponse>(productListingToUpdate);
         }
         catch (Exception ex)
         {
+            await unitOfWork.RollbackTransactionAsync();
             logger.LogError(ex, $"Error when updating {request.ListingId}: {ex.Message}");
             throw;
         }

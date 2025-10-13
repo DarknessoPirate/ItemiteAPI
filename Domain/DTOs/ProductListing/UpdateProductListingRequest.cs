@@ -9,6 +9,9 @@ public class UpdateProductListingRequest
     public bool? IsNegotiable { get; set; } = false;
     public int CategoryId { get; set; }
     
-    //public List<FileWrapper> Images { get; set; }
-    //public FileWrapper MainImage {get; set;}
+    public List<int>? PhotoIdsToDelete { get; set; }
+    
+    public List<int>? ExistingPhotoIds { get; set; }
+    public List<int>? ExistingPhotoOrders { get; set; }
+    public List<int>? NewImagesOrder { get; set; }
 }

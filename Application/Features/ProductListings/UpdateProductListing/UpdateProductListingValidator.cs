@@ -1,3 +1,4 @@
+using Domain.DTOs.ProductListing;
 using FluentValidation;
 
 namespace Application.Features.ProductListings.UpdateProductListing;
@@ -30,5 +31,54 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
         RuleFor(x => x.UpdateDto.Location)
             .NotEmpty().WithMessage("Location is empty")
             .NotNull().WithMessage("Location is null");
+        RuleFor(x => x.UpdateDto)
+            .Must(HaveUniqueImageOrders)
+            .WithMessage("Image orders must be unique across all images (existing and new)")
+            .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
+                       || (x.UpdateDto.NewImagesOrder != null && x.UpdateDto.NewImagesOrder.Any()));
+        RuleFor(x => x.UpdateDto)
+            .Must(HaveMainImage)
+            .WithMessage("At least one image must have order = 1 (main image)")
+            .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
+                       || (x.UpdateDto.NewImagesOrder != null && x.UpdateDto.NewImagesOrder.Any()));
+        RuleFor(x => x)
+            .Must(command => command.NewImages == null 
+                             || command.UpdateDto.NewImagesOrder == null 
+                             || command.NewImages.Count == command.UpdateDto.NewImagesOrder.Count)
+            .WithMessage("NewImagesOrder length must match NewImages length");
+    }
+
+    private bool HaveUniqueImageOrders(UpdateProductListingRequest request)
+    {
+        var allOrders = new List<int>();
+        
+        if (request.ExistingPhotoOrders != null)
+        {
+            allOrders.AddRange(request.ExistingPhotoOrders);
+        }
+        
+        if (request.NewImagesOrder != null)
+        {
+            allOrders.AddRange(request.NewImagesOrder);
+        }
+    
+        return allOrders.Count == allOrders.Distinct().Count();
+    }
+
+    private bool HaveMainImage(UpdateProductListingRequest request)
+    {
+        var allOrders = new List<int>();
+    
+        if (request.ExistingPhotoOrders != null)
+        {
+            allOrders.AddRange(request.ExistingPhotoOrders);
+        }
+    
+        if (request.NewImagesOrder != null)
+        {
+            allOrders.AddRange(request.NewImagesOrder);
+        }
+    
+        return allOrders.Contains(1);
     }
 }

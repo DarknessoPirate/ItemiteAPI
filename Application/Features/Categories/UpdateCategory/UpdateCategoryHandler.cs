@@ -65,15 +65,15 @@ public class UpdateCategoryHandler(
             currentParentId = parent.ParentCategoryId;
         }
 
-        
+
         var oldParentCategoryId = categoryToUpdate.ParentCategoryId;
         var oldRootCategoryId = categoryToUpdate.RootCategoryId;
-        
+
         categoryToUpdate.Name = request.Dto.Name;
         categoryToUpdate.Description = request.Dto.Description;
         categoryToUpdate.ImageUrl = request.Dto.ImageUrl;
         categoryToUpdate.ParentCategoryId = request.Dto.ParentCategoryId;
-        
+
 
         // set root category ID based on new parent
         if (request.Dto.ParentCategoryId != null && parentCategory != null) // Use stored parent
@@ -85,14 +85,14 @@ public class UpdateCategoryHandler(
             // It's now a root category, so RootCategoryId should be null
             categoryToUpdate.RootCategoryId = null;
         }
-        
+
         List<Category> descendantsToUpdate;
         // Scenario 1: Subcategory → Root (was a child, now becomes root)
         if (oldParentCategoryId != null && request.Dto.ParentCategoryId == null)
         {
             // Get all descendants following parent hierarchy
             descendantsToUpdate = await categoryRepository.GetDescendantsByCategoryId(categoryToUpdate.Id);
-            
+
             // Update descendants to point to the new root
             foreach (var descendant in descendantsToUpdate)
             {
@@ -104,17 +104,9 @@ public class UpdateCategoryHandler(
         // Scenario 2: Root → Subcategory OR moving between subcategories in different trees
         else if (oldRootCategoryId != categoryToUpdate.RootCategoryId)
         {
-            // Get all descendants by old root (they all have the same RootCategoryId)
-            if (oldRootCategoryId != null)
-            {
-                descendantsToUpdate = await categoryRepository.GetCategoriesByRootIdAsync(oldRootCategoryId.Value);
-            }
-            else
-            {
-                // Was a root, get descendants by parent hierarchy
-                descendantsToUpdate = await categoryRepository.GetDescendantsByCategoryId(categoryToUpdate.Id);
-            }
-            
+            // Get descendants of the category being moved
+            descendantsToUpdate = await categoryRepository.GetDescendantsByCategoryId(categoryToUpdate.Id);
+
             // Update descendants to point to the new root
             foreach (var descendant in descendantsToUpdate)
             {
