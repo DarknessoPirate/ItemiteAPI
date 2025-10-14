@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -14,6 +15,8 @@ public class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>
     protected readonly ISender Sender;
     protected readonly ItemiteDbContext DbContext;
     protected readonly ICacheService Cache;
+    protected readonly List<User> InitialUsers;
+    protected readonly List<Category> InitialCategories;
 
     protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
     {
@@ -22,14 +25,9 @@ public class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>
         Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<ItemiteDbContext>();
         Cache = _scope.ServiceProvider.GetRequiredService<ICacheService>();
-    }
-
-    // remove all entities for passed entity class 
-    protected void ClearTable<T>() where T : class
-    {
-        var entities = DbContext.Set<T>();
-        DbContext.RemoveRange(entities);
-        DbContext.SaveChanges();
+        
+        InitialUsers = DbContext.Users.ToList();
+        InitialCategories = DbContext.Categories.ToList();
     }
     
 }
