@@ -12,7 +12,7 @@ namespace Infrastructure.Services;
 public class EmailService(
     IFluentEmail fluentEmail,
     IOptions<AuthSettings> authSettings
-    ) : IEmailService
+) : IEmailService
 {
     public async Task SendConfirmationAsync(User user, string emailToken)
     {
@@ -23,11 +23,11 @@ public class EmailService(
         };
 
         var emailConfirmationUri = authSettings.Value.EmailVerificationUri;
-        
+
         var confirmationLink = QueryHelpers.AddQueryString(emailConfirmationUri, queryParam!);
-        
+
         var template = "Helpers/EmailTemplates/EmailConfirmation.cshtml";
-        
+
         var sendResponse = await fluentEmail
             .To(user.Email!)
             .Subject("Itemite email confirmation")
@@ -53,11 +53,11 @@ public class EmailService(
         };
 
         var passwordResetUri = authSettings.Value.PasswordResetUri;
-        
+
         var passwordResetLink = QueryHelpers.AddQueryString(passwordResetUri, queryParam!);
-        
+
         var template = "Helpers/EmailTemplates/PasswordReset.cshtml";
-        
+
         var sendResponse = await fluentEmail
             .To(user.Email!)
             .Subject("Itemite password reset")
@@ -71,6 +71,37 @@ public class EmailService(
         if (!sendResponse.Successful)
         {
             throw new EmailException("Error while sending reset password email", sendResponse.ErrorMessages.ToList());
+        }
+    }
+
+    public async Task SendEmailChangeTokenAsync(User user, string newEmail, string emailChangeToken)
+    {
+        var queryParam = new Dictionary<string, string>
+        {
+            { "token", emailChangeToken },
+            { "currentEmail", user.Email! }
+        };
+
+        var emailChangeConfirmationUri = authSettings.Value.EmailChangeConfirmationUri;
+
+        var confirmationLink = QueryHelpers.AddQueryString(emailChangeConfirmationUri, queryParam!);
+
+        var template = "Helpers/EmailTemplates/EmailChangeConfirmation.cshtml";
+
+        var sendResponse = await fluentEmail
+            .To(newEmail)
+            .Subject("Itemite email change")
+            .UsingTemplateFromFile(template, new EmailChangeConfirmationModel
+            {
+                UserName = user.UserName!,
+                NewEmail = newEmail,
+                ConfirmationLink = confirmationLink
+            })
+            .SendAsync();
+
+        if (!sendResponse.Successful)
+        {
+            throw new EmailException("Error while sending email change confirmation", sendResponse.ErrorMessages.ToList());
         }
     }
 }
