@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Features.ProductListings.CreateProductListing;
 using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
@@ -71,18 +72,28 @@ public class ProductListingController(IMediator mediator, IRequestContextService
     [Authorize]
     [Consumes("multipart/form-data")]
     [HttpPut("{listingId}")]
-    public async Task<IActionResult> UpdateProductListing([FromForm] UpdateProductListingRequest request, [FromForm] List<IFormFile> newImages,[FromRoute] int listingId)
+    public async Task<IActionResult> UpdateProductListing(
+        [FromForm] UpdateProductListingRequest request, 
+        [FromForm] List<IFormFile> newImages, 
+        [FromForm] List<int> newImageOrders,
+        [FromRoute] int listingId)
     {
-        var fileWrappers = new List<FileWrapper>();
-        foreach (var image in newImages)
+        var fileWrappersWithOrders = new List<FileWrapperWithOrder>();
+        for (int i = 0; i < newImages.Count; i++)
         {
-            fileWrappers.Add(new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()));
+            var image = newImages[i];
+            var order = i < newImageOrders.Count ? newImageOrders[i] : 2;
+            fileWrappersWithOrders.Add(new FileWrapperWithOrder
+            {
+                File = new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()),
+                Order = order
+            });
         }
         var command = new UpdateProductListingCommand
         {
             UpdateDto = request,
             ListingId = listingId,
-            NewImages = fileWrappers,
+            NewImages = fileWrappersWithOrders,
             UserId = requestContextService.GetUserId()
         };
         var updatedProductListing = await mediator.Send(command);

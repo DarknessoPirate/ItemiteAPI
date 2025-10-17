@@ -60,12 +60,13 @@ public class UpdateProductListingHandler(
         await unitOfWork.BeginTransactionAsync();
         try
         {
-            if (request.UpdateDto.PhotoIdsToDelete != null && request.UpdateDto.PhotoIdsToDelete.Any())
+            if (request.UpdateDto.ExistingPhotoOrders != null && request.UpdateDto.ExistingPhotoIds != null)
             {
-                var photosToDelete = productListingToUpdate.ListingPhotos
-                    .Where(lp => request.UpdateDto.PhotoIdsToDelete.Contains(lp.PhotoId))
+                var allListingPhotos = productListingToUpdate.ListingPhotos.ToList();
+                var photosToDelete = allListingPhotos
+                    .Where(lp => !request.UpdateDto.ExistingPhotoIds.Contains(lp.PhotoId))
                     .ToList();
-
+                
                 foreach (var listingPhoto in photosToDelete)
                 {
                     var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
@@ -76,15 +77,12 @@ public class UpdateProductListingHandler(
                     await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
                     productListingToUpdate.ListingPhotos.Remove(listingPhoto);
                 }
-            }
-            
-            if (request.UpdateDto.ExistingPhotoIds != null && request.UpdateDto.ExistingPhotoOrders != null)
-            {
+               
                 for (int i = 0; i < request.UpdateDto.ExistingPhotoIds.Count; i++)
                 {
                     var photoId = request.UpdateDto.ExistingPhotoIds[i];
                     var newOrder = request.UpdateDto.ExistingPhotoOrders[i];
-        
+                    
                     var listingPhoto = productListingToUpdate.ListingPhotos
                         .FirstOrDefault(lp => lp.PhotoId == photoId);
         
@@ -102,7 +100,7 @@ public class UpdateProductListingHandler(
                 for (int i = 0; i < request.NewImages.Count; i++)
                 {
                     var image = request.NewImages[i];
-                    var uploadResult = await mediaService.UploadPhotoAsync(image);
+                    var uploadResult = await mediaService.UploadPhotoAsync(image.File);
         
                     if (uploadResult.Error != null)
                     {
@@ -123,8 +121,8 @@ public class UpdateProductListingHandler(
         
                     await photoRepository.AddPhotoAsync(photo);
                     
-                    int order = request.UpdateDto.NewImagesOrder != null && request.UpdateDto.NewImagesOrder.Count > i
-                        ? request.UpdateDto.NewImagesOrder[i]
+                    int order = request.NewImages != null && request.NewImages.Count > i
+                        ? request.NewImages.Select(i => i.Order).ToArray()[i]
                         : productListingToUpdate.ListingPhotos.Max(lp => lp.Order) + i + 1;
         
                     var listingPhoto = new ListingPhoto
