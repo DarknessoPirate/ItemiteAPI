@@ -2,6 +2,7 @@ using Application.Exceptions;
 using Application.Features.ProductListings.CreateProductListing;
 using Application.Features.ProductListings.DeleteProductListing;
 using Application.Features.ProductListings.GetPaginatedProductListings;
+using Application.Features.ProductListings.GetProductListing;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using Domain.Entities;
@@ -248,6 +249,47 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
         pageResponse2.Items.First().Name.Should().Be("test_name3");
         pageResponse2.Items.First().MainImageUrl.Should().Be("https://fake-cloudinary-url.com/test_image1");
 
+    }
+    
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(int.MaxValue)]
+    public async Task GetProductListing_ShouldThrow_NotFoundException(int listingId)
+    {
+        await AddTestProductListings();
+
+        var query = new GetProductListingQuery
+        {
+            ListingId = listingId
+        };
+        
+        await Assert.ThrowsAsync<NotFoundException>(() => Sender.Send(query));
+    }
+    
+    [Fact]
+    public async Task GetProductListing_Should_ReturnCorrectProductListing()
+    {
+        var productListingIds = await AddTestProductListings();
+
+        var query = new GetProductListingQuery
+        {
+            ListingId = productListingIds[0],
+            UserId = InitialUsers.Last().Id
+        };
+        
+        var productListing = await Sender.Send(query);
+        
+        productListing.Id.Should().Be(productListingIds[0]);
+        productListing.Name.Should().Be("test_name1");
+        productListing.MainImageUrl.Should().Be("https://fake-cloudinary-url.com/test_image1");
+        productListing.Images.Should().HaveCount(2);
+        productListing.IsFeatured.Should().BeFalse();
+        productListing.IsNegotiable.Should().BeFalse();
+        productListing.Categories.Should().HaveCount(3);
+        productListing.Categories.Should().Contain(c => c.Name == "Clothing");
+        productListing.Categories.Should().Contain(c => c.Name == "Pants");
+        productListing.Owner.Id.Should().Be(InitialUsers.First().Id);
+        productListing.Views.Should().Be(1);
     }
     
     private async Task<List<int>> AddTestProductListings()
