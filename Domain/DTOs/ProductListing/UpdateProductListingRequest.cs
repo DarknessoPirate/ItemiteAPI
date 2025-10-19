@@ -1,3 +1,5 @@
+using Domain.DTOs.File;
+
 namespace Domain.DTOs.ProductListing;
 
 public class UpdateProductListingRequest
@@ -9,9 +11,6 @@ public class UpdateProductListingRequest
     public bool? IsNegotiable { get; set; } = false;
     public int CategoryId { get; set; }
     
-    public List<int>? PhotoIdsToDelete { get; set; }
-    
     public List<int>? ExistingPhotoIds { get; set; }
     public List<int>? ExistingPhotoOrders { get; set; }
-    public List<int>? NewImagesOrder { get; set; }
 }

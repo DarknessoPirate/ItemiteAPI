@@ -31,52 +31,52 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
         RuleFor(x => x.UpdateDto.Location)
             .NotEmpty().WithMessage("Location is empty")
             .NotNull().WithMessage("Location is null");
-        RuleFor(x => x.UpdateDto)
+        RuleFor(x => x)
             .Must(HaveUniqueImageOrders)
             .WithMessage("Image orders must be unique across all images (existing and new)")
             .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
-                       || (x.UpdateDto.NewImagesOrder != null && x.UpdateDto.NewImagesOrder.Any()));
-        RuleFor(x => x.UpdateDto)
+                       || (x.NewImages != null && x.NewImages.Any()));
+        RuleFor(x => x)
             .Must(HaveMainImage)
             .WithMessage("At least one image must have order = 1 (main image)")
             .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
-                       || (x.UpdateDto.NewImagesOrder != null && x.UpdateDto.NewImagesOrder.Any()));
-        RuleFor(x => x)
-            .Must(command => command.NewImages == null 
-                             || command.UpdateDto.NewImagesOrder == null 
-                             || command.NewImages.Count == command.UpdateDto.NewImagesOrder.Count)
-            .WithMessage("NewImagesOrder length must match NewImages length");
+                       || (x.NewImages != null && x.NewImages.Any()));
+        RuleFor(x => x.UpdateDto)
+            .Must(x => x.ExistingPhotoOrders!.Count == x.ExistingPhotoIds!.Count)
+            .WithMessage("Existing photo orders and ids must have same size")
+            .When(x => x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoIds != null &&
+                        x.UpdateDto.ExistingPhotoOrders.Any() && x.UpdateDto.ExistingPhotoIds.Any());
     }
 
-    private bool HaveUniqueImageOrders(UpdateProductListingRequest request)
+    private bool HaveUniqueImageOrders(UpdateProductListingCommand command)
     {
         var allOrders = new List<int>();
         
-        if (request.ExistingPhotoOrders != null)
+        if (command.UpdateDto.ExistingPhotoOrders != null)
         {
-            allOrders.AddRange(request.ExistingPhotoOrders);
+            allOrders.AddRange(command.UpdateDto.ExistingPhotoOrders);
         }
         
-        if (request.NewImagesOrder != null)
+        if (command.NewImages != null)
         {
-            allOrders.AddRange(request.NewImagesOrder);
+            allOrders.AddRange(command.NewImages.Select(i => i.Order));
         }
     
         return allOrders.Count == allOrders.Distinct().Count();
     }
 
-    private bool HaveMainImage(UpdateProductListingRequest request)
+    private bool HaveMainImage(UpdateProductListingCommand command)
     {
         var allOrders = new List<int>();
     
-        if (request.ExistingPhotoOrders != null)
+        if (command.UpdateDto.ExistingPhotoOrders != null)
         {
-            allOrders.AddRange(request.ExistingPhotoOrders);
+            allOrders.AddRange(command.UpdateDto.ExistingPhotoOrders);
         }
     
-        if (request.NewImagesOrder != null)
+        if (command.NewImages != null)
         {
-            allOrders.AddRange(request.NewImagesOrder);
+            allOrders.AddRange(command.NewImages.Select(i => i.Order));
         }
     
         return allOrders.Contains(1);
