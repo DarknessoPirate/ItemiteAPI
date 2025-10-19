@@ -59,6 +59,7 @@ public class ChangeBackgroundPictureHandler(
             var photo = new Photo
             {
                 Url = uploadResult.SecureUrl.AbsoluteUri,
+                FileName = request.File.FileName,
                 PublicId = uploadResult.PublicId,
                 DateUploaded = DateTime.UtcNow,
             };

@@ -13,6 +13,8 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<ListingPhoto> ListingPhotos { get; set; }
+    public DbSet<MessagePhoto> MessagePhotos { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +40,30 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .HasOne(lp => lp.Photo)
             .WithMany()
             .HasForeignKey(lp => lp.PhotoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<MessagePhoto>()
+            .HasOne(mp => mp.Message)
+            .WithMany(m => m.MessagePhotos)
+            .HasForeignKey(mp => mp.MessageId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<MessagePhoto>()
+            .HasOne(mp => mp.Photo)
+            .WithMany()
+            .HasForeignKey(mp => mp.PhotoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany(s => s.SentMessages)
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Recipient)
+            .WithMany(r => r.ReceivedMessages)
+            .HasForeignKey(m => m.RecipientId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Category>()

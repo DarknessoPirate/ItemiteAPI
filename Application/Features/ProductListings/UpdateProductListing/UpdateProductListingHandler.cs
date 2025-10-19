@@ -117,6 +117,7 @@ public class UpdateProductListingHandler(
         
                     var photo = new Photo
                     {
+                        FileName = image.FileName,
                         Url = uploadResult.SecureUrl.AbsoluteUri,
                         PublicId = uploadResult.PublicId
                     };

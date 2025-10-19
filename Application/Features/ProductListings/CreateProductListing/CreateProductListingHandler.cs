@@ -61,10 +61,11 @@ public class CreateProductListingHandler(
                 savedPhotosPublicIds.Add(uploadResult.PublicId);
                 var photo = new Photo
                 {
+                    FileName = image.FileName,
                     Url = uploadResult.SecureUrl.AbsoluteUri,
                     PublicId = uploadResult.PublicId
                 };
-                photoRepository.AddPhotoAsync(photo);
+                await photoRepository.AddPhotoAsync(photo);
                 
                 var listingPhoto = new ListingPhoto
                 {
