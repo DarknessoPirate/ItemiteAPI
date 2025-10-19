@@ -292,6 +292,8 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
         productListing.Views.Should().Be(1);
     }
     
+    // TODO: update test
+    
     private async Task<List<int>> AddTestProductListings()
     {
         var createCommand1 = new CreateProductListingCommand
