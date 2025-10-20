@@ -66,6 +66,12 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .HasForeignKey(m => m.RecipientId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Listing)
+            .WithMany(l => l.ListingMessages)
+            .HasForeignKey(m => m.ListingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Category>()
             .HasOne(c => c.ParentCategory)
             .WithMany(c => c.SubCategories)
