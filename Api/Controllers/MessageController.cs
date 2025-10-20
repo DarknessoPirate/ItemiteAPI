@@ -1,4 +1,5 @@
 using Application.Features.Messages.SendMessage;
+using Application.Features.Messages.UpdateMessage;
 using Domain.DTOs.File;
 using Domain.DTOs.Messages;
 using Infrastructure.Interfaces.Services;
@@ -35,4 +36,21 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
 
         return Ok(result);
     }
+
+    [HttpPut("{messageId:int}")]
+
+    public async Task<ActionResult<MessageResponse>> ModifyMessage(int messageId, string? newContent)
+    {
+        var command = new UpdateMessageCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            MessageId = messageId,
+            NewContent = newContent
+        };
+
+        var result = await mediator.Send(command);
+
+        return Ok(result);
+    }
+    
 }
