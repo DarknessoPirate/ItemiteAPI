@@ -1,3 +1,4 @@
+using AutoMapper;
 using Domain.DTOs.Messages;
 using Domain.DTOs.Photo;
 using Domain.Entities;
@@ -17,8 +18,10 @@ public class SendMessageHandler(
     UserManager<User> userManager,
     IMessageRepository messageRepository,
     IPhotoRepository photoRepository,
+    IListingRepository<ListingBase> listingRepository,
     IMediaService mediaService,
     IUnitOfWork unitOfWork,
+    IMapper mapper,
     ILogger<SendMessageHandler> logger
 ) : IRequestHandler<SendMessageCommand, SendMessageResult>
 {
@@ -28,9 +31,23 @@ public class SendMessageHandler(
         if (sender == null)
             throw new BadRequestException("Sender not found");
 
-        var recipient = await userManager.FindByIdAsync(request.RecipientId.ToString());
+        if (sender.Id == request.SendMessageDto.RecipientId)
+            throw new BadRequestException("Can't send a message to yourself");
+
+        var recipient = await userManager.FindByIdAsync(request.SendMessageDto.RecipientId.ToString());
         if (recipient == null)
             throw new BadRequestException("Recipient not found");
+
+        var listing = await listingRepository.GetListingByIdAsync(request.SendMessageDto.ListingId);
+        if (listing == null)
+            throw new BadRequestException("Listing does not exist");
+
+        if (listing.IsArchived)
+            throw new BadRequestException("Cannot send messages to archived listings");
+
+        if (listing.OwnerId != request.SendMessageDto.RecipientId)
+            throw new BadRequestException("Listing owner and recipient ID mismatch");
+
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         var uploadedPhotosPublicIds = new List<string>();
@@ -39,9 +56,10 @@ public class SendMessageHandler(
         {
             var message = new Message
             {
-                Content = request.Content,
+                Content = request.SendMessageDto.Content,
                 SenderId = request.SenderId,
-                RecipientId = request.RecipientId,
+                ListingId = listing.Id,
+                RecipientId = request.SendMessageDto.RecipientId,
                 DateSent = DateTime.UtcNow
             };
 
@@ -130,19 +148,9 @@ public class SendMessageHandler(
             }
 
             await unitOfWork.CommitTransactionAsync(cancellationToken);
-
             return new SendMessageResult
             {
-                message = new MessageResponse
-                {
-                    MessageId = message.Id,
-                    Content = message.Content,
-                    DateSent = message.DateSent,
-                    DateModified = message.DateModified,
-                    SenderId = message.SenderId,
-                    RecipientId = message.RecipientId,
-                    Photos = successfulPhotos
-                },
+                message = mapper.Map<MessageResponse>(message),
                 UploadResults = photoResults
             };
         }

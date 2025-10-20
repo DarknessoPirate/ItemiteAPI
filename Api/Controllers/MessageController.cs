@@ -21,8 +21,7 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
     {
         var command = new SendMessageCommand
         {
-            Content = request.Content,
-            RecipientId = request.RecipientId,
+            SendMessageDto = request,
             SenderId = requestContextService.GetUserId(),
             Photos = photos.Select(p => new FileWrapper(
                 p.FileName,
@@ -39,7 +38,7 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
 
     [HttpPut("{messageId:int}")]
 
-    public async Task<ActionResult<MessageResponse>> ModifyMessage(int messageId, string? newContent)
+    public async Task<ActionResult<MessageResponse>> UpdateMessage(int messageId, string? newContent)
     {
         var command = new UpdateMessageCommand
         {

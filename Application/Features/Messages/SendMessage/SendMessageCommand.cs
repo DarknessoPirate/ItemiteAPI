@@ -6,8 +6,7 @@ namespace Application.Features.Messages.SendMessage;
 
 public class SendMessageCommand : IRequest<SendMessageResult>
 {
-   public string? Content { get; set; }
-   public int RecipientId { get; set; }
+   public SendMessageRequest SendMessageDto { get; set; } 
    public int SenderId { get; set; }
    public List<FileWrapper> Photos { get; set; } = [];
 }

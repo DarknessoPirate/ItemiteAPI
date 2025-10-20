@@ -10,6 +10,7 @@ public class MessageAutoMapper : Profile
     {
         CreateMap<Message, MessageResponse>()
             .ForMember(dest => dest.MessageId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.ListingId, opt => opt.MapFrom(src => src.ListingId))
             .ForMember(dest => dest.Photos, opt => opt.MapFrom(src => 
                 src.MessagePhotos.Select(mp => mp.Photo)));
     }

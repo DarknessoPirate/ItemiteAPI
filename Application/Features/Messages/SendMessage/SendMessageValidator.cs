@@ -6,7 +6,7 @@ public class SendMessageValidator : AbstractValidator<SendMessageCommand>
 {
     public SendMessageValidator()
     {
-        RuleFor(x => x.RecipientId)
+        RuleFor(x => x.SendMessageDto.RecipientId)
             .NotEmpty().WithMessage("Recipient ID can't be null")
             .GreaterThan(0).WithMessage("Recipient ID must be valid");
 
@@ -14,14 +14,14 @@ public class SendMessageValidator : AbstractValidator<SendMessageCommand>
             .NotEmpty().WithMessage("Sender ID can't be null")
             .GreaterThan(0).WithMessage("Sender ID must be valid");
 
-        RuleFor(x => x.Content)
+        RuleFor(x => x.SendMessageDto.Content)
             .MaximumLength(1000)
-            .When(x => !string.IsNullOrWhiteSpace(x.Content))
+            .When(x => !string.IsNullOrWhiteSpace(x.SendMessageDto.Content))
             .WithMessage("Message length cannot exceed 1000 characters");
 
         // must have at least content OR photos, (can have only photos or only content) 
         RuleFor(x => x)
-            .Must(cmd => !string.IsNullOrWhiteSpace(cmd.Content) || cmd.Photos.Count != 0)
+            .Must(cmd => !string.IsNullOrWhiteSpace(cmd.SendMessageDto.Content) || cmd.Photos.Count != 0)
             .WithMessage("Message must contain either text content or at least one photo");
 
         RuleFor(x => x.Photos)

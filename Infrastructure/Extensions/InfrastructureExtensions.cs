@@ -26,6 +26,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IListingRepository<ProductListing>, ListingRepository<ProductListing>>();
         services.AddScoped<IListingRepository<AuctionListing>, ListingRepository<AuctionListing>>();
+        services.AddScoped<IListingRepository<ListingBase>, ListingRepository<ListingBase>>();
 
         services.AddStackExchangeRedisCache(options =>
         {

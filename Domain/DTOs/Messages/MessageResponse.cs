@@ -9,6 +9,7 @@ public class MessageResponse
     public DateTime DateSent { get; set; }
     public DateTime? DateModified { get; set; }
     public int SenderId { get; set; }
+    public int ListingId { get; set; }
     public int RecipientId { get; set; }
     public List<PhotoResponse> Photos { get; set; } = [];
 }
