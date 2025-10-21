@@ -1,3 +1,4 @@
+using Application.Features.Messages.DeleteMessage;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Domain.DTOs.File;
@@ -37,7 +38,6 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
     }
 
     [HttpPut("{messageId:int}")]
-
     public async Task<ActionResult<MessageResponse>> UpdateMessage(int messageId, string? newContent)
     {
         var command = new UpdateMessageCommand
@@ -50,6 +50,20 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
         var result = await mediator.Send(command);
 
         return Ok(result);
+    }
+
+    [HttpDelete("{messageId:int}")]
+    public async Task<IActionResult> DeleteMessage(int messageId)
+    {
+        var command = new DeleteMessageCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            MessageId = messageId
+        };
+
+        await mediator.Send(command);
+
+        return NoContent();
     }
     
 }

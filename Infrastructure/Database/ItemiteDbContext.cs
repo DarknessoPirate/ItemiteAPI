@@ -15,7 +15,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<ListingPhoto> ListingPhotos { get; set; }
     public DbSet<MessagePhoto> MessagePhotos { get; set; }
     public DbSet<Message> Messages { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()

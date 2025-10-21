@@ -6,6 +6,7 @@ using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services;
@@ -13,12 +14,14 @@ namespace Infrastructure.Services;
 public class MediaService : IMediaService
 {
     private readonly Cloudinary _cloudinary;
+    private readonly ILogger<MediaService> _logger;
 
-    public MediaService(IOptions<CloudinarySettings> cloudinaryConfig)
+    public MediaService(IOptions<CloudinarySettings> cloudinaryConfig, ILogger<MediaService> logger)
     {
         var account = new Account(cloudinaryConfig.Value.CloudName, cloudinaryConfig.Value.ApiKey,
             cloudinaryConfig.Value.ApiSecret);
         _cloudinary = new Cloudinary(account);
+        _logger = logger;
     }
 
     public async Task<ImageUploadResult> UploadPhotoAsync(FileWrapper file)
@@ -57,15 +60,16 @@ public class MediaService : IMediaService
 
             if (uploadResult.Error != null)
             {
-                throw new CloudinaryException($"Failed to upload photo: {uploadResult.Error.Message}");
+                _logger.LogError($"Error while uploading image: {uploadResult.Error.Message}");
+                throw new CloudinaryException($"Failed to upload photo");
             }
 
             return uploadResult;
         }
         catch (Exception ex) when (ex is not CloudinaryException)
         {
-            // only wrap non-cloudinaryExceptions
-            throw new MediaServiceException($"Photo upload failed: {ex.Message}");
+            _logger.LogError($"Error while uploading image: {ex.Message}");
+            throw new MediaServiceException("Photo upload failed");
         }
     }
 
@@ -84,7 +88,8 @@ public class MediaService : IMediaService
         }
         catch (Exception ex)
         {
-            throw new MediaServiceException($"Failed to delete media: {ex.Message}");
+            _logger.LogError($"Error while deleting image: {ex.Message}");
+            throw new MediaServiceException($"Failed to delete image");
         }
     }
 }

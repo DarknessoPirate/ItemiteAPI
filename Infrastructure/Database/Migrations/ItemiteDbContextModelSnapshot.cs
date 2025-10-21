@@ -170,6 +170,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<DateTime>("DateSent")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 

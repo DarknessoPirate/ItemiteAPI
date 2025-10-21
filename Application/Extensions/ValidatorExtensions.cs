@@ -7,6 +7,7 @@ using Application.Features.Categories.CreateCategory;
 using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.UpdateCategory;
+using Application.Features.Messages.DeleteMessage;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Application.Features.ProductListings.CreateProductListing;
@@ -40,5 +41,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangePasswordCommand>, ChangePasswordValidator>();
         services.AddScoped<IValidator<SendMessageCommand>, SendMessageValidator>();
         services.AddScoped<IValidator<UpdateMessageCommand>, UpdateMessageValidator>();
+        services.AddScoped<IValidator<DeleteMessageCommand>, DeleteMessageValidator>();
     }
 }

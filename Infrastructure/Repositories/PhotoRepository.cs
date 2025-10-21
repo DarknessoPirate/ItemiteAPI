@@ -17,4 +17,5 @@ public class PhotoRepository(ItemiteDbContext context) : IPhotoRepository
         if (photo != null)
             context.Photos.Remove(photo);
     }
+    
 }

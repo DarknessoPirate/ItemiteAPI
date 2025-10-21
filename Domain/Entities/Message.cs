@@ -11,6 +11,7 @@ public class Message
     public DateTime? DateModified { get; set; } = null;
     public bool IsRead { get; set; } = false;
     public DateTime? ReadAt { get; set; } = null;
+    public bool IsDeleted { get; set; } = false;
     public User Sender { get; set; }
     public int SenderId { get; set; }
     public User Recipient { get; set; }
