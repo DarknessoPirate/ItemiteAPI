@@ -1,10 +1,12 @@
 using AutoMapper;
 using Domain.Configs;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.ProductListings.CreateProductListing;
@@ -17,13 +19,33 @@ public class CreateProductListingHandler(
         ICacheService cacheService,
         IMediaService mediaService,
         IPhotoRepository photoRepository,
+        UserManager<User> userManager,
         ILogger<CreateProductListingHandler> logger
         ) : IRequestHandler<CreateProductListingCommand, int>
 {
+   
     public async Task<int> Handle(CreateProductListingCommand request, CancellationToken cancellationToken)
     {
         var productListing = mapper.Map<ProductListing>(request.ProductListingDto);
         productListing.OwnerId = request.UserId;
+        
+        if (request.ProductListingDto.Location == null || !IsLocationComplete(request.ProductListingDto.Location))
+        {
+            var user = await userManager.FindByIdAsync(request.UserId.ToString());
+            if (user?.Location == null || !IsLocationComplete(user.Location))
+            {
+                throw new BadRequestException("Location is required. Please provide location or set your profile location.");
+            }
+            
+            productListing.Location = new Location
+            {
+                Longitude = user.Location.Longitude,
+                Latitude = user.Location.Latitude,
+                Country = user.Location.Country,
+                City = user.Location.City,
+                PostalCode = user.Location.PostalCode
+            };
+        }
         
         var category = await categoryRepository.GetByIdAsync(request.ProductListingDto.CategoryId);
         if (category == null)
@@ -95,5 +117,16 @@ public class CreateProductListingHandler(
         
         
         return productListing.Id;
+    }
+    
+    private bool IsLocationComplete(Location? location)
+    {
+        if (location == null) return false;
+    
+        return location.Longitude.HasValue 
+               && location.Latitude.HasValue 
+               && !string.IsNullOrWhiteSpace(location.Country) 
+               && !string.IsNullOrWhiteSpace(location.City) 
+               && !string.IsNullOrWhiteSpace(location.PostalCode);
     }
 }

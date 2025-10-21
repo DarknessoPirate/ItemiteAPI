@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Configs;
 using Domain.DTOs.ProductListing;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -38,7 +39,29 @@ public class UpdateProductListingHandler(
         productListingToUpdate.Name = request.UpdateDto.Name;
         productListingToUpdate.Description = request.UpdateDto.Description;
         productListingToUpdate.Price = request.UpdateDto.Price;
-        productListingToUpdate.Location = request.UpdateDto.Location;
+        if (request.UpdateDto.Location == null || !IsLocationComplete(request.UpdateDto.Location))
+        {
+            var ownerLoc = productListingToUpdate.Owner.Location;
+            if (ownerLoc == null || !IsLocationComplete(ownerLoc))
+            {
+                throw new BadRequestException("Location is required. Please provide location or set your profile location.");
+            }
+   
+            productListingToUpdate.Location.Longitude = ownerLoc.Longitude;
+            productListingToUpdate.Location.Latitude = ownerLoc.Latitude;
+            productListingToUpdate.Location.Country = ownerLoc.Country;
+            productListingToUpdate.Location.City = ownerLoc.City;
+            productListingToUpdate.Location.PostalCode = ownerLoc.PostalCode;
+        }
+        else
+        {
+            var loc = request.UpdateDto.Location;
+            productListingToUpdate.Location.Longitude = loc.Longitude;
+            productListingToUpdate.Location.Latitude = loc.Latitude;
+            productListingToUpdate.Location.Country = loc.Country;
+            productListingToUpdate.Location.City = loc.City;
+            productListingToUpdate.Location.PostalCode = loc.PostalCode;
+        }
         productListingToUpdate.IsNegotiable = request.UpdateDto.IsNegotiable ?? false;
         
         var category = await categoryRepository.GetByIdAsync(request.UpdateDto.CategoryId);
@@ -149,5 +172,16 @@ public class UpdateProductListingHandler(
             logger.LogError(ex, $"Error when updating {request.ListingId}: {ex.Message}");
             throw;
         }
+    }
+    
+    private bool IsLocationComplete(Location? location)
+    {
+        if (location == null) return false;
+    
+        return location.Longitude.HasValue 
+               && location.Latitude.HasValue 
+               && !string.IsNullOrWhiteSpace(location.Country) 
+               && !string.IsNullOrWhiteSpace(location.City) 
+               && !string.IsNullOrWhiteSpace(location.PostalCode);
     }
 }

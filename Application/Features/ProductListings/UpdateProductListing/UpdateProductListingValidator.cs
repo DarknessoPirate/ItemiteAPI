@@ -1,4 +1,5 @@
 using Domain.DTOs.ProductListing;
+using Domain.ValueObjects;
 using FluentValidation;
 
 namespace Application.Features.ProductListings.UpdateProductListing;
@@ -46,8 +47,59 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
             .WithMessage("Existing photo orders and ids must have same size")
             .When(x => x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoIds != null &&
                         x.UpdateDto.ExistingPhotoOrders.Any() && x.UpdateDto.ExistingPhotoIds.Any());
+        
+        RuleFor(x => x.UpdateDto.Location)
+            .Must(LocationIsCompleteOrNull)
+            .WithMessage("If location is provided, all fields (Longitude, Latitude, Country, City, PostalCode) must be filled")
+            .When(x => x.UpdateDto.Location != null);
+
+        RuleFor(x => x.UpdateDto.Location.Longitude)
+            .InclusiveBetween(-180, 180)
+            .WithMessage("Longitude must be between -180 and 180")
+            .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
+
+        RuleFor(x => x.UpdateDto.Location.Latitude)
+            .InclusiveBetween(-90, 90)
+            .WithMessage("Latitude must be between -90 and 90")
+            .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
+
+        RuleFor(x => x.UpdateDto.Location.Country)
+            .NotEmpty().WithMessage("Country is required when location is provided")
+            .Length(2, 100).WithMessage("Country must be between 2 and 100 characters")
+            .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
+
+        RuleFor(x => x.UpdateDto.Location.City)
+            .NotEmpty().WithMessage("City is required when location is provided")
+            .Length(2, 100).WithMessage("City must be between 2 and 100 characters")
+            .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
+
+        RuleFor(x => x.UpdateDto.Location.PostalCode)
+            .NotEmpty().WithMessage("Postal code is required when location is provided")
+            .Length(2, 20).WithMessage("Postal code must be between 2 and 20 characters")
+            .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
     }
 
+    private bool HasAnyLocationField(Location location)
+    {
+        return location.Longitude.HasValue 
+               || location.Latitude.HasValue 
+               || !string.IsNullOrWhiteSpace(location.Country) 
+               || !string.IsNullOrWhiteSpace(location.City) 
+               || !string.IsNullOrWhiteSpace(location.PostalCode);
+    }
+
+    private bool LocationIsCompleteOrNull(Location? location)
+    {
+        if (location == null) return true;
+        
+        if (!HasAnyLocationField(location)) return true;
+        
+        return location.Longitude.HasValue 
+               && location.Latitude.HasValue 
+               && !string.IsNullOrWhiteSpace(location.Country) 
+               && !string.IsNullOrWhiteSpace(location.City) 
+               && !string.IsNullOrWhiteSpace(location.PostalCode);
+    }
     private bool HaveUniqueImageOrders(UpdateProductListingCommand command)
     {
         var allOrders = new List<int>();

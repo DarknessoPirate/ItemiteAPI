@@ -1,5 +1,6 @@
 using Domain.DTOs.Category;
 using Domain.DTOs.User;
+using Domain.ValueObjects;
 
 namespace Domain.DTOs.ProductListing;
 
@@ -14,7 +15,7 @@ public class ProductListingResponse
     public bool IsFeatured { get; set; }
     public bool IsNegotiable { get; set; }
     public UserResponse? Owner { get; set; }
-    public string? Location { get; set; }
+    public Location Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }
     public List<ProductListingImageResponse>? Images { get; set; }
     public string? MainImageUrl { get; set; }

@@ -1,4 +1,5 @@
 using Domain.DTOs.Category;
+using Domain.ValueObjects;
 
 namespace Domain.DTOs.ProductListing;
 
@@ -8,7 +9,7 @@ public class ProductListingBasicResponse
     public string? Name { get; set; }
     public decimal Price { get; set; }
     public bool IsNegotiable { get; set; }
-    public string? Location { get; set; }
+    public Location Location { get; set; }
     public DateTime DateCreated { get; set; }
     public List<CategoryBasicResponse> Categories { get; set; }
     public string? MainImageUrl { get; set; }

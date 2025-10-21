@@ -1,12 +1,13 @@
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities;
 
 public class User : IdentityUser<int>
 {
-    public string? Location { get; set; }
+    public Location? Location { get; set; }
     public DateTime? EmailConfirmationTokenExpirationDate { get; set; }
     public string? PendingNewEmail { get; set; }
     public DateTime? EmailChangeTokenExpirationDate { get; set; }
