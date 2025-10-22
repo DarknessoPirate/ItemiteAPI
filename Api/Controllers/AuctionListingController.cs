@@ -1,4 +1,5 @@
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
+using Application.Features.Listings.AuctionListings.GetAuctionListing;
 using Domain.DTOs.AuctionListing;
 using Domain.DTOs.File;
 using Infrastructure.Interfaces.Services;
@@ -12,6 +13,18 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class AuctionListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
+    [HttpGet("{listingId}")]
+    public async Task<IActionResult> GetAuctionListing(int listingId)
+    {
+        var auctionListingQuery = new GetAuctionListingQuery
+        {
+            ListingId = listingId,
+            UserId = requestContextService.GetUserIdNullable()
+        };
+        var listing = await mediator.Send(auctionListingQuery);
+        return Ok(listing);
+    }
+    
     [Authorize]
     [HttpPost]
     [Consumes("multipart/form-data")]

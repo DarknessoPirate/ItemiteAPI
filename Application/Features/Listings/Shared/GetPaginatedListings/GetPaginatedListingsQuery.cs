@@ -24,7 +24,7 @@ public class GetPaginatedListingsQuery : IRequest<PageResponse<ListingBasicRespo
     
         return $"{PageSize.ToString()}_" +
                $"{PageNumber.ToString()}_" +
-               $"{ListingType.ToString() ?? null}_" +
+               $"{ListingType?.ToString() ?? "null"}_" +
                $"{SortBy?.ToString() ?? "null"}_" +
                $"{SortDirection?.ToString() ?? "null"}_" +
                $"{PriceFrom?.ToString() ?? "null"}_" +

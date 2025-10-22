@@ -1,39 +1,40 @@
+using Application.Features.Listings.ProductListings.GetProductListing;
 using AutoMapper;
 using Domain.Configs;
+using Domain.DTOs.AuctionListing;
 using Domain.DTOs.Listing;
-using Domain.DTOs.ProductListing;
 using Domain.Entities;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.Listings.ProductListings.GetProductListing;
+namespace Application.Features.Listings.AuctionListings.GetAuctionListing;
 
-public class GetProductListingHandler(
-    IListingRepository<ProductListing> productListingRepository,
+public class GetAuctionListingHandler(
+    IListingRepository<AuctionListing> auctionListingRepository,
     ICacheService cache,
     IMapper mapper,
     IUnitOfWork unitOfWork,
     ILogger<GetProductListingHandler> logger
-    ) : IRequestHandler<GetProductListingQuery, ProductListingResponse>
+    ) : IRequestHandler<GetAuctionListingQuery, AuctionListingResponse>
 {
-    public async Task<ProductListingResponse> Handle(GetProductListingQuery request, CancellationToken cancellationToken)
+    public async Task<AuctionListingResponse> Handle(GetAuctionListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cache.GetAsync<AuctionListingResponse>($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;
         }
         
-        var listing = await productListingRepository.GetListingByIdAsync(request.ListingId);
+        var listing = await auctionListingRepository.GetListingByIdAsync(request.ListingId);
         if (request.UserId != null && listing.OwnerId != request.UserId)
         {
             try
             {
                 listing.Views += 1;
-                productListingRepository.UpdateListing(listing);
+                auctionListingRepository.UpdateListing(listing);
                 await unitOfWork.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -42,7 +43,7 @@ public class GetProductListingHandler(
             }
         }
         
-        var mappedListing = mapper.Map<ProductListingResponse>(listing);
+        var mappedListing = mapper.Map<AuctionListingResponse>(listing);
         
         var listingImages = listing.ListingPhotos;
         var listingImageResponses = listingImages.Select(x => new ListingImageResponse
@@ -54,7 +55,7 @@ public class GetProductListingHandler(
         
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}", mappedListing);
         
         return mappedListing;
     }
