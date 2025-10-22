@@ -61,9 +61,9 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
             .Length(2, 100).WithMessage("City must be between 2 and 100 characters")
             .When(x => x.AuctionListingDto.Location != null && HasAnyLocationField(x.AuctionListingDto.Location));
 
-        RuleFor(x => x.AuctionListingDto.Location.PostalCode)
-            .NotEmpty().WithMessage("Postal code is required when location is provided")
-            .Length(2, 20).WithMessage("Postal code must be between 2 and 20 characters")
+        RuleFor(x => x.AuctionListingDto.Location.State)
+            .NotEmpty().WithMessage("State is required when location is provided")
+            .Length(2, 100).WithMessage("State must be between 2 and 20 characters")
             .When(x => x.AuctionListingDto.Location != null && HasAnyLocationField(x.AuctionListingDto.Location));
     }
     
@@ -73,7 +73,7 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
                || location.Latitude.HasValue 
                || !string.IsNullOrWhiteSpace(location.Country) 
                || !string.IsNullOrWhiteSpace(location.City) 
-               || !string.IsNullOrWhiteSpace(location.PostalCode);
+               || !string.IsNullOrWhiteSpace(location.State);
     }
 
     private bool LocationIsCompleteOrNull(Location? location)
@@ -86,6 +86,6 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

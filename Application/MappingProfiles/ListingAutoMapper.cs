@@ -47,6 +47,6 @@ public class ListingAutoMapper : Profile
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

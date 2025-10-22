@@ -43,7 +43,7 @@ public class CreateProductListingHandler(
                 Latitude = user.Location.Latitude,
                 Country = user.Location.Country,
                 City = user.Location.City,
-                PostalCode = user.Location.PostalCode
+                State = user.Location.State
             };
         }
         
@@ -127,6 +127,6 @@ public class CreateProductListingHandler(
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

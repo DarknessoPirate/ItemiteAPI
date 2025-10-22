@@ -51,7 +51,7 @@ public class UpdateProductListingHandler(
             productListingToUpdate.Location.Latitude = ownerLoc.Latitude;
             productListingToUpdate.Location.Country = ownerLoc.Country;
             productListingToUpdate.Location.City = ownerLoc.City;
-            productListingToUpdate.Location.PostalCode = ownerLoc.PostalCode;
+            productListingToUpdate.Location.State = ownerLoc.State;
         }
         else
         {
@@ -60,7 +60,7 @@ public class UpdateProductListingHandler(
             productListingToUpdate.Location.Latitude = loc.Latitude;
             productListingToUpdate.Location.Country = loc.Country;
             productListingToUpdate.Location.City = loc.City;
-            productListingToUpdate.Location.PostalCode = loc.PostalCode;
+            productListingToUpdate.Location.State = loc.State;
         }
         productListingToUpdate.IsNegotiable = request.UpdateDto.IsNegotiable ?? false;
         
@@ -182,6 +182,6 @@ public class UpdateProductListingHandler(
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }
