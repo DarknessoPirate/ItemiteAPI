@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.AuctionListings.CreateAuctionListing;
+namespace Application.Features.Listings.AuctionListings.CreateAuctionListing;
 
 public class CreateAuctionListingHandler(
     IListingRepository<AuctionListing> auctionListingRepository,
@@ -100,7 +100,7 @@ public class CreateAuctionListingHandler(
             await auctionListingRepository.CreateListingAsync(auctionListing);
             await unitOfWork.CommitTransactionAsync();
 
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
         }
         catch (Exception ex)
         {

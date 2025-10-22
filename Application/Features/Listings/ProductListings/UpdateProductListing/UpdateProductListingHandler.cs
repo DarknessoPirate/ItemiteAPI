@@ -10,7 +10,7 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
 public class UpdateProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
@@ -161,8 +161,8 @@ public class UpdateProductListingHandler(
             productListingRepository.UpdateListing(productListingToUpdate);
             await unitOfWork.CommitTransactionAsync();
 
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
-            await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
+            await cacheService.RemoveAsync($"{CacheKeys.LISTING}{request.ListingId}");
 
             return mapper.Map<ProductListingBasicResponse>(productListingToUpdate);
         }

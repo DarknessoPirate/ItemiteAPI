@@ -1,13 +1,11 @@
 using Application.Exceptions;
-using Application.Features.ProductListings.CreateProductListing;
-using Application.Features.ProductListings.DeleteProductListing;
-using Application.Features.ProductListings.GetPaginatedProductListings;
-using Application.Features.ProductListings.GetProductListing;
+using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.GetProductListing;
+using Application.Features.Listings.Shared.DeleteListing;
+using Application.Features.Listings.Shared.GetPaginatedListings;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
-using Domain.Entities;
 using Domain.Enums;
-using Domain.ValueObjects;
 using FluentAssertions;
 using Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -132,7 +130,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         var listingIds = await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = listingIds[0],
             UserId = InitialUsers.Last().Id
@@ -147,7 +145,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = 999999,
             UserId = InitialUsers.Last().Id
@@ -162,7 +160,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         var listingIds = await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = listingIds[0],
             UserId = InitialUsers.First().Id
@@ -189,7 +187,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var query = new GetPaginatedProductListingsQuery
+        var query = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = pageSize,
@@ -205,7 +203,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var query1 = new GetPaginatedProductListingsQuery
+        var query1 = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = 2,
@@ -226,7 +224,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
         pageResponse1.Items.First().Name.Should().Be("test_name2");
         pageResponse1.Items.First().MainImageUrl.Should().Be("https://fake-cloudinary-url.com/test_image1");
         
-        var query2 = new GetPaginatedProductListingsQuery
+        var query2 = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = 3,

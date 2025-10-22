@@ -1,5 +1,4 @@
-using Application.Features.AuctionListings.CreateAuctionListing;
-using Application.Features.ProductListings.CreateProductListing;
+using Application.Features.Listings.AuctionListings.CreateAuctionListing;
 using Domain.DTOs.AuctionListing;
 using Domain.DTOs.File;
 using Infrastructure.Interfaces.Services;

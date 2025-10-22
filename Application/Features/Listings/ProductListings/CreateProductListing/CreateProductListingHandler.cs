@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.ProductListings.CreateProductListing;
+namespace Application.Features.Listings.ProductListings.CreateProductListing;
 
 public class CreateProductListingHandler(
         IListingRepository<ProductListing> productListingRepository,
@@ -101,7 +101,7 @@ public class CreateProductListingHandler(
             await productListingRepository.CreateListingAsync(productListing);
             await unitOfWork.CommitTransactionAsync();
 
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
         }
         catch (Exception ex)
         {

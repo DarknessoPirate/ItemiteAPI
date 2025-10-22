@@ -1,8 +1,7 @@
-using Domain.DTOs.ProductListing;
 using Domain.ValueObjects;
 using FluentValidation;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
 public class UpdateProductListingValidator : AbstractValidator<UpdateProductListingCommand>
 {

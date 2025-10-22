@@ -7,7 +7,7 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.ProductListings.GetProductListing;
+namespace Application.Features.Listings.ProductListings.GetProductListing;
 
 public class GetProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
@@ -20,7 +20,7 @@ public class GetProductListingHandler(
     public async Task<ProductListingResponse> Handle(GetProductListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.LISTING}{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;
@@ -53,7 +53,7 @@ public class GetProductListingHandler(
         
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.LISTING}{listing.Id}", mappedListing);
         
         return mappedListing;
     }

@@ -1,9 +1,6 @@
-using System.Text.Json;
-using Application.Features.ProductListings.CreateProductListing;
-using Application.Features.ProductListings.DeleteProductListing;
-using Application.Features.ProductListings.GetPaginatedProductListings;
-using Application.Features.ProductListings.GetProductListing;
-using Application.Features.ProductListings.UpdateProductListing;
+using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.GetProductListing;
+using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using Infrastructure.Interfaces.Services;
@@ -17,13 +14,7 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class ProductListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetProductListings([FromQuery] GetPaginatedProductListingsQuery query)
-    {
-        var productListings = await mediator.Send(query);
-        return Ok(productListings);
-    }
-
+    
     [HttpGet("{listingId}")]
     public async Task<IActionResult> GetProductListingById(int listingId)
     {
@@ -54,19 +45,6 @@ public class ProductListingController(IMediator mediator, IRequestContextService
         };
         var createdProductListingId = await mediator.Send(command);
         return Created($"api/productlisting/{createdProductListingId}", new {createdProductListingId} );
-    }
-
-    [Authorize]
-    [HttpDelete("{listingId}")]
-    public async Task<IActionResult> DeleteProductListing([FromRoute] int listingId)
-    {
-        var command = new DeleteProductListingCommand
-        {
-            ListingId = listingId,
-            UserId = requestContextService.GetUserId()
-        };
-        await mediator.Send(command);
-        return NoContent();
     }
     
     [Authorize]

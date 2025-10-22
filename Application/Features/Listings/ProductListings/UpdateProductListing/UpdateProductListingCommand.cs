@@ -2,7 +2,7 @@ using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using MediatR;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
 public class UpdateProductListingCommand : IRequest<ProductListingBasicResponse>
 {
