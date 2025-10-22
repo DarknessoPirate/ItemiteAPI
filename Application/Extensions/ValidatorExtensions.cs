@@ -1,3 +1,4 @@
+using Application.Features.AuctionListings.CreateAuctionListing;
 using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.RefreshToken;
@@ -36,5 +37,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangeEmailCommand>, ChangeEmailValidator>();
         services.AddScoped<IValidator<ConfirmEmailChangeCommand>, ConfirmEmailChangeValidator>();
         services.AddScoped<IValidator<ChangePasswordCommand>, ChangePasswordValidator>();
+        services.AddScoped<IValidator<CreateAuctionListingCommand>, CreateAuctionListingValidator>();
     }
 }
