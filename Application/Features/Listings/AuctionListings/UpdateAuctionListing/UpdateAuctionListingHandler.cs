@@ -1,7 +1,8 @@
 using Application.Exceptions;
+using Application.Features.Listings.ProductListings.UpdateProductListing;
 using AutoMapper;
 using Domain.Configs;
-using Domain.DTOs.ProductListing;
+using Domain.DTOs.AuctionListing;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Infrastructure.Exceptions;
@@ -10,59 +11,65 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.Listings.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 
-public class UpdateProductListingHandler(
-    IListingRepository<ProductListing> productListingRepository,
+public class UpdateAuctionListingHandler(
+    IListingRepository<AuctionListing> auctionListingRepository,
     ICategoryRepository categoryRepository,
     IPhotoRepository photoRepository,
     IMediaService mediaService,
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    ILogger<UpdateProductListingHandler> logger
-    ) : IRequestHandler<UpdateProductListingCommand, ProductListingResponse>
+    ILogger<UpdateAuctionListingHandler> logger
+    ) : IRequestHandler<UpdateAuctionListingCommand, AuctionListingResponse>
 {
-    public async Task<ProductListingResponse> Handle(UpdateProductListingCommand request, CancellationToken cancellationToken)
+    public async Task<AuctionListingResponse> Handle(UpdateAuctionListingCommand request, CancellationToken cancellationToken)
     {
-        var productListingToUpdate = await productListingRepository.GetListingByIdAsync(request.ListingId);
-        if (productListingToUpdate == null)
+        var auctionListingToUpdate = await auctionListingRepository.GetListingByIdAsync(request.ListingId);
+        if (auctionListingToUpdate == null)
         {
-            throw new NotFoundException("Product listing with id " + request.ListingId + " not found");
+            throw new NotFoundException("Auction listing with id " + request.ListingId + " not found");
         }
         
-        if (productListingToUpdate.OwnerId != request.UserId)
+        if (auctionListingToUpdate.OwnerId != request.UserId)
         {
-            throw new ForbiddenException("You are not allowed to update this product");
+            throw new ForbiddenException("You are not allowed to update this auction");
         }
         
-        productListingToUpdate.Name = request.UpdateDto.Name;
-        productListingToUpdate.Description = request.UpdateDto.Description;
-        productListingToUpdate.Price = request.UpdateDto.Price;
+        auctionListingToUpdate.Name = request.UpdateDto.Name;
+        auctionListingToUpdate.Description = request.UpdateDto.Description;
+        
+        
+        if (request.UpdateDto.StartingBid > auctionListingToUpdate.CurrentBid)
+        {
+            throw new BadRequestException("Starting bid can't be greater than current bid");
+        }
+        auctionListingToUpdate.StartingBid = request.UpdateDto.StartingBid;
+        
         if (request.UpdateDto.Location == null || !IsLocationComplete(request.UpdateDto.Location))
         {
-            var ownerLoc = productListingToUpdate.Owner.Location;
+            var ownerLoc = auctionListingToUpdate.Owner.Location;
             if (ownerLoc == null || !IsLocationComplete(ownerLoc))
             {
                 throw new BadRequestException("Location is required. Please provide location or set your profile location.");
             }
    
-            productListingToUpdate.Location.Longitude = ownerLoc.Longitude;
-            productListingToUpdate.Location.Latitude = ownerLoc.Latitude;
-            productListingToUpdate.Location.Country = ownerLoc.Country;
-            productListingToUpdate.Location.City = ownerLoc.City;
-            productListingToUpdate.Location.State = ownerLoc.State;
+            auctionListingToUpdate.Location.Longitude = ownerLoc.Longitude;
+            auctionListingToUpdate.Location.Latitude = ownerLoc.Latitude;
+            auctionListingToUpdate.Location.Country = ownerLoc.Country;
+            auctionListingToUpdate.Location.City = ownerLoc.City;
+            auctionListingToUpdate.Location.State = ownerLoc.State;
         }
         else
         {
             var loc = request.UpdateDto.Location;
-            productListingToUpdate.Location.Longitude = loc.Longitude;
-            productListingToUpdate.Location.Latitude = loc.Latitude;
-            productListingToUpdate.Location.Country = loc.Country;
-            productListingToUpdate.Location.City = loc.City;
-            productListingToUpdate.Location.State = loc.State;
+            auctionListingToUpdate.Location.Longitude = loc.Longitude;
+            auctionListingToUpdate.Location.Latitude = loc.Latitude;
+            auctionListingToUpdate.Location.Country = loc.Country;
+            auctionListingToUpdate.Location.City = loc.City;
+            auctionListingToUpdate.Location.State = loc.State;
         }
-        productListingToUpdate.IsNegotiable = request.UpdateDto.IsNegotiable ?? false;
         
         var category = await categoryRepository.GetByIdAsync(request.UpdateDto.CategoryId);
         if (category == null)
@@ -72,18 +79,18 @@ public class UpdateProductListingHandler(
 
         if (await categoryRepository.IsParentCategory(request.UpdateDto.CategoryId))
         {
-            throw new BadRequestException("You can't assign parent category to product listing");
+            throw new BadRequestException("You can't assign parent category to auction listing");
         }
 
         var directParents = await categoryRepository.GetAllParentsRelatedToCategory(category);
         directParents.Add(category);
         
-        productListingToUpdate.Categories = directParents;
+        auctionListingToUpdate.Categories = directParents;
 
         await unitOfWork.BeginTransactionAsync();
         try
         {
-            var allListingPhotos = productListingToUpdate.ListingPhotos.ToList();
+            var allListingPhotos = auctionListingToUpdate.ListingPhotos.ToList();
             if (request.UpdateDto.ExistingPhotoOrders == null && request.UpdateDto.ExistingPhotoIds == null)
             {
                 foreach (var listingPhoto in allListingPhotos)
@@ -94,7 +101,7 @@ public class UpdateProductListingHandler(
                         throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
                     }
                     await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
-                    productListingToUpdate.ListingPhotos.Remove(listingPhoto);
+                    auctionListingToUpdate.ListingPhotos.Remove(listingPhoto);
                 }
             }
             else if (request.UpdateDto.ExistingPhotoOrders != null && request.UpdateDto.ExistingPhotoIds != null)
@@ -111,7 +118,7 @@ public class UpdateProductListingHandler(
                         throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
                     }
                     await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
-                    productListingToUpdate.ListingPhotos.Remove(listingPhoto);
+                    auctionListingToUpdate.ListingPhotos.Remove(listingPhoto);
                 }
                
                 for (int i = 0; i < request.UpdateDto.ExistingPhotoIds.Count; i++)
@@ -119,7 +126,7 @@ public class UpdateProductListingHandler(
                     var photoId = request.UpdateDto.ExistingPhotoIds[i];
                     var newOrder = request.UpdateDto.ExistingPhotoOrders[i];
                     
-                    var listingPhoto = productListingToUpdate.ListingPhotos
+                    var listingPhoto = auctionListingToUpdate.ListingPhotos
                         .FirstOrDefault(lp => lp.PhotoId == photoId);
         
                     if (listingPhoto != null)
@@ -159,7 +166,7 @@ public class UpdateProductListingHandler(
                     
                     int order = request.NewImages != null && request.NewImages.Count > i
                         ? request.NewImages.Select(i => i.Order).ToArray()[i]
-                        : productListingToUpdate.ListingPhotos.Max(lp => lp.Order) + i + 1;
+                        : auctionListingToUpdate.ListingPhotos.Max(lp => lp.Order) + i + 1;
         
                     var listingPhoto = new ListingPhoto
                     {
@@ -167,17 +174,17 @@ public class UpdateProductListingHandler(
                         Order = order
                     };
         
-                    productListingToUpdate.ListingPhotos.Add(listingPhoto);
+                    auctionListingToUpdate.ListingPhotos.Add(listingPhoto);
                 }
             }
 
-            productListingRepository.UpdateListing(productListingToUpdate);
+            auctionListingRepository.UpdateListing(auctionListingToUpdate);
             await unitOfWork.CommitTransactionAsync();
 
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-            await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
 
-            return mapper.Map<ProductListingResponse>(productListingToUpdate);
+            return mapper.Map<AuctionListingResponse>(auctionListingToUpdate);
         }
         catch (Exception ex)
         {
@@ -186,7 +193,6 @@ public class UpdateProductListingHandler(
             throw;
         }
     }
-    
     private bool IsLocationComplete(Location? location)
     {
         if (location == null) return false;

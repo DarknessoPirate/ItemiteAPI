@@ -12,13 +12,6 @@ public class ProductListingAutoMapper : Profile
         CreateMap<CreateProductListingRequest, ProductListing>()
             .ForMember(dest => dest.Location, opt => 
                 opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
-        CreateMap<ProductListing, ProductListingBasicResponse>()
-            .ForMember(p => p.Categories, o =>
-                o.MapFrom(p => p.Categories))
-            .ForMember(p => p.MainImageUrl, o =>
-                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
-            .ForMember(p => p.Location, opt => 
-                opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
 
         CreateMap<ProductListing, ProductListingResponse>()
             .ForMember(p => p.Categories, o =>

@@ -1,5 +1,6 @@
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
 using Application.Features.Listings.AuctionListings.GetAuctionListing;
+using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 using Domain.DTOs.AuctionListing;
 using Domain.DTOs.File;
 using Infrastructure.Interfaces.Services;
@@ -43,5 +44,36 @@ public class AuctionListingController(IMediator mediator, IRequestContextService
         };
         var createdAuctionListingId = await mediator.Send(command);
         return Created($"api/auctionlisting/{createdAuctionListingId}", new {createdAuctionListingId} );
+    }
+    
+    [Authorize]
+    [Consumes("multipart/form-data")]
+    [HttpPut("{listingId}")]
+    public async Task<IActionResult> UpdateProductListing(
+        [FromForm] UpdateAuctionListingRequest request, 
+        [FromForm] List<IFormFile> newImages, 
+        [FromForm] List<int> newImageOrders,
+        [FromRoute] int listingId)
+    {
+        var fileWrappersWithOrders = new List<FileWrapperWithOrder>();
+        for (int i = 0; i < newImages.Count; i++)
+        {
+            var image = newImages[i];
+            var order = i < newImageOrders.Count ? newImageOrders[i] : 2;
+            fileWrappersWithOrders.Add(new FileWrapperWithOrder
+            {
+                File = new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()),
+                Order = order
+            });
+        }
+        var command = new UpdateAuctionListingCommand
+        {
+            UpdateDto = request,
+            ListingId = listingId,
+            NewImages = fileWrappersWithOrders,
+            UserId = requestContextService.GetUserId()
+        };
+        var updatedProductListing = await mediator.Send(command);
+        return Ok(updatedProductListing);
     }
 }

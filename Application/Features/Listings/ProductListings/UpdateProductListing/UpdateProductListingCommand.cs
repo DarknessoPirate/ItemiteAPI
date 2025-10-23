@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
-public class UpdateProductListingCommand : IRequest<ProductListingBasicResponse>
+public class UpdateProductListingCommand : IRequest<ProductListingResponse>
 {
     public UpdateProductListingRequest UpdateDto { get; set; }
     public List<FileWrapperWithOrder>? NewImages { get; set; }

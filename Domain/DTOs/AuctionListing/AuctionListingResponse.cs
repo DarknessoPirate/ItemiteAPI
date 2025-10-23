@@ -12,7 +12,6 @@ public class AuctionListingResponse
     public string? Description { get; set; }
     public decimal StartingBid { get; set; }
     public decimal? CurrentBid { get; set; }
-    // TODO Bid history entity
     public int Views { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateEnds { get; set; }
