@@ -1,11 +1,10 @@
 using Application.Exceptions;
-using Application.Features.ProductListings.CreateProductListing;
-using Application.Features.ProductListings.DeleteProductListing;
-using Application.Features.ProductListings.GetPaginatedProductListings;
-using Application.Features.ProductListings.GetProductListing;
+using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.GetProductListing;
+using Application.Features.Listings.Shared.DeleteListing;
+using Application.Features.Listings.Shared.GetPaginatedListings;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
-using Domain.Entities;
 using Domain.Enums;
 using FluentAssertions;
 using Infrastructure.Exceptions;
@@ -17,7 +16,6 @@ namespace Test.Integration;
 
 public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
 {
-    
     public ProductListingTests(IntegrationTestWebAppFactory factory) : base(factory)
     {
     }
@@ -32,7 +30,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = Int32.MaxValue,
                 Description = "test_listing",
                 ImageOrders = [1],
-                Location = "test_location",
+                Location = null,
                 Name = "test_name",
                 Price = 22.50M
             },
@@ -54,7 +52,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.RootCategoryId == null).Id,
                 Description = "test_listing",
                 ImageOrders = [1],
-                Location = "test_location",
+                Location = null,
                 Name = "test_name",
                 Price = 22.50M
             },
@@ -67,10 +65,10 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     }
     
     [Theory]
-    [InlineData("", "test_location", "test_name", 20.50)]
-    [InlineData("test", "test_location", "t", 20.50)]
-    [InlineData("test", "test_location", "test_name", -20.50)]
-    public async Task CreateProductListing_ShouldThrow_ValidatorException(string description, string location, string name, double price)
+    [InlineData("", "test_name", 20.50)]
+    [InlineData("test", "t", 20.50)]
+    [InlineData("test", "test_name", -20.50)]
+    public async Task CreateProductListing_ShouldThrow_ValidatorException(string description, string name, double price)
     {
         var createCommand = new CreateProductListingCommand
         {
@@ -79,7 +77,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.RootCategoryId == null).Id,
                 Description = description,
                 ImageOrders = [1],
-                Location = location,
+                Location = null,
                 Name = name,
                 Price = (decimal)price
             },
@@ -101,7 +99,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.Name == "Pants").Id,
                 Description = "test_listing",
                 ImageOrders = [1,2],
-                Location = "test_location",
+                Location = null,
                 Name = "test_name",
                 Price = 100.50M
             },
@@ -132,7 +130,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         var listingIds = await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = listingIds[0],
             UserId = InitialUsers.Last().Id
@@ -147,7 +145,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = 999999,
             UserId = InitialUsers.Last().Id
@@ -162,7 +160,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         var listingIds = await AddTestProductListings();
 
-        var deleteCommand = new DeleteProductListingCommand
+        var deleteCommand = new DeleteListingCommand
         {
             ListingId = listingIds[0],
             UserId = InitialUsers.First().Id
@@ -189,7 +187,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var query = new GetPaginatedProductListingsQuery
+        var query = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = pageSize,
@@ -205,7 +203,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
     {
         await AddTestProductListings();
 
-        var query1 = new GetPaginatedProductListingsQuery
+        var query1 = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = 2,
@@ -226,7 +224,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
         pageResponse1.Items.First().Name.Should().Be("test_name2");
         pageResponse1.Items.First().MainImageUrl.Should().Be("https://fake-cloudinary-url.com/test_image1");
         
-        var query2 = new GetPaginatedProductListingsQuery
+        var query2 = new GetPaginatedListingsQuery
         {
             PageNumber = 1,
             PageSize = 3,
@@ -303,7 +301,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.Name == "Pants").Id,
                 Description = "test_listing1",
                 ImageOrders = [1,2],
-                Location = "test_location1",
+                Location = null,
                 Name = "test_name1",
                 Price = 100.50M
             },
@@ -321,7 +319,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.Name == "Smartphones").Id,
                 Description = "test_listing2",
                 ImageOrders = [1],
-                Location = "test_location2",
+                Location = null,
                 Name = "test_name2",
                 Price = 50.10M
             },
@@ -338,7 +336,7 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
                 CategoryId = InitialCategories.First(c => c.Name == "Desktops").Id,
                 Description = "test_listing3",
                 ImageOrders = [1,2,3],
-                Location = "test_location3",
+                Location = null,
                 Name = "test_name3",
                 Price = 5000.50M
             },

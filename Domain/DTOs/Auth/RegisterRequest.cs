@@ -1,3 +1,5 @@
+using Domain.ValueObjects;
+
 namespace Domain.Auth;
 
 public class RegisterRequest
@@ -6,5 +8,5 @@ public class RegisterRequest
     public required string Email { get; set; }
     public required string Password { get; set; }
     public string? PhoneNumber { get; set; }
-    public string? Location { get; set; }
+    public Location? Location { get; set; }
 }
