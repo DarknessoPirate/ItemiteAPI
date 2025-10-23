@@ -1,8 +1,7 @@
-using Domain.DTOs.ProductListing;
 using Domain.ValueObjects;
 using FluentValidation;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
 public class UpdateProductListingValidator : AbstractValidator<UpdateProductListingCommand>
 {
@@ -73,9 +72,9 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
             .Length(2, 100).WithMessage("City must be between 2 and 100 characters")
             .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
 
-        RuleFor(x => x.UpdateDto.Location.PostalCode)
-            .NotEmpty().WithMessage("Postal code is required when location is provided")
-            .Length(2, 20).WithMessage("Postal code must be between 2 and 20 characters")
+        RuleFor(x => x.UpdateDto.Location.State)
+            .NotEmpty().WithMessage("State is required when location is provided")
+            .Length(2, 100).WithMessage("State must be between 2 and 100 characters")
             .When(x => x.UpdateDto.Location != null && HasAnyLocationField(x.UpdateDto.Location));
     }
 
@@ -85,7 +84,7 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
                || location.Latitude.HasValue 
                || !string.IsNullOrWhiteSpace(location.Country) 
                || !string.IsNullOrWhiteSpace(location.City) 
-               || !string.IsNullOrWhiteSpace(location.PostalCode);
+               || !string.IsNullOrWhiteSpace(location.State);
     }
 
     private bool LocationIsCompleteOrNull(Location? location)
@@ -98,7 +97,7 @@ public class UpdateProductListingValidator : AbstractValidator<UpdateProductList
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
     private bool HaveUniqueImageOrders(UpdateProductListingCommand command)
     {

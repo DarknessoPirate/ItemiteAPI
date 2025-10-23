@@ -1,19 +1,21 @@
 using AutoMapper;
-using Domain.DTOs.ProductListing;
+using Domain.DTOs.AuctionListing;
 using Domain.Entities;
 using Domain.ValueObjects;
 
 namespace Application.MappingProfiles;
 
-public class ProductListingAutoMapper : Profile
+public class AuctionListingAutoMapper : Profile
 {
-    public ProductListingAutoMapper()
+    public AuctionListingAutoMapper()
     {
-        CreateMap<CreateProductListingRequest, ProductListing>()
-            .ForMember(dest => dest.Location, opt => 
-                opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
-
-        CreateMap<ProductListing, ProductListingResponse>()
+        CreateMap<CreateAuctionListingRequest, AuctionListing>()
+            .ForMember(dest => dest.Location, opt =>
+                opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null))
+            .ForMember(dest => dest.DateEnds, opt =>
+                opt.MapFrom(src => src.DateEnds ?? DateTime.UtcNow.AddDays(15)));
+        
+        CreateMap<AuctionListing, AuctionListingResponse>()
             .ForMember(p => p.Categories, o =>
                 o.MapFrom(p => p.Categories))
             .ForMember(p => p.Owner, o =>

@@ -2,7 +2,7 @@ using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using MediatR;
 
-namespace Application.Features.ProductListings.CreateProductListing;
+namespace Application.Features.Listings.ProductListings.CreateProductListing;
 
 public class CreateProductListingCommand : IRequest<int>
 {

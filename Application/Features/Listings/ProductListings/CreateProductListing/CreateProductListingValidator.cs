@@ -1,7 +1,7 @@
 using Domain.ValueObjects;
 using FluentValidation;
 
-namespace Application.Features.ProductListings.CreateProductListing;
+namespace Application.Features.Listings.ProductListings.CreateProductListing;
 
 public class CreateProductListingValidator : AbstractValidator<CreateProductListingCommand>
 {
@@ -59,9 +59,9 @@ public class CreateProductListingValidator : AbstractValidator<CreateProductList
             .Length(2, 100).WithMessage("City must be between 2 and 100 characters")
             .When(x => x.ProductListingDto.Location != null && HasAnyLocationField(x.ProductListingDto.Location));
 
-        RuleFor(x => x.ProductListingDto.Location.PostalCode)
-            .NotEmpty().WithMessage("Postal code is required when location is provided")
-            .Length(2, 20).WithMessage("Postal code must be between 2 and 20 characters")
+        RuleFor(x => x.ProductListingDto.Location.State)
+            .NotEmpty().WithMessage("State is required when location is provided")
+            .Length(2, 100).WithMessage("State must be between 2 and 100 characters")
             .When(x => x.ProductListingDto.Location != null && HasAnyLocationField(x.ProductListingDto.Location));
        
     }
@@ -72,7 +72,7 @@ public class CreateProductListingValidator : AbstractValidator<CreateProductList
                || location.Latitude.HasValue 
                || !string.IsNullOrWhiteSpace(location.Country) 
                || !string.IsNullOrWhiteSpace(location.City) 
-               || !string.IsNullOrWhiteSpace(location.PostalCode);
+               || !string.IsNullOrWhiteSpace(location.State);
     }
 
     private bool LocationIsCompleteOrNull(Location? location)
@@ -85,6 +85,6 @@ public class CreateProductListingValidator : AbstractValidator<CreateProductList
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

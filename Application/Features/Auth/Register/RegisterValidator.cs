@@ -70,9 +70,9 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
             .Length(2, 100).WithMessage("City must be between 2 and 100 characters")
             .When(x => x.registerDto.Location != null && HasAnyLocationField(x.registerDto.Location));
 
-        RuleFor(x => x.registerDto.Location.PostalCode)
-            .NotEmpty().WithMessage("Postal code is required when location is provided")
-            .Length(2, 20).WithMessage("Postal code must be between 2 and 20 characters")
+        RuleFor(x => x.registerDto.Location.State)
+            .NotEmpty().WithMessage("State is required when location is provided")
+            .Length(2, 100).WithMessage("State must be between 2 and 100 characters")
             .When(x => x.registerDto.Location != null && HasAnyLocationField(x.registerDto.Location));
     }
 
@@ -94,7 +94,7 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
                || location.Latitude.HasValue 
                || !string.IsNullOrWhiteSpace(location.Country) 
                || !string.IsNullOrWhiteSpace(location.City) 
-               || !string.IsNullOrWhiteSpace(location.PostalCode);
+               || !string.IsNullOrWhiteSpace(location.State);
     }
 
     private bool LocationIsCompleteOrNull(Location? location)
@@ -107,6 +107,6 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

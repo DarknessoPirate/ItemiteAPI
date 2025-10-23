@@ -1,6 +1,6 @@
-namespace Domain.DTOs.ProductListing;
+namespace Domain.DTOs.Listing;
 
-public class ProductListingImageResponse
+public class ListingImageResponse
 {
     public int ImageId { get; set; }
     public string? ImageUrl { get; set; }

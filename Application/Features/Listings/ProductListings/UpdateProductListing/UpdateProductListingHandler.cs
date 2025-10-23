@@ -10,7 +10,7 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
 public class UpdateProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
@@ -21,9 +21,9 @@ public class UpdateProductListingHandler(
     IUnitOfWork unitOfWork,
     IMapper mapper,
     ILogger<UpdateProductListingHandler> logger
-    ) : IRequestHandler<UpdateProductListingCommand, ProductListingBasicResponse>
+    ) : IRequestHandler<UpdateProductListingCommand, ProductListingResponse>
 {
-    public async Task<ProductListingBasicResponse> Handle(UpdateProductListingCommand request, CancellationToken cancellationToken)
+    public async Task<ProductListingResponse> Handle(UpdateProductListingCommand request, CancellationToken cancellationToken)
     {
         var productListingToUpdate = await productListingRepository.GetListingByIdAsync(request.ListingId);
         if (productListingToUpdate == null)
@@ -51,7 +51,7 @@ public class UpdateProductListingHandler(
             productListingToUpdate.Location.Latitude = ownerLoc.Latitude;
             productListingToUpdate.Location.Country = ownerLoc.Country;
             productListingToUpdate.Location.City = ownerLoc.City;
-            productListingToUpdate.Location.PostalCode = ownerLoc.PostalCode;
+            productListingToUpdate.Location.State = ownerLoc.State;
         }
         else
         {
@@ -60,7 +60,7 @@ public class UpdateProductListingHandler(
             productListingToUpdate.Location.Latitude = loc.Latitude;
             productListingToUpdate.Location.Country = loc.Country;
             productListingToUpdate.Location.City = loc.City;
-            productListingToUpdate.Location.PostalCode = loc.PostalCode;
+            productListingToUpdate.Location.State = loc.State;
         }
         productListingToUpdate.IsNegotiable = request.UpdateDto.IsNegotiable ?? false;
         
@@ -83,9 +83,22 @@ public class UpdateProductListingHandler(
         await unitOfWork.BeginTransactionAsync();
         try
         {
-            if (request.UpdateDto.ExistingPhotoOrders != null && request.UpdateDto.ExistingPhotoIds != null)
+            var allListingPhotos = productListingToUpdate.ListingPhotos.ToList();
+            if (request.UpdateDto.ExistingPhotoOrders == null && request.UpdateDto.ExistingPhotoIds == null)
             {
-                var allListingPhotos = productListingToUpdate.ListingPhotos.ToList();
+                foreach (var listingPhoto in allListingPhotos)
+                {
+                    var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
+                    if (deletionResult.Error != null)
+                    {
+                        throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
+                    }
+                    await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
+                    productListingToUpdate.ListingPhotos.Remove(listingPhoto);
+                }
+            }
+            else if (request.UpdateDto.ExistingPhotoOrders != null && request.UpdateDto.ExistingPhotoIds != null)
+            {
                 var photosToDelete = allListingPhotos
                     .Where(lp => !request.UpdateDto.ExistingPhotoIds.Contains(lp.PhotoId))
                     .ToList();
@@ -161,10 +174,10 @@ public class UpdateProductListingHandler(
             productListingRepository.UpdateListing(productListingToUpdate);
             await unitOfWork.CommitTransactionAsync();
 
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTINGS}*");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
 
-            return mapper.Map<ProductListingBasicResponse>(productListingToUpdate);
+            return mapper.Map<ProductListingResponse>(productListingToUpdate);
         }
         catch (Exception ex)
         {
@@ -182,6 +195,6 @@ public class UpdateProductListingHandler(
                && location.Latitude.HasValue 
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
-               && !string.IsNullOrWhiteSpace(location.PostalCode);
+               && !string.IsNullOrWhiteSpace(location.State);
     }
 }

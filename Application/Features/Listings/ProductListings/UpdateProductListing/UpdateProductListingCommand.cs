@@ -2,9 +2,9 @@ using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using MediatR;
 
-namespace Application.Features.ProductListings.UpdateProductListing;
+namespace Application.Features.Listings.ProductListings.UpdateProductListing;
 
-public class UpdateProductListingCommand : IRequest<ProductListingBasicResponse>
+public class UpdateProductListingCommand : IRequest<ProductListingResponse>
 {
     public UpdateProductListingRequest UpdateDto { get; set; }
     public List<FileWrapperWithOrder>? NewImages { get; set; }

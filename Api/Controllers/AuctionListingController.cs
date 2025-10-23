@@ -1,8 +1,8 @@
-using Application.Features.Listings.ProductListings.CreateProductListing;
-using Application.Features.Listings.ProductListings.GetProductListing;
-using Application.Features.Listings.ProductListings.UpdateProductListing;
+using Application.Features.Listings.AuctionListings.CreateAuctionListing;
+using Application.Features.Listings.AuctionListings.GetAuctionListing;
+using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
+using Domain.DTOs.AuctionListing;
 using Domain.DTOs.File;
-using Domain.DTOs.ProductListing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,46 +12,45 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
+public class AuctionListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
-    
     [HttpGet("{listingId}")]
-    public async Task<IActionResult> GetProductListingById(int listingId)
+    public async Task<IActionResult> GetAuctionListing(int listingId)
     {
-        var productListingQuery = new GetProductListingQuery
+        var auctionListingQuery = new GetAuctionListingQuery
         {
             ListingId = listingId,
             UserId = requestContextService.GetUserIdNullable()
         };
-        var listing = await mediator.Send(productListingQuery);
+        var listing = await mediator.Send(auctionListingQuery);
         return Ok(listing);
     }
     
     [Authorize]
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> CreateProductListing([FromForm] CreateProductListingRequest request, [FromForm] List<IFormFile> images)
+    public async Task<IActionResult> CreateAuctionListing([FromForm] CreateAuctionListingRequest request, [FromForm] List<IFormFile> images)
     {
         var fileWrappers = new List<FileWrapper>();
         foreach (var image in images)
         {
             fileWrappers.Add(new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()));
         }
-        var command = new CreateProductListingCommand
+        var command = new CreateAuctionListingCommand
         {
-            ProductListingDto = request,
+            AuctionListingDto = request,
             Images = fileWrappers,
             UserId = requestContextService.GetUserId()
         };
-        var createdProductListingId = await mediator.Send(command);
-        return Created($"api/productlisting/{createdProductListingId}", new {createdProductListingId} );
+        var createdAuctionListingId = await mediator.Send(command);
+        return Created($"api/auctionlisting/{createdAuctionListingId}", new {createdAuctionListingId} );
     }
     
     [Authorize]
     [Consumes("multipart/form-data")]
     [HttpPut("{listingId}")]
     public async Task<IActionResult> UpdateProductListing(
-        [FromForm] UpdateProductListingRequest request, 
+        [FromForm] UpdateAuctionListingRequest request, 
         [FromForm] List<IFormFile> newImages, 
         [FromForm] List<int> newImageOrders,
         [FromRoute] int listingId)
@@ -67,7 +66,7 @@ public class ProductListingController(IMediator mediator, IRequestContextService
                 Order = order
             });
         }
-        var command = new UpdateProductListingCommand
+        var command = new UpdateAuctionListingCommand
         {
             UpdateDto = request,
             ListingId = listingId,
