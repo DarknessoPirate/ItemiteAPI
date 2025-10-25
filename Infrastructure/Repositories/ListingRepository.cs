@@ -27,7 +27,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         if (listing == null)
         {
-            throw new NotFoundException($"Listing with Id: {listingId} not found");
+            throw new NotFoundException($"{typeof(T).Name} with Id: {listingId} not found");
         }
         return listing;
     }
@@ -37,7 +37,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         var listing = await dbContext.Set<T>().Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         if (listing == null)
         {
-            throw new NotFoundException($"Listing with Id: {listingId} not found");
+            throw new NotFoundException($"{typeof(T).Name} with Id: {listingId} not found");
         }
         return listing;
     }

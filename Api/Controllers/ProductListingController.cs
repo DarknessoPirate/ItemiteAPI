@@ -1,8 +1,6 @@
-using Application.Features.ProductListings.CreateProductListing;
-using Application.Features.ProductListings.DeleteProductListing;
-using Application.Features.ProductListings.GetPaginatedProductListings;
-using Application.Features.ProductListings.GetProductListing;
-using Application.Features.ProductListings.UpdateProductListing;
+using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.GetProductListing;
+using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
 using Infrastructure.Interfaces.Services;
@@ -16,13 +14,7 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class ProductListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetProductListings([FromQuery] GetPaginatedProductListingsQuery query)
-    {
-        var productListings = await mediator.Send(query);
-        return Ok(productListings);
-    }
-
+    
     [HttpGet("{listingId}")]
     public async Task<IActionResult> GetProductListingById(int listingId)
     {
@@ -54,35 +46,32 @@ public class ProductListingController(IMediator mediator, IRequestContextService
         var createdProductListingId = await mediator.Send(command);
         return Created($"api/productlisting/{createdProductListingId}", new {createdProductListingId} );
     }
-
-    [Authorize]
-    [HttpDelete("{listingId}")]
-    public async Task<IActionResult> DeleteProductListing([FromRoute] int listingId)
-    {
-        var command = new DeleteProductListingCommand
-        {
-            ListingId = listingId,
-            UserId = requestContextService.GetUserId()
-        };
-        await mediator.Send(command);
-        return NoContent();
-    }
     
     [Authorize]
     [Consumes("multipart/form-data")]
     [HttpPut("{listingId}")]
-    public async Task<IActionResult> UpdateProductListing([FromForm] UpdateProductListingRequest request, [FromForm] List<IFormFile> newImages,[FromRoute] int listingId)
+    public async Task<IActionResult> UpdateProductListing(
+        [FromForm] UpdateProductListingRequest request, 
+        [FromForm] List<IFormFile> newImages, 
+        [FromForm] List<int> newImageOrders,
+        [FromRoute] int listingId)
     {
-        var fileWrappers = new List<FileWrapper>();
-        foreach (var image in newImages)
+        var fileWrappersWithOrders = new List<FileWrapperWithOrder>();
+        for (int i = 0; i < newImages.Count; i++)
         {
-            fileWrappers.Add(new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()));
+            var image = newImages[i];
+            var order = i < newImageOrders.Count ? newImageOrders[i] : 2;
+            fileWrappersWithOrders.Add(new FileWrapperWithOrder
+            {
+                File = new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()),
+                Order = order
+            });
         }
         var command = new UpdateProductListingCommand
         {
             UpdateDto = request,
             ListingId = listingId,
-            NewImages = fileWrappers,
+            NewImages = fileWrappersWithOrders,
             UserId = requestContextService.GetUserId()
         };
         var updatedProductListing = await mediator.Send(command);

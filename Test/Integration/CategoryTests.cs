@@ -11,6 +11,7 @@ using Domain.DTOs.Category;
 using Domain.Entities;
 using FluentAssertions;
 using Infrastructure.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using Test.Configs;
 using Xunit;
 
@@ -62,21 +63,17 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         await Assert.ThrowsAsync<NotFoundException>(() => Sender.Send(command));
     }
     
-    [Theory]
-    [InlineData("test1", "test", "test.jpg", null)]
-    [InlineData("test2", "test", "test.jpg", null)]
-    [InlineData("test3", "test", "test.jpg",1)]
-    public async Task CreateCategory_ShouldThrow_BadRequestException(string name, string description, string imageUrl, int? parentCategoryId)
+    [Fact]
+    public async Task CreateCategory_ShouldThrow_BadRequestException()
     {
-        await AddTestCategories();
         var command = new CreateCategoryCommand()
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
-                Name = name,
-                Description = description,
-                ImageUrl = imageUrl,
-                ParentCategoryId = parentCategoryId
+                Name = InitialCategories.First(c => c.RootCategoryId == null).Name,
+                Description = "test",
+                ImageUrl = "test.jpg",
+                ParentCategoryId = null
             }
         };
         
@@ -559,7 +556,11 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
     // execute before every test method
     public Task InitializeAsync()
     {
-        ClearTable<Category>();
+        var testCategories = DbContext.Categories
+            .Where(c => c.Name.StartsWith("test"))
+            .ToList();
+        DbContext.RemoveRange(testCategories);
+        DbContext.SaveChanges();
         return Task.CompletedTask;
     }
 

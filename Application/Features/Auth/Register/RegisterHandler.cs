@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Configs;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -21,6 +22,7 @@ public class RegisterHandler(
     public async Task<int> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var user = mapper.Map<User>(request.registerDto);
+        
         var result = await userManager.CreateAsync(user, request.registerDto.Password);
         
         if (!result.Succeeded)

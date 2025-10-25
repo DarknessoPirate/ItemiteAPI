@@ -7,6 +7,10 @@ using Application.Features.Categories.CreateCategory;
 using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.UpdateCategory;
+using Application.Features.Listings.AuctionListings.CreateAuctionListing;
+using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.UpdateProductListing;
+using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Messages.DeleteMessage;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
@@ -42,5 +46,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<SendMessageCommand>, SendMessageValidator>();
         services.AddScoped<IValidator<UpdateMessageCommand>, UpdateMessageValidator>();
         services.AddScoped<IValidator<DeleteMessageCommand>, DeleteMessageValidator>();
+        services.AddScoped<IValidator<CreateAuctionListingCommand>, CreateAuctionListingValidator>();
+        services.AddScoped<IValidator<GetPaginatedListingsQuery>, GetPaginatedListingsValidator>();
     }
 }

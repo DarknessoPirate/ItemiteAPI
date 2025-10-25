@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Domain.ValueObjects;
 
 namespace Domain.Entities;
 
@@ -10,9 +11,7 @@ public class ListingBase
     [MaxLength(200)]
     public string Name { get; set; } = string.Empty;
     [Required]
-    [MinLength(5)]
-    [MaxLength(200)]
-    public string Location { get; set; } = string.Empty;
+    public Location Location { get; set; } = new();
     public int Views { get; set; } = 0;
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     public DateTime DateEnds { get; set; } 
