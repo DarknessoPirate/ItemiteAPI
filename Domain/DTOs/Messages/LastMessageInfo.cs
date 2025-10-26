@@ -1,6 +1,6 @@
 namespace Domain.DTOs.Messages;
 
-public class LastMessageResponse
+public class LastMessageInfo
 {
     public int MessageId { get; set; }
     public string UserName { get; set; }

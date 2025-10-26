@@ -1,11 +1,12 @@
+using Domain.DTOs.Listing;
 using Domain.DTOs.User;
 
 namespace Domain.DTOs.Messages;
 
 public class ChatInfoResponse
 {
-    public int UnreadMessagesCount { get; set; }
-    public LastMessageResponse LastMessage { get; set; }
-    private List<ChatMemberResponse> Members { get; set; }
-    public int ListingOwnerId { get; set; }
+    public ListingBasicInfo Listing { get; set; }
+    public int UnreadMessagesCounts { get; set; }
+    public LastMessageInfo LastMessage { get; set; }
+    public List<ChatMemberInfo> Members { get; set; }
 }

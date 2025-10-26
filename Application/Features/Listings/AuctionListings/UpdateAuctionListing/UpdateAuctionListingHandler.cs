@@ -159,7 +159,8 @@ public class UpdateAuctionListingHandler(
                     var photo = new Photo
                     {
                         Url = uploadResult.SecureUrl.AbsoluteUri,
-                        PublicId = uploadResult.PublicId
+                        PublicId = uploadResult.PublicId,
+                        FileName = image.File.FileName
                     };
         
                     await photoRepository.AddPhotoAsync(photo);

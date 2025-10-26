@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Application.Features.Messages.GetListingChats;
 
-public class GetListingChatsValidator : AbstractValidator<GetListingChatsCommand>
+public class GetListingChatsValidator : AbstractValidator<GetListingChatsQuery>
 {
 
     public GetListingChatsValidator()

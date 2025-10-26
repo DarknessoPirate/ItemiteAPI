@@ -1,8 +1,10 @@
 using Application.Features.Messages.DeleteMessage;
+using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Domain.DTOs.File;
 using Domain.DTOs.Messages;
+using Domain.DTOs.Pagination;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +66,23 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
         await mediator.Send(command);
 
         return NoContent();
+    }
+
+    [HttpGet("{listingId:int}/chats")]
+    public async Task<ActionResult<PageResponse<ChatInfoResponse>>> GetListingChats([FromRoute] int listingId ,[FromQuery] int pageNumber,
+        [FromQuery] int pageSize)
+    {
+        var query = new GetListingChatsQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            ListingId = listingId,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var result = await mediator.Send(query);
+
+        return result;
     }
     
 }
