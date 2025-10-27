@@ -4,6 +4,7 @@ using Domain.Configs;
 using Domain.DTOs.AuctionListing;
 using Domain.DTOs.Listing;
 using Domain.Entities;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -29,6 +30,10 @@ public class GetAuctionListingHandler(
         }
         
         var listing = await auctionListingRepository.GetListingByIdAsync(request.ListingId);
+        if (listing == null)
+        {
+            throw new NotFoundException($"Auction with id: {request.ListingId} not found");
+        }
         if (request.UserId != null && listing.OwnerId != request.UserId)
         {
             try
