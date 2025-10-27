@@ -177,6 +177,7 @@ public class TokenService(
         {
             Path = "/",
             HttpOnly = true,
+            Expires = refreshToken.TokenExpirationDate,
             IsEssential = true,
             Secure = true,
             SameSite = SameSiteMode.Lax,

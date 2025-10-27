@@ -28,6 +28,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne() // no nav back to user (access only from user side)
             .HasForeignKey<User>(u => u.BackgroundPhotoId)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.AuthProvider)
+            .HasConversion<string>();
 
         modelBuilder.Entity<ListingPhoto>()
             .HasOne(lp => lp.Listing)
