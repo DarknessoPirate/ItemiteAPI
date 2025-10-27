@@ -9,6 +9,7 @@ public interface IListingRepository<T> where T : ListingBase
     Task<T?> GetListingWithPhotosByIdAsync(int listingId);
     Task<T?> GetListingByIdAsync(int listingId);
     Task CreateListingAsync(T listing);
+    Task<bool> ListingExistsAsync(int listingId);
     void UpdateListing(T listing);
     void DeleteListing(T listing);
 }

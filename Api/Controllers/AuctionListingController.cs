@@ -1,5 +1,6 @@
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
 using Application.Features.Listings.AuctionListings.GetAuctionListing;
+using Application.Features.Listings.AuctionListings.GetBidHistory;
 using Application.Features.Listings.AuctionListings.PlaceBid;
 using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 using Domain.DTOs.AuctionListing;
@@ -59,6 +60,17 @@ public class AuctionListingController(IMediator mediator, IRequestContextService
         };
         var createdBidId = await mediator.Send(command);
         return Ok(new {createdBidId});
+    }
+    
+    [HttpGet("{listingId}/bid")]
+    public async Task<IActionResult> GetBidsHistory([FromRoute] int listingId)
+    {
+        var query = new GetBidHistoryQuery
+        {
+            AuctionId = listingId
+        };
+        var bids = await mediator.Send(query);
+        return Ok(bids);
     }
     
     [Authorize]

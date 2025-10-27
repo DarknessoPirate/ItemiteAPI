@@ -39,6 +39,12 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         await dbContext.Set<T>().AddAsync(listing);
     }
 
+    public async Task<bool> ListingExistsAsync(int listingId)
+    {
+        var listing = await dbContext.Set<T>().FirstOrDefaultAsync(l => l.Id == listingId);
+        return listing != null;
+    }
+
     public void UpdateListing(T listing)
     {
         dbContext.Set<T>().Update(listing);

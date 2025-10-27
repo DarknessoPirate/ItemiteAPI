@@ -14,6 +14,8 @@ public class BidRepository(ItemiteDbContext dbContext) : IBidRepository
 
     public async Task<List<AuctionBid>> GetAuctionBids(int auctionId)
     {
-        return await dbContext.AuctionBids.Where(b => b.AuctionId == auctionId).ToListAsync();
+        return await dbContext.AuctionBids
+            .Include(b => b.Bidder)
+            .Where(b => b.AuctionId == auctionId).OrderByDescending(b => b.BidPrice).ToListAsync();
     }
 }
