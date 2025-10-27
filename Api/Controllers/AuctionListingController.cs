@@ -1,5 +1,6 @@
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
 using Application.Features.Listings.AuctionListings.GetAuctionListing;
+using Application.Features.Listings.AuctionListings.PlaceBid;
 using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 using Domain.DTOs.AuctionListing;
 using Domain.DTOs.File;
@@ -44,6 +45,20 @@ public class AuctionListingController(IMediator mediator, IRequestContextService
         };
         var createdAuctionListingId = await mediator.Send(command);
         return Created($"api/auctionlisting/{createdAuctionListingId}", new {createdAuctionListingId} );
+    }
+
+    [Authorize]
+    [HttpPost("{listingId}/bid")]
+    public async Task<IActionResult> PlaceBid([FromRoute] int listingId, [FromBody] PlaceBidRequest request)
+    {
+        var command = new PlaceBidCommand
+        {
+            BidDto = request,
+            UserId = requestContextService.GetUserId(),
+            AuctionId = listingId
+        };
+        var createdBidId = await mediator.Send(command);
+        return Ok(new {createdBidId});
     }
     
     [Authorize]
