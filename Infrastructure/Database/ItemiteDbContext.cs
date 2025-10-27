@@ -13,6 +13,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Photo> Photos { get; set; }
     public DbSet<ListingPhoto> ListingPhotos { get; set; }
+    public DbSet<AuctionBid> AuctionBids { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,12 +61,18 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithMany(u => u.OwnedListings)
             .HasForeignKey(l => l.OwnerId)
             .OnDelete(DeleteBehavior.Cascade); // when user is deleted, all their listings are deleted too
-
-        modelBuilder.Entity<AuctionListing>()
-            .HasOne(a => a.HighestBidder)
-            .WithMany(u => u.HighestBids)
-            .HasForeignKey(a => a.HighestBidderId)
-            .OnDelete(DeleteBehavior.SetNull); // when highest bidder deletes account, set the highest bidder to null
+        
+        modelBuilder.Entity<AuctionBid>()
+            .HasOne(b => b.Auction)
+            .WithMany(a => a.Bids)
+            .HasForeignKey(a => a.AuctionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AuctionBid>()
+            .HasOne(b => b.Bidder)
+            .WithMany(u => u.Bids)
+            .HasForeignKey(a => a.BidderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<RefreshToken>()
             .HasOne(r => r.User)
