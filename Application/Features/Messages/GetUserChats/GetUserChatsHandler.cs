@@ -9,49 +9,40 @@ using Infrastructure.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.Features.Messages.GetListingChats;
+namespace Application.Features.Messages.GetUserChats;
 
 /*
- * Returns list of basic information for existing chats for the specific listing
- * (listing info, unread message count, last message simple data, chat members data)
- * this is supposed to be used by the listing owner to get an overview of any existing/unread conversations from the listing.
- * TLDR: seller uses this to get existing chats for the listing
- * IMPORTANT: RETURNS PAGINATED RESPONSE
+ * This handler is supposed to be used by a buyer , trying to find existing chats
+ * for a product he wants to buy. This will return the same type as the GetListingChats
+ * that the owner of a listing would use, but it is not confined to a specific listing.
+ * The user will get all chats that he is a part of for all of the listings (excluding owned listings).
+ * TLDR: use it to get chats for listings user wants to buy (excludes owned listing chats)
+ * IMPORTANT: THIS IS A PAGINATED RESPONSE
  */
-public class GetListingChatsHandler(
+public class GetUserChatsHandler(
     UserManager<User> userManager,
     IMessageRepository messageRepository,
-    IListingRepository<ListingBase> listingRepository,
     IMapper mapper
-) : IRequestHandler<GetListingChatsQuery, PageResponse<ChatInfoResponse>>
+) : IRequestHandler<GetUserChatsQuery, PageResponse<ChatInfoResponse>>
 {
-    public async Task<PageResponse<ChatInfoResponse>> Handle(GetListingChatsQuery request,
+    public async Task<PageResponse<ChatInfoResponse>> Handle(GetUserChatsQuery request,
         CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
             throw new BadRequestException("User not found");
 
-        var listing = await listingRepository.GetListingByIdAsync(request.ListingId);
-        if (listing == null)
-            throw new BadRequestException("Listing not found");
-
-        if (listing.Owner.Id != user.Id)
-            throw new UnauthorizedException("You can only get chats for your own listings");
-
-        var (latestMessages, totalCount) =
-            await messageRepository.FindLatestMessagesByListingIdAsync(listing.Id, request.PageNumber,
+        var (latestMessages, totalChatsCount) =
+            await messageRepository.FindLatestMessagesForUserIdAsync(request.UserId, request.PageNumber,
                 request.PageSize);
 
-
-        var unreadCounts = await messageRepository.GetUnreadMessageCountsForListingIdAsync(request.ListingId, user.Id);
+        var unreadCounts = await messageRepository.GetUnreadMessageCountsForUserIdAsync(request.UserId);
 
         var chats = latestMessages.Select(message =>
         {
             // Determine who the other user is (conversation partner)
             var otherUser = message.SenderId == user.Id ? message.Recipient : message.Sender;
 
-            // Get unread count for this conversation
             var unreadCount = unreadCounts
                 .FirstOrDefault(uc => uc.OtherUserId == otherUser.Id)
                 ?.Count ?? 0;
@@ -71,7 +62,7 @@ public class GetListingChatsHandler(
 
         return new PageResponse<ChatInfoResponse>(
             chats,
-            totalCount,
+            totalChatsCount,
             request.PageSize,
             request.PageNumber
         );

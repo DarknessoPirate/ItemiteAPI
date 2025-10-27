@@ -12,6 +12,7 @@ using Application.Features.Listings.ProductListings.CreateProductListing;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Messages.DeleteMessage;
+using Application.Features.Messages.GetChatPage;
 using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
@@ -46,5 +47,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<CreateAuctionListingCommand>, CreateAuctionListingValidator>();
         services.AddScoped<IValidator<GetPaginatedListingsQuery>, GetPaginatedListingsValidator>();
         services.AddScoped<IValidator<GetListingChatsQuery>, GetListingChatsValidator>();
+        services.AddScoped<IValidator<GetChatPageQuery>, GetChatPageValidator>();
     }
 }

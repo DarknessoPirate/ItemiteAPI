@@ -1,5 +1,7 @@
 using Application.Features.Messages.DeleteMessage;
+using Application.Features.Messages.GetChatPage;
 using Application.Features.Messages.GetListingChats;
+using Application.Features.Messages.GetUserChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Domain.DTOs.File;
@@ -15,7 +17,7 @@ namespace Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class MessageController(IMediator mediator ,IRequestContextService requestContextService) : ControllerBase
+public class MessageController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<SendMessageResult>> SendMessage(
@@ -69,7 +71,9 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
     }
 
     [HttpGet("{listingId:int}/chats")]
-    public async Task<ActionResult<PageResponse<ChatInfoResponse>>> GetListingChats([FromRoute] int listingId ,[FromQuery] int pageNumber,
+    public async Task<ActionResult<PageResponse<ChatInfoResponse>>> GetListingChats(
+        [FromRoute] int listingId,
+        [FromQuery] int pageNumber,
         [FromQuery] int pageSize)
     {
         var query = new GetListingChatsQuery
@@ -82,7 +86,44 @@ public class MessageController(IMediator mediator ,IRequestContextService reques
 
         var result = await mediator.Send(query);
 
-        return result;
+        return Ok(result);
     }
-    
+
+    [HttpGet("chats")]
+    public async Task<ActionResult<PageResponse<ChatInfoResponse>>> GetUserChats(
+        [FromQuery] int pageNumber,
+        [FromQuery] int pageSize)
+    {
+        var query = new GetUserChatsQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var result = await mediator.Send(query);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{listingId:int}/chats/{otherUserId:int}")]
+    public async Task<ActionResult<PageResponse<MessageResponse>>> GetChatPage(
+        [FromRoute] int listingId,
+        [FromRoute] int otherUserId,
+        [FromQuery] int pageNumber,
+        [FromQuery] int pageSize)
+    {
+        var query = new GetChatPageQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            ListingId = listingId,
+            OtherUserId = otherUserId,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var response = await mediator.Send(query);
+
+        return Ok(response);
+    }
 }

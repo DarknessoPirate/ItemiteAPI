@@ -45,9 +45,21 @@ public class SendMessageHandler(
         if (listing.IsArchived)
             throw new BadRequestException("Cannot send messages to archived listings");
 
-        if (listing.OwnerId != request.SendMessageDto.RecipientId)
-            throw new BadRequestException("Listing owner and recipient ID mismatch");
+        if (listing.OwnerId != request.SenderId && listing.OwnerId != request.SendMessageDto.RecipientId)
+            throw new BadRequestException("Either sender or recipient must be the listing owner");
 
+        // if sender is the owner, they can only reply if somebody messaged them first
+        if (listing.OwnerId == request.SenderId)
+        {
+            // Check if the recipient has messaged the owner first
+            var hasRecipientMessagedFirst = await messageRepository.HasUserMessagedAboutListingAsync(
+                request.SendMessageDto.RecipientId,  // The buyer (recipient)
+                request.SenderId,                     // The owner (sender)
+                request.SendMessageDto.ListingId);
+            
+            if (!hasRecipientMessagedFirst)
+                throw new BadRequestException("You can only reply to users who have contacted you first");
+        }
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         var uploadedPhotosPublicIds = new List<string>();
