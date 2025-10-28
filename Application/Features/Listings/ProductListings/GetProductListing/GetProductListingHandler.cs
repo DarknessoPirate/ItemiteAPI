@@ -3,6 +3,7 @@ using Domain.Configs;
 using Domain.DTOs.Listing;
 using Domain.DTOs.ProductListing;
 using Domain.Entities;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -28,6 +29,10 @@ public class GetProductListingHandler(
         }
         
         var listing = await productListingRepository.GetListingByIdAsync(request.ListingId);
+        if (listing == null)
+        {
+            throw new NotFoundException($"Product listing with id: {request.ListingId} not found");
+        }
         if (request.UserId != null && listing.OwnerId != request.UserId)
         {
             try

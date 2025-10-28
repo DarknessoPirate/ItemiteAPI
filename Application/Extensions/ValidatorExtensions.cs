@@ -8,6 +8,8 @@ using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetCategoryTree;
 using Application.Features.Categories.UpdateCategory;
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
+using Application.Features.Listings.AuctionListings.GetBidHistory;
+using Application.Features.Listings.AuctionListings.PlaceBid;
 using Application.Features.Listings.ProductListings.CreateProductListing;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
@@ -38,5 +40,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangePasswordCommand>, ChangePasswordValidator>();
         services.AddScoped<IValidator<CreateAuctionListingCommand>, CreateAuctionListingValidator>();
         services.AddScoped<IValidator<GetPaginatedListingsQuery>, GetPaginatedListingsValidator>();
+        services.AddScoped<IValidator<PlaceBidCommand>, PlaceBidValidator>();
+        services.AddScoped<IValidator<GetBidHistoryQuery>, GetBidHistoryValidator>();
     }
 }

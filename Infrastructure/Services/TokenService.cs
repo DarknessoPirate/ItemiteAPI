@@ -176,8 +176,8 @@ public class TokenService(
         httpContext.Response.Cookies.Append("accessToken", accessToken.Token, new CookieOptions
         {
             Path = "/",
-            Expires = accessToken.TokenExpirationDate,
             HttpOnly = true,
+            Expires = refreshToken.TokenExpirationDate,
             IsEssential = true,
             Secure = true,
             SameSite = SameSiteMode.Lax,
