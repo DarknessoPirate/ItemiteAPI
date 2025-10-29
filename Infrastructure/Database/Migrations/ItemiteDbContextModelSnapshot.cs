@@ -37,35 +37,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("CategoryListingBase");
                 });
 
-            modelBuilder.Entity("Domain.Entities.AuctionBid", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("BidDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("BidPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("BidderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuctionId");
-
-                    b.HasIndex("BidderId");
-
-                    b.ToTable("AuctionBids");
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -75,8 +46,7 @@ namespace Infrastructure.Database.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
@@ -87,9 +57,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("RootCategoryId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -114,8 +81,7 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("boolean");
@@ -127,6 +93,11 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(13)
                         .HasColumnType("character varying(13)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -150,113 +121,6 @@ namespace Infrastructure.Database.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.Entities.ListingPhoto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PhotoId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
-
-                    b.HasIndex("PhotoId");
-
-                    b.ToTable("ListingPhotos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Photo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateUploaded")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Photos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedByIp")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DeviceId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("JwtId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ReplacedByTokenId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("RevokedByIp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReplacedByTokenId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -265,220 +129,36 @@ namespace Infrastructure.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("AuthProvider")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("BackgroundPhotoId")
-                        .HasColumnType("integer");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
                         .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime?>("EmailChangeTokenExpirationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("EmailConfirmationTokenExpirationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PendingNewEmail")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("ProfilePhotoId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SecurityStamp")
+                    b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BackgroundPhotoId")
-                        .IsUnique();
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("ProfilePhotoId")
-                        .IsUnique();
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Domain.Entities.AuctionListing", b =>
@@ -488,11 +168,13 @@ namespace Infrastructure.Database.Migrations
                     b.Property<decimal?>("CurrentBid")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("HighestBidId")
+                    b.Property<int?>("HighestBidderId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("StartingBid")
                         .HasColumnType("numeric");
+
+                    b.HasIndex("HighestBidderId");
 
                     b.HasDiscriminator().HasValue("Auction");
                 });
@@ -504,8 +186,8 @@ namespace Infrastructure.Database.Migrations
                     b.Property<bool>("IsNegotiable")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                    b.Property<int>("Price")
+                        .HasColumnType("integer");
 
                     b.HasDiscriminator().HasValue("Product");
                 });
@@ -525,31 +207,12 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.AuctionBid", b =>
-                {
-                    b.HasOne("Domain.Entities.AuctionListing", "Auction")
-                        .WithMany("Bids")
-                        .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "Bidder")
-                        .WithMany("Bids")
-                        .HasForeignKey("BidderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
-
-                    b.Navigation("Bidder");
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.HasOne("Domain.Entities.Category", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
                 });
@@ -562,173 +225,17 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<int>("ListingBaseId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Country")
-                                .HasColumnType("text");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text");
-
-                            b1.HasKey("ListingBaseId");
-
-                            b1.ToTable("Listings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ListingBaseId");
-                        });
-
-                    b.Navigation("Location")
-                        .IsRequired();
-
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ListingPhoto", b =>
+            modelBuilder.Entity("Domain.Entities.AuctionListing", b =>
                 {
-                    b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithMany("ListingPhotos")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Photo", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Listing");
-
-                    b.Navigation("Photo");
-                });
-
-            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("Domain.Entities.RefreshToken", "ReplacedByToken")
-                        .WithOne("ReplacedThisToken")
-                        .HasForeignKey("Domain.Entities.RefreshToken", "ReplacedByTokenId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReplacedByToken");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.HasOne("Domain.Entities.Photo", "BackgroundPhoto")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.User", "BackgroundPhotoId")
+                    b.HasOne("Domain.Entities.User", "HighestBidder")
+                        .WithMany("HighestBids")
+                        .HasForeignKey("HighestBidderId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Domain.Entities.Photo", "ProfilePhoto")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.User", "ProfilePhotoId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.OwnsOne("Domain.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Country")
-                                .HasColumnType("text");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("AspNetUsers");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.Navigation("BackgroundPhoto");
-
-                    b.Navigation("Location");
-
-                    b.Navigation("ProfilePhoto");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
-                {
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
-                {
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
-                {
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("HighestBidder");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -736,28 +243,11 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("SubCategories");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ListingBase", b =>
-                {
-                    b.Navigation("ListingPhotos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.Navigation("ReplacedThisToken");
-                });
-
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Navigation("Bids");
+                    b.Navigation("HighestBids");
 
                     b.Navigation("OwnedListings");
-
-                    b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Domain.Entities.AuctionListing", b =>
-                {
-                    b.Navigation("Bids");
                 });
 #pragma warning restore 612, 618
         }

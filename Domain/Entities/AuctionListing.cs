@@ -7,6 +7,7 @@ public class AuctionListing : ListingBase
     [Required]
     public decimal StartingBid { get; set; }
     public decimal? CurrentBid { get; set; }
-    public int? HighestBidId {get; set; } 
-    public ICollection<AuctionBid> Bids { get; set; } = new List<AuctionBid>();
+
+    public int? HighestBidderId { get; set; } = null;
+    public User? HighestBidder { get; set; } = null;
 }
