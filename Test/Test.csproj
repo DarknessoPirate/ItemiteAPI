@@ -22,13 +22,4 @@
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <None Include="..\Infrastructure\Configuration\Seeding\initial-categories.json" Link="Configuration\Seeding\initial-categories.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="..\Infrastructure\Configuration\Seeding\initial-users.json" Link="Configuration\Seeding\initial-users.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
 </Project>

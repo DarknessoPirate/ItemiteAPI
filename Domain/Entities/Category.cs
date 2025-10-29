@@ -9,12 +9,13 @@ public class Category
     [MinLength(2)]
     [MaxLength(50)]
     public string Name { get; set; } = string.Empty;
-    [MaxLength(100)]
-    public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
-    public int? ParentCategoryId { get; set; }
-    public int? RootCategoryId { get; set; }
-    public Category? ParentCategory { get; set; }
-    public ICollection<Category> SubCategories { get; set; } = new List<Category>();
-    public ICollection<ListingBase> Listings { get; set; } = new List<ListingBase>();
+
+    public string? Description { get; set; } = null;
+    public string? ImageUrl { get; set; } = null;
+
+    public int? ParentCategoryId { get; set; } = null;
+    public Category? ParentCategory { get; set; } = null;
+    public ICollection<Category>? SubCategories { get; set; } = new List<Category>();
+    
+    public ICollection<ListingBase>? Listings { get; set; } = new List<ListingBase>();
 }
