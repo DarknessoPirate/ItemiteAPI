@@ -12,14 +12,16 @@ public class User : IdentityUser<int>
     public string? PendingNewEmail { get; set; }
     public DateTime? EmailChangeTokenExpirationDate { get; set; }
     public AuthProvider AuthProvider { get; set; }
-    
+
     public int? ProfilePhotoId { get; set; }
     public Photo? ProfilePhoto { get; set; }
-    
+
     public int? BackgroundPhotoId { get; set; }
     public Photo? BackgroundPhoto { get; set; }
 
     public ICollection<ListingBase> OwnedListings { get; set; } = new List<ListingBase>();
     public ICollection<AuctionBid> Bids { get; set; } = new List<AuctionBid>();
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<Message> SentMessages { get; set; } = [];
+    public ICollection<Message> ReceivedMessages { get; set; } = [];
 }

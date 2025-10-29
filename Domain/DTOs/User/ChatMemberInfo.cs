@@ -1,9 +1,8 @@
 namespace Domain.DTOs.User;
 
-public class UserBasicResponse
+public class ChatMemberInfo
 {
     public int Id { get; set; }
     public string UserName { get; set; }
-    public string Email { get; set; }
-    // TODO: ADD PROFILE PHOTO URL
+    public string? PhotoUrl { get; set; }
 }

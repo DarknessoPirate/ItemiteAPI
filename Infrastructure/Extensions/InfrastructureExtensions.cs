@@ -51,5 +51,6 @@ public static class InfrastructureExtensions
         services.AddScoped<IMediaService, MediaService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPhotoRepository, PhotoRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
     }
 }

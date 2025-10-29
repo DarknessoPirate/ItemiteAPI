@@ -24,4 +24,5 @@ public class ListingBase
     public ICollection<Category> Categories { get; set; } = new List<Category>();
     
     public ICollection<ListingPhoto> ListingPhotos { get; set; } = new List<ListingPhoto>();
+    public ICollection<Message> ListingMessages { get; set; } = new List<Message>();
 }

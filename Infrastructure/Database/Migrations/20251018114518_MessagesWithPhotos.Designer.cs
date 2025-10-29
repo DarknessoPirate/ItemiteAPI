@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251018114518_MessagesWithPhotos")]
+    partial class MessagesWithPhotos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,35 +38,6 @@ namespace Infrastructure.Database.Migrations
                     b.HasIndex("ListingsId");
 
                     b.ToTable("CategoryListingBase");
-                });
-
-            modelBuilder.Entity("Domain.Entities.AuctionBid", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("BidDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("BidPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("BidderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuctionId");
-
-                    b.HasIndex("BidderId");
-
-                    b.ToTable("AuctionBids");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -128,6 +102,11 @@ namespace Infrastructure.Database.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("character varying(13)");
 
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -185,25 +164,12 @@ namespace Infrastructure.Database.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateSent")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ReadAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("RecipientId")
@@ -213,8 +179,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
 
                     b.HasIndex("RecipientId");
 
@@ -256,10 +220,6 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<DateTime>("DateUploaded")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
@@ -342,9 +302,8 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("AuthProvider")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("AuthProvider")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("BackgroundPhotoId")
                         .HasColumnType("integer");
@@ -365,6 +324,9 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -562,11 +524,13 @@ namespace Infrastructure.Database.Migrations
                     b.Property<decimal?>("CurrentBid")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("HighestBidId")
+                    b.Property<int?>("HighestBidderId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("StartingBid")
                         .HasColumnType("numeric");
+
+                    b.HasIndex("HighestBidderId");
 
                     b.HasDiscriminator().HasValue("Auction");
                 });
@@ -599,25 +563,6 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.AuctionBid", b =>
-                {
-                    b.HasOne("Domain.Entities.AuctionListing", "Auction")
-                        .WithMany("Bids")
-                        .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "Bidder")
-                        .WithMany("Bids")
-                        .HasForeignKey("BidderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
-
-                    b.Navigation("Bidder");
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.HasOne("Domain.Entities.Category", "ParentCategory")
@@ -634,37 +579,6 @@ namespace Infrastructure.Database.Migrations
                         .WithMany("OwnedListings")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Domain.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<int>("ListingBaseId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Country")
-                                .HasColumnType("text");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text");
-
-                            b1.HasKey("ListingBaseId");
-
-                            b1.ToTable("Listings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ListingBaseId");
-                        });
-
-                    b.Navigation("Location")
                         .IsRequired();
 
                     b.Navigation("Owner");
@@ -691,12 +605,6 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.Message", b =>
                 {
-                    b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithMany("ListingMessages")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.User", "Recipient")
                         .WithMany("ReceivedMessages")
                         .HasForeignKey("RecipientId")
@@ -708,8 +616,6 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Listing");
 
                     b.Navigation("Recipient");
 
@@ -765,37 +671,7 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("Domain.Entities.User", "ProfilePhotoId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("Domain.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Country")
-                                .HasColumnType("text");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("AspNetUsers");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.Navigation("BackgroundPhoto");
-
-                    b.Navigation("Location");
 
                     b.Navigation("ProfilePhoto");
                 });
@@ -851,6 +727,16 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.AuctionListing", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "HighestBidder")
+                        .WithMany("HighestBids")
+                        .HasForeignKey("HighestBidderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("HighestBidder");
+                });
+
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Navigation("SubCategories");
@@ -858,8 +744,6 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.ListingBase", b =>
                 {
-                    b.Navigation("ListingMessages");
-
                     b.Navigation("ListingPhotos");
                 });
 
@@ -875,7 +759,7 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Navigation("Bids");
+                    b.Navigation("HighestBids");
 
                     b.Navigation("OwnedListings");
 
@@ -884,11 +768,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("SentMessages");
-                });
-
-            modelBuilder.Entity("Domain.Entities.AuctionListing", b =>
-                {
-                    b.Navigation("Bids");
                 });
 #pragma warning restore 612, 618
         }
