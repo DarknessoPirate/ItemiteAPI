@@ -15,7 +15,8 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<ListingPhoto> ListingPhotos { get; set; }
     public DbSet<MessagePhoto> MessagePhotos { get; set; }
     public DbSet<Message> Messages { get; set; }
-    
+    public DbSet<AuctionBid> AuctionBids { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()
@@ -29,6 +30,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne() // no nav back to user (access only from user side)
             .HasForeignKey<User>(u => u.BackgroundPhotoId)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.AuthProvider)
+            .HasConversion<string>();
 
         modelBuilder.Entity<ListingPhoto>()
             .HasOne(lp => lp.Listing)
@@ -92,12 +97,18 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithMany(u => u.OwnedListings)
             .HasForeignKey(l => l.OwnerId)
             .OnDelete(DeleteBehavior.Cascade); // when user is deleted, all their listings are deleted too
-
-        modelBuilder.Entity<AuctionListing>()
-            .HasOne(a => a.HighestBidder)
-            .WithMany(u => u.HighestBids)
-            .HasForeignKey(a => a.HighestBidderId)
-            .OnDelete(DeleteBehavior.SetNull); // when highest bidder deletes account, set the highest bidder to null
+        
+        modelBuilder.Entity<AuctionBid>()
+            .HasOne(b => b.Auction)
+            .WithMany(a => a.Bids)
+            .HasForeignKey(a => a.AuctionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AuctionBid>()
+            .HasOne(b => b.Bidder)
+            .WithMany(u => u.Bids)
+            .HasForeignKey(a => a.BidderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<RefreshToken>()
             .HasOne(r => r.User)

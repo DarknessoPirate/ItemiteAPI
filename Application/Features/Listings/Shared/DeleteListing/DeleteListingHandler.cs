@@ -21,6 +21,10 @@ public class DeleteListingHandler(
     public async Task Handle(DeleteListingCommand request, CancellationToken cancellationToken)
     {
         var listingToDelete = await listingRepository.GetListingWithPhotosByIdAsync(request.ListingId);
+        if (listingToDelete == null)
+        {
+            throw new NotFoundException($"Listing with id: {request.ListingId} not found");
+        }
         if (listingToDelete.OwnerId != request.UserId)
         {
             throw new ForbiddenException("You are not allowed to delete this listing");

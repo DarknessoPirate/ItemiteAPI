@@ -20,7 +20,7 @@ public class User : IdentityUser<int>
     public Photo? BackgroundPhoto { get; set; }
 
     public ICollection<ListingBase> OwnedListings { get; set; } = new List<ListingBase>();
-    public ICollection<AuctionListing> HighestBids { get; set; } = new List<AuctionListing>();
+    public ICollection<AuctionBid> Bids { get; set; } = new List<AuctionBid>();
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public ICollection<Message> SentMessages { get; set; } = [];
     public ICollection<Message> ReceivedMessages { get; set; } = [];
