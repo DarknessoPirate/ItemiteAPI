@@ -58,7 +58,12 @@ public class Program
         });
         builder.Services.AddOpenApi();
         builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; }); // setting to generate api urls in full lowercase 
-
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("FrontendClient", policybuilder =>
+                policybuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins(builder.Configuration["AllowedOrigins"])
+            );
+        });
 
         var app = builder.Build();
         
@@ -90,7 +95,7 @@ public class Program
         app.ConfigureSerilogHttpLogging();
         app.UseHttpsRedirection();
         app.UseHttpsRedirection();
-        
+        app.UseCors("FrontendClient");
         app.UseAuthentication();
         app.UseAuthorization();
 
