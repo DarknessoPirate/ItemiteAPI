@@ -6,6 +6,7 @@ using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces.Services;
+using Infrastructure.SignalR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -98,9 +99,8 @@ public class Program
         app.UseCors("FrontendClient");
         app.UseAuthentication();
         app.UseAuthorization();
-
-
         app.MapControllers();
+        app.MapHub<NotificationHub>("/notifications");
 
         app.Run();
     }

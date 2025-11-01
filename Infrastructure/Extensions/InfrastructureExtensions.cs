@@ -20,6 +20,7 @@ public static class InfrastructureExtensions
             options.UseNpgsql(configuration.GetConnectionString("PostgreSQL")
                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
         });
+        services.AddSignalR();
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
