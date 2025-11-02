@@ -1,3 +1,4 @@
+using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -52,6 +53,10 @@ public class FollowListingHandler(
         listingRepository.UpdateListing(listingToFollow);
         
         await unitOfWork.SaveChangesAsync();
+        
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
+        await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+        await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
         
         return followedListing.Id;
     }

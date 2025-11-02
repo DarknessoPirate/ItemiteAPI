@@ -13,6 +13,7 @@ namespace Application.Features.Listings.ProductListings.GetProductListing;
 
 public class GetProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
+    IListingRepository<ListingBase> listingRepository,
     ICacheService cache,
     IMapper mapper,
     IUnitOfWork unitOfWork,
@@ -48,6 +49,12 @@ public class GetProductListingHandler(
         }
         
         var mappedListing = mapper.Map<ProductListingResponse>(listing);
+
+        if (request.UserId != null)
+        {
+            var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
+            mappedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+        }
         
         var listingImages = listing.ListingPhotos;
         var listingImageResponses = listingImages.Select(x => new ListingImageResponse

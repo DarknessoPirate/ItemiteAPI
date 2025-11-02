@@ -18,6 +18,7 @@ public class AuctionListingResponse
     public DateTime DateEnds { get; set; }
     public bool IsArchived { get; set; }
     public bool IsFeatured { get; set; }
+    public bool? IsFollowed { get; set; }
     public UserResponse? Owner { get; set; }
     public Location Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }

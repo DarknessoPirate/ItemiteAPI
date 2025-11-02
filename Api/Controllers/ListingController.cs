@@ -1,6 +1,7 @@
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
+using Domain.DTOs.Listing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,14 @@ namespace Api.Controllers;
 public class ListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetListings([FromQuery] GetPaginatedListingsQuery query)
+    public async Task<IActionResult> GetListings([FromQuery] PaginateListingQuery query)
     {
-        var listings = await mediator.Send(query);
+        var getListingsQuery = new GetPaginatedListingsQuery
+        {
+            Query = query,
+            UserId = requestContextService.GetUserIdNullable()
+        };
+        var listings = await mediator.Send(getListingsQuery);
         return Ok(listings);
     }
     

@@ -17,6 +17,7 @@ public class ProductListingResponse
     public bool IsArchived { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsNegotiable { get; set; }
+    public bool? IsFollowed { get; set; }
     public UserResponse? Owner { get; set; }
     public Location Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }
