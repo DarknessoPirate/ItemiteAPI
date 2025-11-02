@@ -13,6 +13,7 @@ public class ListingBase
     [Required]
     public Location Location { get; set; } = new();
     public int Views { get; set; } = 0;
+    public int Followers { get; set; } = 0;
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     public DateTime DateEnds { get; set; } 
     public bool IsArchived { get; set; } = false;

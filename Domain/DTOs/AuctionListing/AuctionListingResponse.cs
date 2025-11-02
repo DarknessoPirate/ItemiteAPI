@@ -13,6 +13,7 @@ public class AuctionListingResponse
     public decimal StartingBid { get; set; }
     public decimal? CurrentBid { get; set; }
     public int Views { get; set; }
+    public int Followers { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateEnds { get; set; }
     public bool IsArchived { get; set; }
