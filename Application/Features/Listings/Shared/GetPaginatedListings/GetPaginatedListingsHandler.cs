@@ -42,7 +42,7 @@ public class GetPaginatedListingsHandler(
             pageResponse = await HandleBothListingTypes(request, cancellationToken);
         }
 
-        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.Query}", pageResponse);
+        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request}", pageResponse);
         return pageResponse;
     }
     
@@ -50,6 +50,13 @@ public class GetPaginatedListingsHandler(
         GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
         var queryable = repository.GetListingsQueryable().OfType<ProductListing>();
+
+        List<FollowedListing> followedListings = [];
+        if (request.UserId != null)
+        {
+            followedListings = await repository.GetUserFollowedListingsAsync(request.UserId.Value);
+            queryable = FilterByFollowed(queryable, request.Query.FollowedOnly, followedListings);
+        }
         
         queryable = FilterByCategories(queryable, request.Query.CategoryIds);
         queryable = FilterProductByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
@@ -64,15 +71,22 @@ public class GetPaginatedListingsHandler(
         var listings = await queryable.ToListAsync(cancellationToken);
         var responses = mapper.Map<List<ListingBasicResponse>>(listings);
 
-        responses = await SetIsFollowedField(responses, request.UserId);
+        responses = await SetIsFollowedField(responses, followedListings);
 
         return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
-
+    
     private async Task<PageResponse<ListingBasicResponse>> HandleAuctionListings(
         GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
         var queryable = repository.GetListingsQueryable().OfType<AuctionListing>();
+        
+        List<FollowedListing> followedListings = [];
+        if (request.UserId != null)
+        {
+            followedListings = await repository.GetUserFollowedListingsAsync(request.UserId.Value);
+            queryable = FilterByFollowed(queryable, request.Query.FollowedOnly, followedListings);
+        }
         
         queryable = FilterByCategories(queryable, request.Query.CategoryIds);
         queryable = FilterAuctionByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
@@ -87,7 +101,7 @@ public class GetPaginatedListingsHandler(
         var listings = await queryable.ToListAsync(cancellationToken);
         var responses = mapper.Map<List<ListingBasicResponse>>(listings);
         
-        responses = await SetIsFollowedField(responses, request.UserId);
+        responses = await SetIsFollowedField(responses, followedListings);
 
         return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
@@ -100,7 +114,15 @@ public class GetPaginatedListingsHandler(
 
         productQuery = FilterByCategories(productQuery, request.Query.CategoryIds);
         auctionQuery = FilterByCategories(auctionQuery, request.Query.CategoryIds);
-
+        
+        List<FollowedListing> followedListings = [];
+        if (request.UserId != null)
+        {
+            followedListings = await repository.GetUserFollowedListingsAsync(request.UserId.Value);
+            productQuery = FilterByFollowed(productQuery, request.Query.FollowedOnly, followedListings);
+            auctionQuery = FilterByFollowed(auctionQuery, request.Query.FollowedOnly, followedListings);
+        }
+        
         productQuery = FilterProductByPrice(productQuery, request.Query.PriceFrom, request.Query.PriceTo);
         auctionQuery = FilterAuctionByPrice(auctionQuery, request.Query.PriceFrom, request.Query.PriceTo);
 
@@ -125,20 +147,26 @@ public class GetPaginatedListingsHandler(
 
         var responses = mapper.Map<List<ListingBasicResponse>>(paginatedListings);
         
-        responses = await SetIsFollowedField(responses, request.UserId);
+        responses = await SetIsFollowedField(responses, followedListings);
 
         return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
-
-    private async Task<List<ListingBasicResponse>> SetIsFollowedField(List<ListingBasicResponse> responses, int? userId)
+    
+    private IQueryable<T> FilterByFollowed<T>(IQueryable<T> queryable, bool? followedOnly, List<FollowedListing> followedListings) where T : ListingBase
     {
-        if (userId != null)
+        if (followedOnly != null && followedOnly.Value)
         {
-            var followedListings = await repository.GetUserFollowedListingsAsync(userId.Value);
-            foreach (var response in responses)
-            {
-                response.IsFollowed = followedListings.Select(f => f.ListingId).Contains(response.Id);
-            }
+            queryable = queryable.Where(q => followedListings.Select(f => f.ListingId).Contains(q.Id));
+        }
+        return queryable;
+    }
+
+    private async Task<List<ListingBasicResponse>> SetIsFollowedField(List<ListingBasicResponse> responses, List<FollowedListing> followedListings)
+    {
+        
+        foreach (var response in responses)
+        {
+            response.IsFollowed = followedListings.Select(f => f.ListingId).Contains(response.Id);
         }
         return responses;
     }

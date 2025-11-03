@@ -9,6 +9,7 @@ public class PaginateListingQuery
     public ListingType? ListingType { get; set; }
     public SortBy? SortBy { get; set; } = Domain.Enums.SortBy.CreationDate;
     public SortDirection? SortDirection { get; set; } = Domain.Enums.SortDirection.Ascending;
+    public bool? FollowedOnly { get; set; } = false;
     public decimal? PriceFrom { get; set; } 
     public decimal? PriceTo { get; set; }
     public List<int>? CategoryIds { get; set; }
@@ -26,6 +27,7 @@ public class PaginateListingQuery
                $"{SortDirection?.ToString() ?? "null"}_" +
                $"{PriceFrom?.ToString() ?? "null"}_" +
                $"{PriceTo?.ToString() ?? "null"}_" +
+               $"{FollowedOnly?.ToString() ?? "null"}_" +
                $"{categoriesString}";
     }
 }

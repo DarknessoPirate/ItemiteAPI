@@ -66,7 +66,7 @@ public class GetProductListingHandler(
         
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{request.UserId.ToString() ?? "null"}_{listing.Id}", mappedListing);
         
         return mappedListing;
     }

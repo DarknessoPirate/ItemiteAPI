@@ -67,7 +67,7 @@ public class GetAuctionListingHandler(
         
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.AUCTION_LISTING}{request.UserId.ToString() ?? "null"}_{listing.Id}", mappedListing);
         
         return mappedListing;
     }
