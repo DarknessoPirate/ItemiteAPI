@@ -14,6 +14,12 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return listings;
     }
 
+    public async Task<List<T>> GetUserListingsAsync(int userId)
+    {
+        var userListings = await dbContext.Set<T>().Where(l => l.OwnerId == userId).ToListAsync();
+        return userListings;
+    }
+
     public IQueryable<T> GetListingsQueryable()
     {
        return dbContext.Set<T>().Include(p => p.Categories)
@@ -53,5 +59,14 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     public void DeleteListing(T listing)
     {
         dbContext.Set<T>().Remove(listing);
+    }
+
+    public async Task<List<T>> GetExpiredFeaturedListingsAsync(DateTime expirationDate)
+    {
+        var expiredListings = await dbContext.Set<T>()
+            .Where(l => l.IsFeatured == true && l.FeaturedAt < expirationDate)
+            .ToListAsync();
+    
+        return expiredListings;
     }
 }
