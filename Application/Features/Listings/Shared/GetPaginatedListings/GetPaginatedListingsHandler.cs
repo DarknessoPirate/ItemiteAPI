@@ -20,7 +20,7 @@ public class GetPaginatedListingsHandler(
     public async Task<PageResponse<ListingBasicResponse>> Handle(GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
         var cachedListings = await cacheService.GetAsync<PageResponse<ListingBasicResponse>>(
-            $"{CacheKeys.LISTINGS}{request}");
+            $"{CacheKeys.LISTINGS}{request.UserId.ToString() ?? "null"}_{request}");
 
         if (cachedListings != null)
         {
@@ -42,7 +42,7 @@ public class GetPaginatedListingsHandler(
             pageResponse = await HandleBothListingTypes(request, cancellationToken);
         }
 
-        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request}", pageResponse);
+        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.UserId.ToString() ?? "null"}_{request}", pageResponse);
         return pageResponse;
     }
     

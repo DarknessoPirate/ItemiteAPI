@@ -24,7 +24,7 @@ public class GetAuctionListingHandler(
     public async Task<AuctionListingResponse> Handle(GetAuctionListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<AuctionListingResponse>($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
+            await cache.GetAsync<AuctionListingResponse>($"{CacheKeys.AUCTION_LISTING}{request.UserId.ToString() ?? "null"}_{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;

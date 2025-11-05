@@ -23,7 +23,7 @@ public class GetProductListingHandler(
     public async Task<ProductListingResponse> Handle(GetProductListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.UserId.ToString() ?? "null"}_{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;
