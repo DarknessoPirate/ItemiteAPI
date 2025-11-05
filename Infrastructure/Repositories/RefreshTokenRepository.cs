@@ -34,7 +34,7 @@ public class RefreshTokenRepository(ItemiteDbContext context) : IRefreshTokenRep
         CancellationToken cancellationToken = default)
     {
         return await context.RefreshTokens
-            .Where(rt => rt.UserId == userId && rt.IsActive)
+            .Where(rt => rt.UserId == userId && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow)
             .ToListAsync(cancellationToken);
     }
 
