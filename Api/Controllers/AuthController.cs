@@ -2,6 +2,8 @@ using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.LoginGoogle;
 using Application.Features.Auth.LoginGoogleCallback;
+using Application.Features.Auth.Logout;
+using Application.Features.Auth.LogoutFromAllDevices;
 using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
@@ -11,6 +13,7 @@ using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ForgotPasswordRequest = Microsoft.AspNetCore.Identity.Data.ForgotPasswordRequest;
 
@@ -87,6 +90,32 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
 
         var response = await mediator.Send(command);
         return Ok(response);
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var command = new LogoutCommand
+        {
+            IpAddress = requestContextService.GetIpAddress()
+        };
+        
+        var successMessage = await mediator.Send(command);
+        return Ok(new {successMessage});
+    }
+
+    [Authorize]
+    [HttpPost("logout-all-devices")]
+    public async Task<IActionResult> LogoutFromAllDevices()
+    {
+        var command = new LogoutFromAllDevicesCommand
+        {
+            IpAddress = requestContextService.GetIpAddress()
+        };
+        
+        var successMessage = await mediator.Send(command);
+        return Ok(new {successMessage});
     }
 
     [HttpGet("confirm-email")]

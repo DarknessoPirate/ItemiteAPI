@@ -13,10 +13,12 @@ public class AuctionListingResponse
     public decimal StartingBid { get; set; }
     public decimal? CurrentBid { get; set; }
     public int Views { get; set; }
+    public int Followers { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateEnds { get; set; }
     public bool IsArchived { get; set; }
     public bool IsFeatured { get; set; }
+    public bool? IsFollowed { get; set; }
     public UserResponse? Owner { get; set; }
     public Location Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }

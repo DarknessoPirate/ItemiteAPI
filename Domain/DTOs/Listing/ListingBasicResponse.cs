@@ -14,6 +14,8 @@ public class ListingBasicResponse
     public string? MainImageUrl { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsArchived { get; set; }
+    public int Followers { get; set; }
+    public bool? IsFollowed { get; set; }
     
     public string ListingType { get; set; }
     

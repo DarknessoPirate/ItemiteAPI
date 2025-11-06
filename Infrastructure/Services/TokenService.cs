@@ -194,6 +194,25 @@ public class TokenService(
         });
     }
 
+    public void RemoveTokensFromCookies(HttpContext httpContext)
+    {
+        httpContext.Response.Cookies.Delete("accessToken", new CookieOptions
+        {
+            Path = "/",
+            Secure = true,
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions
+        {
+            Path = "/",
+            Secure = true,
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax
+        });
+    }
+
     private async Task<RefreshToken> CreateRefreshTokenAsync(User user, string jwtId, string createdByIp,
         string? deviceId, string? userAgent)
     {
