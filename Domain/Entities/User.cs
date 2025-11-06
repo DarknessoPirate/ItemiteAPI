@@ -25,4 +25,5 @@ public class User : IdentityUser<int>
     public ICollection<Message> SentMessages { get; set; } = [];
     public ICollection<Message> ReceivedMessages { get; set; } = [];
     public ICollection<FollowedListing> FollowedListings { get; set; } = [];
+    public ICollection<ListingView> ViewedListings { get; set; } = [];
 }

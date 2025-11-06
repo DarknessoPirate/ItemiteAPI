@@ -12,7 +12,7 @@ public class ListingBase
     public string Name { get; set; } = string.Empty;
     [Required]
     public Location Location { get; set; } = new();
-    public int Views { get; set; } = 0;
+    public int ViewsCount { get; set; } = 0;
     public int Followers { get; set; } = 0;
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     public DateTime DateEnds { get; set; } 
@@ -23,9 +23,12 @@ public class ListingBase
     public string? Description { get; set; } = null;
     public int OwnerId { get; set; }
     public required User Owner { get; set; } = null!;
-    public ICollection<Category> Categories { get; set; } = [];
+    public ICollection<Category> Categories { get; set; } = new List<Category>();
+    
+    public ICollection<ListingPhoto> ListingPhotos { get; set; } = new List<ListingPhoto>();
+    public ICollection<Message> ListingMessages { get; set; } = new List<Message>();
+    public ICollection<ListingView> ListingViews { get; set; } = [];
+   
 
-    public ICollection<ListingPhoto> ListingPhotos { get; set; } = [];
-    public ICollection<Message> ListingMessages { get; set; } = [];
-    public ICollection<FollowedListing> FollowedListings { get; set; } = [];
+    
 }
