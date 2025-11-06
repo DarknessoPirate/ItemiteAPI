@@ -13,6 +13,7 @@ namespace Application.Features.Listings.ProductListings.GetProductListing;
 
 public class GetProductListingHandler(
     IListingRepository<ProductListing> productListingRepository,
+    IListingRepository<ListingBase> listingRepository,
     ICacheService cache,
     IMapper mapper,
     IUnitOfWork unitOfWork,
@@ -22,7 +23,7 @@ public class GetProductListingHandler(
     public async Task<ProductListingResponse> Handle(GetProductListingQuery request, CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cache.GetAsync<ProductListingResponse>($"{CacheKeys.PRODUCT_LISTING}{request.UserId.ToString() ?? "null"}_{request.ListingId}");
         if (cachedListing != null)
         {
             return cachedListing;
@@ -48,6 +49,12 @@ public class GetProductListingHandler(
         }
         
         var mappedListing = mapper.Map<ProductListingResponse>(listing);
+
+        if (request.UserId != null)
+        {
+            var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
+            mappedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+        }
         
         var listingImages = listing.ListingPhotos;
         var listingImageResponses = listingImages.Select(x => new ListingImageResponse
@@ -59,7 +66,7 @@ public class GetProductListingHandler(
         
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{request.UserId.ToString() ?? "null"}_{listing.Id}", mappedListing);
         
         return mappedListing;
     }

@@ -39,6 +39,24 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         await dbContext.Set<T>().AddAsync(listing);
     }
 
+    public async Task<List<User>> GetListingFollowersAsync(int listingId)
+    {
+        var followers = await dbContext.FollowedListings.Where(f => f.ListingId == listingId).Select(f => f.User)
+            .ToListAsync();
+        return followers;
+    }
+
+    public async Task<List<FollowedListing>> GetUserFollowedListingsAsync(int userId)
+    {
+        var followedListing = await dbContext.FollowedListings.Where(f => f.UserId == userId).ToListAsync();
+        return followedListing;
+    }
+
+    public async Task AddListingToFollowedAsync(FollowedListing followedListing)
+    {
+        await dbContext.FollowedListings.AddAsync(followedListing);
+    }
+
     public async Task<bool> ListingExistsAsync(int listingId)
     {
         var listing = await dbContext.Set<T>().FirstOrDefaultAsync(l => l.Id == listingId);

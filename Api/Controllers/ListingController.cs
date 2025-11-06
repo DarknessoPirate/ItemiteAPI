@@ -1,5 +1,7 @@
 using Application.Features.Listings.Shared.DeleteListing;
+using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
+using Domain.DTOs.Listing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +14,14 @@ namespace Api.Controllers;
 public class ListingController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetListings([FromQuery] GetPaginatedListingsQuery query)
+    public async Task<IActionResult> GetListings([FromQuery] PaginateListingQuery query)
     {
-        var listings = await mediator.Send(query);
+        var getListingsQuery = new GetPaginatedListingsQuery
+        {
+            Query = query,
+            UserId = requestContextService.GetUserIdNullable()
+        };
+        var listings = await mediator.Send(getListingsQuery);
         return Ok(listings);
     }
     
@@ -29,5 +36,20 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         };
         await mediator.Send(command);
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("follow/{listingId}")]
+    public async Task<IActionResult> FollowListing([FromRoute] int listingId)
+    {
+        var command = new FollowListingCommand
+        {
+            ListingId = listingId,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        var createdFollowId = await mediator.Send(command);
+        
+        return Created("api/listing/followed", new {createdFollowId});
     }
 }

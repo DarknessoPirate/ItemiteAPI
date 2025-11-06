@@ -183,7 +183,7 @@ public class UpdateAuctionListingHandler(
             await unitOfWork.CommitTransactionAsync();
 
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-            await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{request.ListingId}");
 
             return mapper.Map<AuctionListingResponse>(auctionListingToUpdate);
         }
