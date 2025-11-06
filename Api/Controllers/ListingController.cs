@@ -1,6 +1,7 @@
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
+using Application.Features.Listings.Shared.HighlightListing;
 using Domain.DTOs.Listing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -39,6 +40,20 @@ public class ListingController(IMediator mediator, IRequestContextService reques
     }
 
     [Authorize]
+
+    [HttpPost("feature")]
+    public async Task<IActionResult> FeatureListing([FromBody] List<int> listingIdsToFeature)
+    {
+        var command = new HighlightListingCommand
+        {
+            ListingIds = listingIdsToFeature,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        var resultMessage = await mediator.Send(command);
+        return Ok(new { resultMessage });
+    }
+
     [HttpPost("follow/{listingId}")]
     public async Task<IActionResult> FollowListing([FromRoute] int listingId)
     {
@@ -51,5 +66,6 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         var createdFollowId = await mediator.Send(command);
         
         return Created("api/listing/followed", new {createdFollowId});
+
     }
 }
