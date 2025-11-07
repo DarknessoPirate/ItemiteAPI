@@ -60,12 +60,6 @@ public class GetPaginatedListingsHandler(
         GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
         var queryable = repository.GetListingsQueryable().OfType<ProductListing>();
-
-        //List<FollowedListing> followedListings = [];
-        //if (request.UserId != null)
-        //{
-            //queryable = FilterByFollowed(queryable, request.Query.FollowedOnly, followedListings);
-        //}
         
         queryable = FilterByCategories(queryable, request.Query.CategoryIds);
         queryable = FilterProductByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);

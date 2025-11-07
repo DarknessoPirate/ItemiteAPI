@@ -1,5 +1,6 @@
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Listings.Shared.FollowListing;
+using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Listings.Shared.HighlightListing;
 using Domain.DTOs.Listing;
@@ -25,6 +26,20 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         var listings = await mediator.Send(getListingsQuery);
         return Ok(listings);
     }
+
+    [Authorize]
+    [HttpGet("follow")]
+    public async Task<IActionResult> GetFollowedListings([FromQuery] PaginateFollowedListingsQuery query)
+    {
+        var getFollowedListingsQuery = new GetPaginatedFollowedListingsQuery
+        {
+            Query = query,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        var followedListings = await mediator.Send(getFollowedListingsQuery);
+        return Ok(followedListings); 
+    }
     
     [Authorize]
     [HttpDelete("{listingId}")]
@@ -40,7 +55,6 @@ public class ListingController(IMediator mediator, IRequestContextService reques
     }
 
     [Authorize]
-
     [HttpPost("feature")]
     public async Task<IActionResult> FeatureListing([FromBody] List<int> listingIdsToFeature)
     {
