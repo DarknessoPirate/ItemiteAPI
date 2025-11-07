@@ -239,8 +239,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             orderedQuery = sortDirection == SortDirection.Ascending
-                ? orderedQuery.ThenBy(p => p.Views)
-                : orderedQuery.ThenByDescending(p => p.Views);
+                ? orderedQuery.ThenBy(p => p.ViewsCount)
+                : orderedQuery.ThenByDescending(p => p.ViewsCount);
         }
         else
         {
@@ -270,8 +270,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             orderedQuery = sortDirection == SortDirection.Ascending
-                ? orderedQuery.ThenBy(a => a.Views)
-                : orderedQuery.ThenByDescending(a => a.Views);
+                ? orderedQuery.ThenBy(a => a.ViewsCount)
+                : orderedQuery.ThenByDescending(a => a.ViewsCount);
         }
         else
         {
@@ -301,8 +301,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             sorted = sortDirection == SortDirection.Ascending
-                ? sorted.ThenBy(l => l.Views)
-                : sorted.ThenByDescending(l => l.Views);
+                ? sorted.ThenBy(l => l.ViewsCount)
+                : sorted.ThenByDescending(l => l.ViewsCount);
         }
         else
         {
