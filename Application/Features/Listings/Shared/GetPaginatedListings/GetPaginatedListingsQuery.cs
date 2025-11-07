@@ -9,9 +9,4 @@ public class GetPaginatedListingsQuery : IRequest<PageResponse<ListingBasicRespo
 {
     public PaginateListingQuery Query {get; set;}
     public int? UserId {get; set;}
-
-    public override string ToString()
-    {
-        return $"{UserId.ToString() ?? "null"}_{Query}";
-    }
 }

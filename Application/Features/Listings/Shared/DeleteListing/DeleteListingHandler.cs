@@ -47,8 +47,8 @@ public class DeleteListingHandler(
 
             await unitOfWork.CommitTransactionAsync();
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}*_{request.ListingId}");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{request.ListingId}");
+            await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
         }
         catch (Exception ex)
         {

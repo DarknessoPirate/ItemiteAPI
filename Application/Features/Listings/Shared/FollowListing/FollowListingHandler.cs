@@ -54,9 +54,9 @@ public class FollowListingHandler(
         
         await unitOfWork.SaveChangesAsync();
         
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}{request.UserId}*");
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}{request.UserId}_{request.ListingId}");
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}{request.UserId}_{request.ListingId}");
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
+        await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+        await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
         
         return followedListing.Id;
     }
