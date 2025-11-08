@@ -36,8 +36,8 @@ public class HighlightListingHandler(
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
         foreach (var listingId in listingsToFeature.Select(l => l.Id))
         {
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}*_{listingId}");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{listingId}");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}{listingId}");
+            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}{listingId}");
         }
         
         

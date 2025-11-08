@@ -51,7 +51,7 @@ public class PlaceBidHandler(
         await unitOfWork.SaveChangesAsync();
 
         await cacheService.RemoveAsync($"{CacheKeys.BIDS}{auction.Id}");
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{auction.Id}");
+        await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{auction.Id}");
         
         return bidToAdd.Id;
     }

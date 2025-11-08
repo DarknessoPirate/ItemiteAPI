@@ -27,9 +27,14 @@ public class GetAuctionListingHandler(
         CancellationToken cancellationToken)
     {
         var cachedListing =
-            await cache.GetAsync<AuctionListingResponse>($"{CacheKeys.AUCTION_LISTING}{request.UserId.ToString() ?? "null"}_{request.ListingId}");
+            await cache.GetAsync<AuctionListingResponse>($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
         if (cachedListing != null)
         {
+            if (request.UserId != null)
+            {
+                var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
+                cachedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+            }
             return cachedListing;
         }
 
@@ -67,12 +72,6 @@ public class GetAuctionListingHandler(
 
         var mappedListing = mapper.Map<AuctionListingResponse>(listing);
         
-        if (request.UserId != null)
-        {
-            var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
-            mappedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
-        }
-        
         var listingImages = listing.ListingPhotos;
         var listingImageResponses = listingImages.Select(x => new ListingImageResponse
         {
@@ -83,7 +82,14 @@ public class GetAuctionListingHandler(
 
         mappedListing.Images = listingImageResponses;
         
-        await cache.SetAsync($"{CacheKeys.AUCTION_LISTING}{request.UserId.ToString() ?? "null"}_{listing.Id}", mappedListing);
+        // set cache before setting isFollowed value
+        await cache.SetAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}", mappedListing);
+        
+        if (request.UserId != null)
+        {
+            var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
+            mappedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+        }
         
         return mappedListing;
     }

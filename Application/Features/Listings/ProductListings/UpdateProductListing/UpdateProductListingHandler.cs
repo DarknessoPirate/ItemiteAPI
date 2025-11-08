@@ -176,7 +176,7 @@ public class UpdateProductListingHandler(
             await unitOfWork.CommitTransactionAsync();
 
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}*_{request.ListingId}");
+            await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
 
             return mapper.Map<ProductListingResponse>(productListingToUpdate);
         }
