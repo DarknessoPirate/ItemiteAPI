@@ -53,6 +53,7 @@ public class GetPaginatedListingsHandler(
         
         queryable = FilterByCategories(queryable, request.CategoryIds);
         queryable = FilterProductByPrice(queryable, request.PriceFrom, request.PriceTo);
+        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
         queryable = SortProductListings(queryable, request.SortBy, request.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
@@ -74,6 +75,7 @@ public class GetPaginatedListingsHandler(
         
         queryable = FilterByCategories(queryable, request.CategoryIds);
         queryable = FilterAuctionByPrice(queryable, request.PriceFrom, request.PriceTo);
+        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
         queryable = SortAuctionListings(queryable, request.SortBy, request.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
@@ -99,7 +101,10 @@ public class GetPaginatedListingsHandler(
 
         productQuery = FilterProductByPrice(productQuery, request.PriceFrom, request.PriceTo);
         auctionQuery = FilterAuctionByPrice(auctionQuery, request.PriceFrom, request.PriceTo);
-
+        
+        productQuery = FilterByDistance(productQuery, request.Longitude, request.Latitude , request.Distance);
+        auctionQuery = FilterByDistance(auctionQuery, request.Longitude, request.Latitude , request.Distance);
+        
         productQuery = SortProductListings(productQuery, request.SortBy, request.SortDirection);
         auctionQuery = SortAuctionListings(auctionQuery, request.SortBy, request.SortDirection);
 
@@ -171,7 +176,32 @@ public class GetPaginatedListingsHandler(
         }
         return queryable;
     }
-    
+
+    private IQueryable<T> FilterByDistance<T>(
+        IQueryable<T> queryable, double? longitude, double? latitude, double? distance)
+        where T : ListingBase
+    {
+        if (longitude != null && latitude != null )
+        {
+            double lat = latitude.Value;
+            double lon = longitude.Value;
+            double dist = distance ?? 0;
+
+            queryable = queryable
+                .Where(l => l.Location.Latitude.HasValue && l.Location.Longitude.HasValue)
+                .Where(l =>
+                    6371 *
+                    (2 * Math.Asin(Math.Sqrt(
+                        Math.Pow(Math.Sin((l.Location.Latitude.Value - lat) * Math.PI / 180 / 2), 2) +
+                        Math.Cos(lat * Math.PI / 180) * Math.Cos(l.Location.Latitude.Value * Math.PI / 180) *
+                        Math.Pow(Math.Sin((l.Location.Longitude.Value - lon) * Math.PI / 180 / 2), 2)
+                    ))) <= dist
+                );
+        }
+
+        return queryable;
+    }
+
     private IQueryable<ProductListing> SortProductListings(
         IQueryable<ProductListing> queryable, SortBy? sortBy, SortDirection? sortDirection)
     {
@@ -274,4 +304,16 @@ public class GetPaginatedListingsHandler(
             _ => 0
         };
     }
+    
+    // private double Distance(double lattitude1, double longitude1, double lattitude2, double longitude2)
+    // {
+    //     var r = 6371.0;
+    //     var dLat = ToRadians(lattitude2 - lattitude1);
+    //     var dLon = ToRadians(longitude2 - longitude1);
+    //     var a = Math.Sin(dLat/2.0) * Math.Sin(dLat/2.0) + Math.Cos(ToRadians(lattitude1)) * Math.Cos(ToRadians(lattitude2)) * Math.Sin(dLon/2.0) * Math.Sin(dLon/2.0);
+    //     var c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0-a));
+    //     return r * c;
+    // }
+    //
+    // private double ToRadians(double angle) => angle * Math.PI / 180.0;
 }

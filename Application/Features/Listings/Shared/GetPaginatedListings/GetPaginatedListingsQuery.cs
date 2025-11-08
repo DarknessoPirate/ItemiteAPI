@@ -14,6 +14,9 @@ public class GetPaginatedListingsQuery : IRequest<PageResponse<ListingBasicRespo
     public SortDirection? SortDirection { get; set; } = Domain.Enums.SortDirection.Ascending;
     public decimal? PriceFrom { get; set; } 
     public decimal? PriceTo { get; set; }
+    public double? Longitude { get; set; }
+    public double? Latitude { get; set; }
+    public double? Distance { get; set; }
     public List<int>? CategoryIds { get; set; }
 
     public override string ToString()
@@ -29,6 +32,9 @@ public class GetPaginatedListingsQuery : IRequest<PageResponse<ListingBasicRespo
                $"{SortDirection?.ToString() ?? "null"}_" +
                $"{PriceFrom?.ToString() ?? "null"}_" +
                $"{PriceTo?.ToString() ?? "null"}_" +
+               $"{Longitude?.ToString() ?? "null"}_" +
+               $"{Latitude?.ToString() ?? "null"}_" +
+               $"{Distance?.ToString() ?? "null"}_" +
                $"{categoriesString}";
     }
 }
