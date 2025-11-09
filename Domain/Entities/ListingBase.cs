@@ -28,7 +28,4 @@ public class ListingBase
     public ICollection<ListingPhoto> ListingPhotos { get; set; } = new List<ListingPhoto>();
     public ICollection<Message> ListingMessages { get; set; } = new List<Message>();
     public ICollection<ListingView> ListingViews { get; set; } = [];
-   
-
-    
 }
