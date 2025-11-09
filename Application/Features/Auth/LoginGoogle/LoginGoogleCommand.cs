@@ -6,4 +6,5 @@ namespace Application.Features.Auth.LoginGoogle;
 public class LoginGoogleCommand : IRequest<AuthenticationProperties>
 {
     public string ReturnUrl { get; set; }
+    public string FailureUrl { get; set; }
 }

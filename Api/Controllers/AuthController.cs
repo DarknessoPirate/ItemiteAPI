@@ -9,6 +9,7 @@ using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
 using Domain.Auth;
 using Domain.DTOs.Auth;
+using Domain.Enums;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -48,15 +49,19 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
     }
 
     [HttpGet("login/google")]
-    public async Task<IActionResult> LoginGoogle([FromQuery] string returnUrl)
+    public async Task<IActionResult> LoginGoogle([FromQuery] string returnUrl, [FromQuery] string failureUrl)
     {
-        var command = new LoginGoogleCommand {ReturnUrl = returnUrl};
+        var command = new LoginGoogleCommand
+        {
+            ReturnUrl = returnUrl,
+            FailureUrl = failureUrl
+        };
         var authProperties = await mediator.Send(command);
         return Challenge(authProperties, "Google");
     }
     
     [HttpGet("login/google/callback", Name = "LoginGoogleCallback")]
-    public async Task<IActionResult> LoginGoogleCallback([FromQuery] string returnUrl)
+    public async Task<IActionResult> LoginGoogleCallback([FromQuery] string returnUrl, [FromQuery] string failureUrl)
     {
         var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
         if (!result.Succeeded)
@@ -66,16 +71,19 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         
         var command = new LoginGoogleCallbackCommand
         {
-            ReturnUrl = returnUrl,
             ClaimsPrincipal = result.Principal,
             IpAddress = requestContextService.GetIpAddress(),
             DeviceId = requestContextService.GetDeviceId(),
             UserAgent = requestContextService.GetUserAgent()
         };
         
-        await mediator.Send(command);
+        var loginResult = await mediator.Send(command);
+        if (loginResult != (int) GoogleLoginResult.Success)
+        {
+            return Redirect($"{failureUrl}?error={loginResult}");
+        }
         
-        return Redirect(command.ReturnUrl);
+        return Redirect(returnUrl);
     }
     
     [HttpPost("refresh")]

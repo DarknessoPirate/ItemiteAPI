@@ -14,23 +14,23 @@ public class LoginGoogleCallbackHandler(
         UserManager<User> userManager,
         ITokenService tokenService,
         IHttpContextAccessor contextAccessor
-        ) : IRequestHandler<LoginGoogleCallbackCommand>
+        ) : IRequestHandler<LoginGoogleCallbackCommand, int>
 {
-    public async Task Handle(LoginGoogleCallbackCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(LoginGoogleCallbackCommand request, CancellationToken cancellationToken)
     {
         if (request.ClaimsPrincipal == null)
         {
-            throw new UnauthorizedException("No claims present");
+            return (int) GoogleLoginResult.NoClaimsFailure;
         }
         var email = request.ClaimsPrincipal.FindFirstValue(ClaimTypes.Email);
         if (email == null)
         {
-            throw new UnauthorizedException("No email address present");
+           return (int) GoogleLoginResult.NoEmailFailure;
         }
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            var userName = email.Split('@')[0].ToLower();
+            var userName = $"{email.Split('@')[0].ToLower()}_{Guid.NewGuid().ToString()[..8]}";
             user = new User
             {
                 Email = email,
@@ -42,12 +42,12 @@ public class LoginGoogleCallbackHandler(
             var createResult = await userManager.CreateAsync(user);
             if (!createResult.Succeeded)
             {
-                throw new UnauthorizedException("Error creating user");
+                return (int) GoogleLoginResult.UsernameUniqueFailure;
             }
         }
         else if (user.AuthProvider == AuthProvider.Email)
         {
-            throw new UnauthorizedException("This email is already registered. Sign in using login form.");
+            return (int) GoogleLoginResult.EmailUniqueFailure;
         }
         var tokens = await tokenService.GenerateTokenPairAsync(
             user,
@@ -57,5 +57,6 @@ public class LoginGoogleCallbackHandler(
         );
         
         tokenService.SetTokensInsideCookie(tokens, contextAccessor.HttpContext!);
+        return (int) GoogleLoginResult.Success;
     }
 }

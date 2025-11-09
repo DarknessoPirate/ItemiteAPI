@@ -16,7 +16,7 @@ public class LoginGoogleHandler(
     public async Task<AuthenticationProperties> Handle(LoginGoogleCommand request, CancellationToken cancellationToken)
     {
         var generatedUri = linkGenerator.GetPathByName(contextAccessor.HttpContext!,  "LoginGoogleCallback");
-        var fullUri = generatedUri + $"?returnUrl={request.ReturnUrl}";
+        var fullUri = generatedUri + $"?returnUrl={request.ReturnUrl}&failureUrl={request.FailureUrl}";
         
         var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", fullUri);
         return await Task.FromResult(properties);
