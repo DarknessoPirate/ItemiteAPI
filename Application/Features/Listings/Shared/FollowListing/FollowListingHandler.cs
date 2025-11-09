@@ -1,8 +1,6 @@
-using Domain.Configs;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
-using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -11,8 +9,7 @@ namespace Application.Features.Listings.Shared.FollowListing;
 public class FollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
     UserManager<User> userManager,
-    IUnitOfWork unitOfWork,
-    ICacheService cacheService
+    IUnitOfWork unitOfWork
     ) : IRequestHandler<FollowListingCommand, int>
 {
     public async Task<int> Handle(FollowListingCommand request, CancellationToken cancellationToken)

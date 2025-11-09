@@ -76,6 +76,11 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         await dbContext.FollowedListings.AddAsync(followedListing);
     }
 
+    public void UnfollowListing(FollowedListing followedListing)
+    {
+        dbContext.FollowedListings.Remove(followedListing);
+    }
+
     public async Task<bool> ListingExistsAsync(int listingId)
     {
         var listing = await dbContext.Set<T>().FirstOrDefaultAsync(l => l.Id == listingId);

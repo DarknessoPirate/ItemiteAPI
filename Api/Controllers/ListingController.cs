@@ -3,6 +3,7 @@ using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Listings.Shared.HighlightListing;
+using Application.Features.Listings.Shared.UnfollowListing;
 using Domain.DTOs.Listing;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -68,6 +69,7 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         return Ok(new { resultMessage });
     }
 
+    [Authorize]
     [HttpPost("follow/{listingId}")]
     public async Task<IActionResult> FollowListing([FromRoute] int listingId)
     {
@@ -80,6 +82,19 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         var createdFollowId = await mediator.Send(command);
         
         return Created("api/listing/followed", new {createdFollowId});
+    }
 
+    [Authorize]
+    [HttpDelete("follow/{listingId}")]
+    public async Task<IActionResult> UnfollowListing([FromRoute] int listingId)
+    {
+        var command = new UnfollowListingCommand
+        {
+            ListingId = listingId,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        await mediator.Send(command);
+        return NoContent();
     }
 }
