@@ -52,19 +52,13 @@ public class Program
         builder.Services.ConfigureIdentity(builder.Configuration);
         builder.Services.AddFluentEmail(builder.Configuration);
         builder.Services.AddApplicationServices();
-        builder.Services.AddApiServices();
+        builder.Services.AddApiServices(builder.Configuration);
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         builder.Services.AddOpenApi();
         builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; }); // setting to generate api urls in full lowercase 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("FrontendClient", policybuilder =>
-                policybuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins(builder.Configuration["AllowedOrigins"])
-            );
-        });
 
         var app = builder.Build();
         
@@ -100,7 +94,8 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.MapHub<NotificationHub>("/notifications");
+        app.MapHub<NotificationHub>("hubs/notifications");
+        app.MapHub<BroadcastHub>("hubs/broadcast");
 
         app.Run();
     }
