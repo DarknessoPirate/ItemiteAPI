@@ -46,7 +46,7 @@ public class GetPaginatedListingsHandler(
             pageResponse = await HandleBothListingTypes(request, cancellationToken);
         }
         
-        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.Query}", pageResponse);
+        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.Query}", pageResponse, 5);
         
         if (request.UserId != null)
         {

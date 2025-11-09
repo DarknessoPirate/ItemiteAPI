@@ -43,7 +43,7 @@ public class GetPaginatedFollowedListingsHandler(
         
         var pageResponse = new PageResponse<ListingBasicResponse>(mappedListings, totalItems, request.Query.PageSize, request.Query.PageNumber);
         
-        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.UserId}_{request.Query}", pageResponse);
+        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.UserId}_{request.Query}", pageResponse, 5);
         return pageResponse;
     }
 }

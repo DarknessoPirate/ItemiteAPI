@@ -81,7 +81,7 @@ public class GetProductListingHandler(
         mappedListing.Images = listingImageResponses;
         
         // set cache before setting isFollowed value
-        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing);
+        await cache.SetAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}", mappedListing, 5);
         
         if (request.UserId != null)
         {
