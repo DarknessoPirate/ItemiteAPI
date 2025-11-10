@@ -26,8 +26,6 @@ public class AppExceptionHandler : IExceptionHandler
             message = exception.Message;
         }
         
-
-        
         var errorResponse = new ErrorResponse
         {
             StatusCode = statusCode,

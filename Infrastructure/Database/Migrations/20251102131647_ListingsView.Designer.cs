@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102131647_ListingsView")]
+    partial class ListingsView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,35 +102,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FollowedListing", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("FollowedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RootCategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FollowedListings");
-                });
-
             modelBuilder.Entity("Domain.Entities.ListingBase", b =>
                 {
                     b.Property<int>("Id")
@@ -145,13 +119,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime?>("FeaturedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Followers")
-                        .HasColumnType("integer");
-
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("boolean");
@@ -695,25 +662,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("ParentCategory");
                 });
 
-            modelBuilder.Entity("Domain.Entities.FollowedListing", b =>
-                {
-                    b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithMany("FollowedListings")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("FollowedListings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Listing");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.ListingBase", b =>
                 {
                     b.HasOne("Domain.Entities.User", "Owner")
@@ -971,8 +919,6 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.ListingBase", b =>
                 {
-                    b.Navigation("FollowedListings");
-
                     b.Navigation("ListingMessages");
 
                     b.Navigation("ListingPhotos");
@@ -993,8 +939,6 @@ namespace Infrastructure.Database.Migrations
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("Bids");
-
-                    b.Navigation("FollowedListings");
 
                     b.Navigation("OwnedListings");
 

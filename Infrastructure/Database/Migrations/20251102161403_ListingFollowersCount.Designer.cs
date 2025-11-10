@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102161403_ListingFollowersCount")]
+    partial class ListingFollowersCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,12 +149,8 @@ namespace Infrastructure.Database.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<DateTime?>("FeaturedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("Followers")
                         .HasColumnType("integer");
-
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("boolean");
@@ -172,7 +171,7 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ViewsCount")
+                    b.Property<int>("Views")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -210,37 +209,6 @@ namespace Infrastructure.Database.Migrations
                     b.HasIndex("PhotoId");
 
                     b.ToTable("ListingPhotos");
-                });
-
-            modelBuilder.Entity("Domain.Entities.ListingView", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RootCategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
-
-                    b.HasIndex("RootCategoryId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ListingViews");
                 });
 
             modelBuilder.Entity("Domain.Entities.Message", b =>
@@ -775,33 +743,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Photo");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ListingView", b =>
-                {
-                    b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithMany("ListingViews")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("RootCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("ViewedListings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Listing");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.Message", b =>
                 {
                     b.HasOne("Domain.Entities.ListingBase", "Listing")
@@ -976,8 +917,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("ListingMessages");
 
                     b.Navigation("ListingPhotos");
-
-                    b.Navigation("ListingViews");
                 });
 
             modelBuilder.Entity("Domain.Entities.Message", b =>
@@ -1003,8 +942,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("SentMessages");
-
-                    b.Navigation("ViewedListings");
                 });
 
             modelBuilder.Entity("Domain.Entities.AuctionListing", b =>

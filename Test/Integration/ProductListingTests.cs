@@ -4,6 +4,7 @@ using Application.Features.Listings.ProductListings.GetProductListing;
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Domain.DTOs.File;
+using Domain.DTOs.Listing;
 using Domain.DTOs.ProductListing;
 using Domain.Enums;
 using FluentAssertions;
@@ -189,10 +190,13 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
 
         var query = new GetPaginatedListingsQuery
         {
-            PageNumber = 1,
-            PageSize = pageSize,
-            PriceFrom = (decimal)priceFrom,
-            PriceTo = (decimal)priceTo
+            Query = new PaginateListingQuery
+            {
+                PageNumber = 1,
+                PageSize = pageSize,
+                PriceFrom = (decimal)priceFrom,
+                PriceTo = (decimal)priceTo
+            }
         };
         
         await Assert.ThrowsAsync<ValidatorException>(() => Sender.Send(query));
@@ -205,10 +209,13 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
 
         var query1 = new GetPaginatedListingsQuery
         {
-            PageNumber = 1,
-            PageSize = 2,
-            SortBy = SortBy.Price,
-            SortDirection = SortDirection.Ascending
+            Query = new PaginateListingQuery
+            {
+                PageNumber = 1,
+                PageSize = 2,
+                SortBy = SortBy.Price,
+                SortDirection = SortDirection.Ascending
+            }
         };
         
         var pageResponse1 = await Sender.Send(query1);
@@ -226,12 +233,15 @@ public class ProductListingTests : BaseIntegrationTest, IAsyncLifetime
         
         var query2 = new GetPaginatedListingsQuery
         {
-            PageNumber = 1,
-            PageSize = 3,
-            SortBy = SortBy.Price,
-            SortDirection = SortDirection.Descending,
-            PriceFrom = 300M,
-            PriceTo = 6000M
+            Query = new PaginateListingQuery
+            {
+                PageNumber = 1,
+                PageSize = 3,
+                SortBy = SortBy.Price,
+                SortDirection = SortDirection.Descending,
+                PriceFrom = 300M,
+                PriceTo = 6000M
+            }
         };
         
         var pageResponse2 = await Sender.Send(query2);

@@ -19,9 +19,11 @@ public class User : IdentityUser<int>
     public int? BackgroundPhotoId { get; set; }
     public Photo? BackgroundPhoto { get; set; }
 
-    public ICollection<ListingBase> OwnedListings { get; set; } = new List<ListingBase>();
-    public ICollection<AuctionBid> Bids { get; set; } = new List<AuctionBid>();
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<ListingBase> OwnedListings { get; set; } = [];
+    public ICollection<AuctionBid> Bids { get; set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<Message> SentMessages { get; set; } = [];
     public ICollection<Message> ReceivedMessages { get; set; } = [];
+    public ICollection<FollowedListing> FollowedListings { get; set; } = [];
+    public ICollection<ListingView> ViewedListings { get; set; } = [];
 }

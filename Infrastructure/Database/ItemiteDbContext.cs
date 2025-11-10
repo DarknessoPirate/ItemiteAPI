@@ -16,6 +16,8 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<MessagePhoto> MessagePhotos { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<AuctionBid> AuctionBids { get; set; }
+    public DbSet<ListingView> ListingViews { get; set; }
+    public DbSet<FollowedListing> FollowedListings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -91,6 +93,24 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         modelBuilder.Entity<ListingBase>()
             .HasMany(l => l.Categories)
             .WithMany(c => c.Listings);
+
+        modelBuilder.Entity<ListingView>()
+            .HasOne(lv => lv.Listing)
+            .WithMany(l => l.ListingViews)
+            .HasForeignKey(lv => lv.ListingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ListingView>()
+            .HasOne(lv => lv.User)
+            .WithMany(u => u.ViewedListings)
+            .HasForeignKey(lv => lv.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ListingView>()
+            .HasOne(lv => lv.Category)
+            .WithMany()
+            .HasForeignKey(lv => lv.RootCategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ListingBase>()
             .HasOne(l => l.Owner)

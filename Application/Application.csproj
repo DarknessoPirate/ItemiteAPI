@@ -17,9 +17,4 @@
       <PackageReference Include="MediatR" Version="13.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Features\AuctionListings\CreateAuctionListing\" />
-      <Folder Include="Features\AuctionListings\DeleteAuctionListing\" />
-    </ItemGroup>
-
 </Project>

@@ -54,5 +54,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IPhotoRepository, PhotoRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ILIstingViewRepository, ListingViewRepository>();
+        services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
     }
 }
