@@ -34,6 +34,11 @@ public class RequestContextService : IRequestContextService
         
         return string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
     }
+    public string? GetUsername()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        return httpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
+    }
 
     public string GetIpAddress()
     {

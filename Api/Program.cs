@@ -6,6 +6,7 @@ using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces.Services;
+using Infrastructure.SignalR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -51,19 +52,13 @@ public class Program
         builder.Services.ConfigureIdentity(builder.Configuration);
         builder.Services.AddFluentEmail(builder.Configuration);
         builder.Services.AddApplicationServices();
-        builder.Services.AddApiServices();
+        builder.Services.AddApiServices(builder.Configuration);
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         builder.Services.AddOpenApi();
         builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; }); // setting to generate api urls in full lowercase 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("FrontendClient", policybuilder =>
-                policybuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins(builder.Configuration["AllowedOrigins"])
-            );
-        });
 
         var app = builder.Build();
         
@@ -98,9 +93,9 @@ public class Program
         app.UseCors("FrontendClient");
         app.UseAuthentication();
         app.UseAuthorization();
-
-
         app.MapControllers();
+        app.MapHub<NotificationHub>("hubs/notifications");
+        app.MapHub<BroadcastHub>("hubs/broadcast");
 
         app.Run();
     }
