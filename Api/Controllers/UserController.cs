@@ -2,6 +2,7 @@ using Application.Features.Users.ChangeBackgroundPicture;
 using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangeProfilePicture;
+using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.RemoveBackgroundPicture;
 using Application.Features.Users.RemoveProfilePicture;
@@ -128,5 +129,18 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         await mediator.Send(command);
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPut("settings/change-username")]
+    public async Task<IActionResult> ChangeUsername(ChangeUsernameRequest request)
+    {
+        var command = new ChangeUsernameCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            Dto = request
+        };
+        await mediator.Send(command);
+        return Ok(new {request.NewUsername});
     }
 }
