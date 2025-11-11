@@ -100,7 +100,7 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Ok(response);
     }
     
-    [HttpPost("logout")]
+    [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
         var command = new LogoutCommand
@@ -112,7 +112,7 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Ok(new {successMessage});
     }
     
-    [HttpPost("logout-all-devices")]
+    [HttpGet("logout-all-devices")]
     public async Task<IActionResult> LogoutFromAllDevices()
     {
         var command = new LogoutFromAllDevicesCommand
