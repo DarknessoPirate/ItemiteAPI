@@ -60,15 +60,14 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public IQueryable<ListingBase> GetListingsFollowedByUserQueryable(int userId)
     {
-        return dbContext.Listings
-            .Include(l => l.Categories)
-            .Include(l => l.ListingPhotos).ThenInclude(lp => lp.Photo)
-            .Include(l => l.FollowedListings)
-            .Where(l => l.FollowedListings.Any(f => f.UserId == userId))
-            .OrderByDescending(l => l.FollowedListings
-                .Where(f => f.UserId == userId)
-                .Select(f => f.FollowedAt)
-                .FirstOrDefault());
+        return dbContext.Users
+            .Where(u => u.Id == userId)
+            .Include(u => u.FollowedListings)
+            .ThenInclude(f => f.Listing).ThenInclude(l => l.Categories)
+            .Include(u => u.FollowedListings)
+            .ThenInclude(f => f.Listing).ThenInclude(l => l.ListingPhotos).ThenInclude(lp => lp.Photo)
+            .SelectMany(u => u.FollowedListings.OrderByDescending(f => f.FollowedAt))
+            .Select(f => f.Listing);
     }
 
     public async Task AddListingToFollowedAsync(FollowedListing followedListing)
