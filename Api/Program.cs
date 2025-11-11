@@ -59,9 +59,20 @@ public class Program
         });
         builder.Services.AddOpenApi();
         builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; }); // setting to generate api urls in full lowercase 
+        builder.Services.AddCors(options =>
+        {
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            options.AddPolicy("FrontendClient", policybuilder =>
+                policybuilder
+                    .WithOrigins(allowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+            );
+        });
 
         var app = builder.Build();
-        
         
         // Seed the database
         using (var scope = app.Services.CreateScope())

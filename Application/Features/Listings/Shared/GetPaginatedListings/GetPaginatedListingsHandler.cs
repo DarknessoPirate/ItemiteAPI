@@ -61,10 +61,11 @@ public class GetPaginatedListingsHandler(
     {
         var queryable = repository.GetListingsQueryable().OfType<ProductListing>();
         
-        queryable = FilterByCategories(queryable, request.Query.CategoryIds);
-        queryable = FilterProductByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
-        queryable = SortProductListings(queryable, request.Query.SortBy, request.Query.SortDirection);
-        
+        queryable = FilterByCategories(queryable, request.CategoryIds);
+        queryable = FilterProductByPrice(queryable, request.PriceFrom, request.PriceTo);
+        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
+        queryable = SortProductListings(queryable, request.SortBy, request.SortDirection);
+
         int totalItems = await queryable.CountAsync(cancellationToken);
         
         queryable = queryable
@@ -82,9 +83,10 @@ public class GetPaginatedListingsHandler(
     {
         var queryable = repository.GetListingsQueryable().OfType<AuctionListing>();
         
-        queryable = FilterByCategories(queryable, request.Query.CategoryIds);
-        queryable = FilterAuctionByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
-        queryable = SortAuctionListings(queryable, request.Query.SortBy, request.Query.SortDirection);
+        queryable = FilterByCategories(queryable, request.CategoryIds);
+        queryable = FilterAuctionByPrice(queryable, request.PriceFrom, request.PriceTo);
+        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
+        queryable = SortAuctionListings(queryable, request.SortBy, request.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
         
@@ -104,14 +106,17 @@ public class GetPaginatedListingsHandler(
         var productQuery = repository.GetListingsQueryable().OfType<ProductListing>();
         var auctionQuery = repository.GetListingsQueryable().OfType<AuctionListing>();
 
-        productQuery = FilterByCategories(productQuery, request.Query.CategoryIds);
-        auctionQuery = FilterByCategories(auctionQuery, request.Query.CategoryIds);
-        
-        productQuery = FilterProductByPrice(productQuery, request.Query.PriceFrom, request.Query.PriceTo);
-        auctionQuery = FilterAuctionByPrice(auctionQuery, request.Query.PriceFrom, request.Query.PriceTo);
+        productQuery = FilterByCategories(productQuery, request.CategoryIds);
+        auctionQuery = FilterByCategories(auctionQuery, request.CategoryIds);
 
-        productQuery = SortProductListings(productQuery, request.Query.SortBy, request.Query.SortDirection);
-        auctionQuery = SortAuctionListings(auctionQuery, request.Query.SortBy, request.Query.SortDirection);
+        productQuery = FilterProductByPrice(productQuery, request.PriceFrom, request.PriceTo);
+        auctionQuery = FilterAuctionByPrice(auctionQuery, request.PriceFrom, request.PriceTo);
+        
+        productQuery = FilterByDistance(productQuery, request.Longitude, request.Latitude , request.Distance);
+        auctionQuery = FilterByDistance(auctionQuery, request.Longitude, request.Latitude , request.Distance);
+        
+        productQuery = SortProductListings(productQuery, request.SortBy, request.SortDirection);
+        auctionQuery = SortAuctionListings(auctionQuery, request.SortBy, request.SortDirection);
 
         var products = await productQuery.ToListAsync(cancellationToken);
         var auctions = await auctionQuery.ToListAsync(cancellationToken);
@@ -191,7 +196,32 @@ public class GetPaginatedListingsHandler(
         }
         return queryable;
     }
-    
+
+    private IQueryable<T> FilterByDistance<T>(
+        IQueryable<T> queryable, double? longitude, double? latitude, double? distance)
+        where T : ListingBase
+    {
+        if (longitude != null && latitude != null )
+        {
+            double lat = latitude.Value;
+            double lon = longitude.Value;
+            double dist = distance ?? 0;
+
+            queryable = queryable
+                .Where(l => l.Location.Latitude.HasValue && l.Location.Longitude.HasValue)
+                .Where(l =>
+                    6371 *
+                    (2 * Math.Asin(Math.Sqrt(
+                        Math.Pow(Math.Sin((l.Location.Latitude.Value - lat) * Math.PI / 180 / 2), 2) +
+                        Math.Cos(lat * Math.PI / 180) * Math.Cos(l.Location.Latitude.Value * Math.PI / 180) *
+                        Math.Pow(Math.Sin((l.Location.Longitude.Value - lon) * Math.PI / 180 / 2), 2)
+                    ))) <= dist
+                );
+        }
+
+        return queryable;
+    }
+
     private IQueryable<ProductListing> SortProductListings(
         IQueryable<ProductListing> queryable, SortBy? sortBy, SortDirection? sortDirection)
     {
