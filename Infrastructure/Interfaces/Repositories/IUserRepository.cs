@@ -8,4 +8,5 @@ public interface IUserRepository
     Task RemoveBackgroundPhotoAsync(int userId);
     Task<User?> GetUserWithProfilePhotoAsync(int userId);
     Task<User?> GetUserWithBackgroundPhotoAsync(int userId);
+    Task<User?> GetUserWithAllFieldsAsync(int userId);
 }

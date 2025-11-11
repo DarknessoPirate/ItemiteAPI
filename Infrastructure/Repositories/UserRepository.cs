@@ -34,4 +34,13 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
             .Include(u => u.BackgroundPhoto)
             .FirstOrDefaultAsync(u => u.Id == userId);
     }
+    
+    public async Task<User?> GetUserWithAllFieldsAsync(int userId)
+    {
+        return await context.Users
+            .Include(u => u.ProfilePhoto)
+            .Include(u => u.BackgroundPhoto)
+            .Include(u => u.Location)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+    }
 }

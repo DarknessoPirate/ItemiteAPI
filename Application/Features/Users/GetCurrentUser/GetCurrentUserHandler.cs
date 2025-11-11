@@ -1,24 +1,23 @@
 using AutoMapper;
 using Domain.DTOs.User;
-using Domain.Entities;
 using Infrastructure.Exceptions;
+using Infrastructure.Interfaces.Repositories;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Users.GetCurrentUser;
 
 public class GetCurrentUserHandler(
-    UserManager<User> userManager,
+    IUserRepository userRepository,
     IMapper mapper
-    ) : IRequestHandler<GetCurrentUserQuery, UserBasicResponse>
+    ) : IRequestHandler<GetCurrentUserQuery, UserResponse>
 {
-    public async Task<UserBasicResponse> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
+    public async Task<UserResponse> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await userRepository.GetUserWithAllFieldsAsync(request.UserId);
         if (user == null)
         {
             throw new UnauthorizedException("User not found");
         }
-        return mapper.Map<UserBasicResponse>(user);
+        return mapper.Map<UserResponse>(user);
     }
 }

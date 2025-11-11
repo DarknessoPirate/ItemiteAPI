@@ -17,6 +17,8 @@ public class UserAutoMapper : Profile
       CreateMap<User, UserResponse>()
          .ForMember(u => u.PhotoUrl, o =>
             o.MapFrom(u => u.ProfilePhoto.Url))
+         .ForMember(u => u.BackgroundUrl, o =>
+            o.MapFrom(u => u.BackgroundPhoto.Url))
          .ForMember(u => u.Location, opt => 
             opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
    }
