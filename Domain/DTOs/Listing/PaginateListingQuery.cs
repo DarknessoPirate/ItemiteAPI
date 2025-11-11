@@ -12,6 +12,9 @@ public class PaginateListingQuery
     public decimal? PriceFrom { get; set; } 
     public decimal? PriceTo { get; set; }
     public List<int>? CategoryIds { get; set; }
+    public double? Longitude { get; set; }
+    public double? Latitude { get; set; }
+    public double? Distance { get; set; }
 
     public override string ToString()
     {
@@ -26,6 +29,9 @@ public class PaginateListingQuery
                $"{SortDirection?.ToString() ?? "null"}_" +
                $"{PriceFrom?.ToString() ?? "null"}_" +
                $"{PriceTo?.ToString() ?? "null"}_" +
+               $"{Longitude?.ToString() ?? "null"}_" +
+               $"{Latitude?.ToString() ?? "null"}_" +
+               $"{Distance?.ToString() ?? "null"}_" +
                $"{categoriesString}";
     }
 }

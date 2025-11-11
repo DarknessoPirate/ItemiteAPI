@@ -61,10 +61,10 @@ public class GetPaginatedListingsHandler(
     {
         var queryable = repository.GetListingsQueryable().OfType<ProductListing>();
         
-        queryable = FilterByCategories(queryable, request.CategoryIds);
-        queryable = FilterProductByPrice(queryable, request.PriceFrom, request.PriceTo);
-        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
-        queryable = SortProductListings(queryable, request.SortBy, request.SortDirection);
+        queryable = FilterByCategories(queryable, request.Query.CategoryIds);
+        queryable = FilterProductByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
+        queryable = FilterByDistance(queryable, request.Query.Longitude, request.Query.Latitude, request.Query.Distance);
+        queryable = SortProductListings(queryable, request.Query.SortBy, request.Query.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
         
@@ -83,10 +83,10 @@ public class GetPaginatedListingsHandler(
     {
         var queryable = repository.GetListingsQueryable().OfType<AuctionListing>();
         
-        queryable = FilterByCategories(queryable, request.CategoryIds);
-        queryable = FilterAuctionByPrice(queryable, request.PriceFrom, request.PriceTo);
-        queryable = FilterByDistance(queryable, request.Longitude, request.Latitude, request.Distance);
-        queryable = SortAuctionListings(queryable, request.SortBy, request.SortDirection);
+        queryable = FilterByCategories(queryable, request.Query.CategoryIds);
+        queryable = FilterAuctionByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
+        queryable = FilterByDistance(queryable, request.Query.Longitude, request.Query.Latitude, request.Query.Distance);
+        queryable = SortAuctionListings(queryable, request.Query.SortBy, request.Query.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
         
@@ -106,17 +106,17 @@ public class GetPaginatedListingsHandler(
         var productQuery = repository.GetListingsQueryable().OfType<ProductListing>();
         var auctionQuery = repository.GetListingsQueryable().OfType<AuctionListing>();
 
-        productQuery = FilterByCategories(productQuery, request.CategoryIds);
-        auctionQuery = FilterByCategories(auctionQuery, request.CategoryIds);
+        productQuery = FilterByCategories(productQuery, request.Query.CategoryIds);
+        auctionQuery = FilterByCategories(auctionQuery, request.Query.CategoryIds);
 
-        productQuery = FilterProductByPrice(productQuery, request.PriceFrom, request.PriceTo);
-        auctionQuery = FilterAuctionByPrice(auctionQuery, request.PriceFrom, request.PriceTo);
+        productQuery = FilterProductByPrice(productQuery, request.Query.PriceFrom, request.Query.PriceTo);
+        auctionQuery = FilterAuctionByPrice(auctionQuery, request.Query.PriceFrom, request.Query.PriceTo);
         
-        productQuery = FilterByDistance(productQuery, request.Longitude, request.Latitude , request.Distance);
-        auctionQuery = FilterByDistance(auctionQuery, request.Longitude, request.Latitude , request.Distance);
+        productQuery = FilterByDistance(productQuery, request.Query.Longitude, request.Query.Latitude , request.Query.Distance);
+        auctionQuery = FilterByDistance(auctionQuery, request.Query.Longitude, request.Query.Latitude , request.Query.Distance);
         
-        productQuery = SortProductListings(productQuery, request.SortBy, request.SortDirection);
-        auctionQuery = SortAuctionListings(auctionQuery, request.SortBy, request.SortDirection);
+        productQuery = SortProductListings(productQuery, request.Query.SortBy, request.Query.SortDirection);
+        auctionQuery = SortAuctionListings(auctionQuery, request.Query.SortBy, request.Query.SortDirection);
 
         var products = await productQuery.ToListAsync(cancellationToken);
         var auctions = await auctionQuery.ToListAsync(cancellationToken);

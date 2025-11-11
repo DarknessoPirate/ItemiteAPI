@@ -12,12 +12,15 @@ public static class ApiExtensions
         services.AddSingleton(Log.Logger);
         services.AddCors(options =>
         {
+            var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>() ??
+                                 throw new ConfigException("AllowedOrigin field missing from appsettings");
+
             options.AddPolicy("FrontendClient", policybuilder =>
-                    policybuilder
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .WithOrigins(configuration["AllowedOrigins"] ?? throw new ConfigException("AllowedOrigin field missing from appsettings"))
-                        .AllowCredentials() // cookies 
+                policybuilder
+                    .WithOrigins(allowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
             );
         });
     }

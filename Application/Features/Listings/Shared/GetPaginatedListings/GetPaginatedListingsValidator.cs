@@ -6,14 +6,14 @@ public class GetPaginatedListingsValidator : AbstractValidator<GetPaginatedListi
 {
     public GetPaginatedListingsValidator()
     {
-        RuleFor(q => q.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
-        RuleFor(q => q.PriceFrom)
+        RuleFor(q => q.Query.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
+        RuleFor(q => q.Query.PriceFrom)
             .GreaterThan(0)
-            .LessThanOrEqualTo(q => q.PriceTo ?? decimal.MaxValue)
-            .When(q => q.PriceFrom.HasValue);
+            .LessThanOrEqualTo(q => q.Query.PriceTo ?? decimal.MaxValue)
+            .When(q => q.Query.PriceFrom.HasValue);
 
-        RuleFor(q => q.PriceTo)
-            .GreaterThanOrEqualTo(q => q.PriceFrom ?? 0)
-            .When(q => q.PriceTo.HasValue);
+        RuleFor(q => q.Query.PriceTo)
+            .GreaterThanOrEqualTo(q => q.Query.PriceFrom ?? 0)
+            .When(q => q.Query.PriceTo.HasValue);
     }
 }
