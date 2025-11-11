@@ -304,16 +304,4 @@ public class GetPaginatedListingsHandler(
             _ => 0
         };
     }
-    
-    // private double Distance(double lattitude1, double longitude1, double lattitude2, double longitude2)
-    // {
-    //     var r = 6371.0;
-    //     var dLat = ToRadians(lattitude2 - lattitude1);
-    //     var dLon = ToRadians(longitude2 - longitude1);
-    //     var a = Math.Sin(dLat/2.0) * Math.Sin(dLat/2.0) + Math.Cos(ToRadians(lattitude1)) * Math.Cos(ToRadians(lattitude2)) * Math.Sin(dLon/2.0) * Math.Sin(dLon/2.0);
-    //     var c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0-a));
-    //     return r * c;
-    // }
-    //
-    // private double ToRadians(double angle) => angle * Math.PI / 180.0;
 }
