@@ -20,6 +20,7 @@ public static class InfrastructureExtensions
             options.UseNpgsql(configuration.GetConnectionString("PostgreSQL")
                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
         });
+        services.AddSignalR();
         
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -52,5 +53,8 @@ public static class InfrastructureExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPhotoRepository, PhotoRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ILIstingViewRepository, ListingViewRepository>();
+        services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
     }
 }

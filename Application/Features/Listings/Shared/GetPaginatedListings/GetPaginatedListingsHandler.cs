@@ -20,20 +20,24 @@ public class GetPaginatedListingsHandler(
     public async Task<PageResponse<ListingBasicResponse>> Handle(GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
         var cachedListings = await cacheService.GetAsync<PageResponse<ListingBasicResponse>>(
-            $"{CacheKeys.LISTINGS}{request}");
+            $"{CacheKeys.LISTINGS}{request.Query}");
 
         if (cachedListings != null)
         {
+            if (request.UserId != null)
+            {
+                cachedListings.Items = await SetIsFollowedField(cachedListings.Items, request.UserId.Value);
+            }
             return cachedListings;
         }
 
         PageResponse<ListingBasicResponse> pageResponse;
 
-        if (request.ListingType == ListingType.Product)
+        if (request.Query.ListingType == ListingType.Product)
         {
             pageResponse = await HandleProductListings(request, cancellationToken);
         }
-        else if (request.ListingType == ListingType.Auction)
+        else if (request.Query.ListingType == ListingType.Auction)
         {
             pageResponse = await HandleAuctionListings(request, cancellationToken);
         }
@@ -41,8 +45,14 @@ public class GetPaginatedListingsHandler(
         {
             pageResponse = await HandleBothListingTypes(request, cancellationToken);
         }
-
-        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request}", pageResponse);
+        
+        await cacheService.SetAsync($"{CacheKeys.LISTINGS}{request.Query}", pageResponse);
+        
+        if (request.UserId != null)
+        {
+            pageResponse.Items = await SetIsFollowedField(pageResponse.Items, request.UserId.Value);
+        }
+        
         return pageResponse;
     }
     
@@ -59,15 +69,15 @@ public class GetPaginatedListingsHandler(
         int totalItems = await queryable.CountAsync(cancellationToken);
         
         queryable = queryable
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize);
+            .Skip((request.Query.PageNumber - 1) * request.Query.PageSize)
+            .Take(request.Query.PageSize);
 
         var listings = await queryable.ToListAsync(cancellationToken);
         var responses = mapper.Map<List<ListingBasicResponse>>(listings);
 
-        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.PageSize, request.PageNumber);
+        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
-
+    
     private async Task<PageResponse<ListingBasicResponse>> HandleAuctionListings(
         GetPaginatedListingsQuery request, CancellationToken cancellationToken)
     {
@@ -81,13 +91,13 @@ public class GetPaginatedListingsHandler(
         int totalItems = await queryable.CountAsync(cancellationToken);
         
         queryable = queryable
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize);
+            .Skip((request.Query.PageNumber - 1) * request.Query.PageSize)
+            .Take(request.Query.PageSize);
 
         var listings = await queryable.ToListAsync(cancellationToken);
         var responses = mapper.Map<List<ListingBasicResponse>>(listings);
 
-        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.PageSize, request.PageNumber);
+        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
 
     private async Task<PageResponse<ListingBasicResponse>> HandleBothListingTypes(
@@ -115,18 +125,28 @@ public class GetPaginatedListingsHandler(
         allListings.AddRange(products);
         allListings.AddRange(auctions);
         
-        allListings = SortCombinedListings(allListings, request.SortBy, request.SortDirection);
+        allListings = SortCombinedListings(allListings, request.Query.SortBy, request.Query.SortDirection);
 
         int totalItems = allListings.Count;
         
         var paginatedListings = allListings
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
+            .Skip((request.Query.PageNumber - 1) * request.Query.PageSize)
+            .Take(request.Query.PageSize)
             .ToList();
 
         var responses = mapper.Map<List<ListingBasicResponse>>(paginatedListings);
 
-        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.PageSize, request.PageNumber);
+        return new PageResponse<ListingBasicResponse>(responses, totalItems, request.Query.PageSize, request.Query.PageNumber);
+    }
+    
+    private async Task<List<ListingBasicResponse>> SetIsFollowedField(List<ListingBasicResponse> responses, int userId)
+    {
+        var followedListings = await repository.GetUserFollowedListingsAsync(userId);
+        foreach (var response in responses)
+        {
+            response.IsFollowed = followedListings.Select(f => f.ListingId).Contains(response.Id);
+        }
+        return responses;
     }
     
     private IQueryable<T> FilterByCategories<T>(IQueryable<T> queryable, List<int>? categoryIds) 
@@ -222,8 +242,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             orderedQuery = sortDirection == SortDirection.Ascending
-                ? orderedQuery.ThenBy(p => p.Views)
-                : orderedQuery.ThenByDescending(p => p.Views);
+                ? orderedQuery.ThenBy(p => p.ViewsCount)
+                : orderedQuery.ThenByDescending(p => p.ViewsCount);
         }
         else
         {
@@ -253,8 +273,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             orderedQuery = sortDirection == SortDirection.Ascending
-                ? orderedQuery.ThenBy(a => a.Views)
-                : orderedQuery.ThenByDescending(a => a.Views);
+                ? orderedQuery.ThenBy(a => a.ViewsCount)
+                : orderedQuery.ThenByDescending(a => a.ViewsCount);
         }
         else
         {
@@ -284,8 +304,8 @@ public class GetPaginatedListingsHandler(
         else if (sortBy == SortBy.Views)
         {
             sorted = sortDirection == SortDirection.Ascending
-                ? sorted.ThenBy(l => l.Views)
-                : sorted.ThenByDescending(l => l.Views);
+                ? sorted.ThenBy(l => l.ViewsCount)
+                : sorted.ThenByDescending(l => l.ViewsCount);
         }
         else
         {

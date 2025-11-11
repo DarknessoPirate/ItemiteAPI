@@ -6,6 +6,7 @@ using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces.Services;
+using Infrastructure.SignalR;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -51,7 +52,7 @@ public class Program
         builder.Services.ConfigureIdentity(builder.Configuration);
         builder.Services.AddFluentEmail(builder.Configuration);
         builder.Services.AddApplicationServices();
-        builder.Services.AddApiServices();
+        builder.Services.AddApiServices(builder.Configuration);
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -71,9 +72,7 @@ public class Program
             );
         });
 
-
         var app = builder.Build();
-        
         
         // Seed the database
         using (var scope = app.Services.CreateScope())
@@ -105,9 +104,9 @@ public class Program
         app.UseCors("FrontendClient");
         app.UseAuthentication();
         app.UseAuthorization();
-
-
         app.MapControllers();
+        app.MapHub<NotificationHub>("hubs/notifications");
+        app.MapHub<BroadcastHub>("hubs/broadcast");
 
         app.Run();
     }

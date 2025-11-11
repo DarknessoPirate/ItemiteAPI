@@ -37,4 +37,7 @@ public class GetPaginatedListingsQuery : IRequest<PageResponse<ListingBasicRespo
                $"{Distance?.ToString() ?? "null"}_" +
                $"{categoriesString}";
     }
+
+    public PaginateListingQuery Query {get; set;}
+    public int? UserId {get; set;}
 }

@@ -12,10 +12,12 @@ public class ProductListingResponse
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int Views { get; set; }
+    public int Followers { get; set; }
     public DateTime DateCreated { get; set; }
     public bool IsArchived { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsNegotiable { get; set; }
+    public bool? IsFollowed { get; set; }
     public UserResponse? Owner { get; set; }
     public Location Location { get; set; }
     public List<CategoryResponse>? Categories { get; set; }
