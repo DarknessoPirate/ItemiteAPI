@@ -180,7 +180,7 @@ public class TokenService(
             Expires = refreshToken.TokenExpirationDate,
             IsEssential = true,
             Secure = true,
-            SameSite = SameSiteMode.Lax,
+            SameSite = SameSiteMode.None
         });
         
         httpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
@@ -190,7 +190,7 @@ public class TokenService(
             HttpOnly = true,
             IsEssential = true,
             Secure = true,
-            SameSite = SameSiteMode.Lax,
+            SameSite = SameSiteMode.None
         });
     }
 
@@ -201,7 +201,7 @@ public class TokenService(
             Path = "/",
             Secure = true,
             HttpOnly = true,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.None
         });
 
         httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions
@@ -209,7 +209,7 @@ public class TokenService(
             Path = "/",
             Secure = true,
             HttpOnly = true,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.None
         });
     }
 
