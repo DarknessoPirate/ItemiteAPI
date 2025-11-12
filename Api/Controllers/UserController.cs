@@ -4,6 +4,7 @@ using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangePhoneNumber;
 using Application.Features.Users.ChangeProfilePicture;
+using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.GetCurrentUser;
 using Application.Features.Users.RemoveBackgroundPicture;
@@ -159,6 +160,20 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         await mediator.Send(command);
         return Ok(new {request.PhoneNumber});
     }
+
+    [Authorize]
+    [HttpPut("settings/change-username")]
+    public async Task<IActionResult> ChangeUsername(ChangeUsernameRequest request)
+    {
+        var command = new ChangeUsernameCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            Dto = request
+        };
+        
+        await mediator.Send(command);
+        return Ok(new {request.NewUsername});
+    }
     
     [Authorize]
     [HttpPut("settings/change-location")]
@@ -169,8 +184,8 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
             UserId = requestContextService.GetUserId(),
             Dto = request
         };
-        
         await mediator.Send(command);
         return Ok(new {request.Location});
+
     }
 }

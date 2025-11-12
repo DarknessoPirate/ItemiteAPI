@@ -22,6 +22,7 @@ using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangePhoneNumber;
+using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,5 +57,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetBidHistoryQuery>, GetBidHistoryValidator>();
         services.AddScoped<IValidator<ChangePhoneNumberCommand>, ChangePhoneNumberValidator>();
         services.AddScoped<IValidator<ChangeLocationCommand>, ChangeLocationValidator>();
+        services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
     }
 }
