@@ -19,7 +19,9 @@ using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Application.Features.Users.ChangeEmail;
+using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
+using Application.Features.Users.ChangePhoneNumber;
 using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
 using FluentValidation;
@@ -53,6 +55,8 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetChatPageQuery>, GetChatPageValidator>();
         services.AddScoped<IValidator<PlaceBidCommand>, PlaceBidValidator>();
         services.AddScoped<IValidator<GetBidHistoryQuery>, GetBidHistoryValidator>();
+        services.AddScoped<IValidator<ChangePhoneNumberCommand>, ChangePhoneNumberValidator>();
+        services.AddScoped<IValidator<ChangeLocationCommand>, ChangeLocationValidator>();
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
     }
 }
