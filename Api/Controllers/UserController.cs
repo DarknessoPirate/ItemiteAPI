@@ -1,6 +1,8 @@
 using Application.Features.Users.ChangeBackgroundPicture;
 using Application.Features.Users.ChangeEmail;
+using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
+using Application.Features.Users.ChangePhoneNumber;
 using Application.Features.Users.ChangeProfilePicture;
 using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.GetCurrentUser;
@@ -142,5 +144,33 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         await mediator.Send(command);
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPut("settings/change-phone-number")]
+    public async Task<IActionResult> ChangePhoneNumber(ChangePhoneNumberRequest request)
+    {
+        var command = new ChangePhoneNumberCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            Dto = request
+        };
+        
+        await mediator.Send(command);
+        return Ok(new {request.PhoneNumber});
+    }
+    
+    [Authorize]
+    [HttpPut("settings/change-location")]
+    public async Task<IActionResult> ChangeLocation(ChangeLocationRequest request)
+    {
+        var command = new ChangeLocationCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            Dto = request
+        };
+        
+        await mediator.Send(command);
+        return Ok(new {request.Location});
     }
 }
