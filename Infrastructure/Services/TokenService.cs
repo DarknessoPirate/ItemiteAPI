@@ -179,8 +179,8 @@ public class TokenService(
             HttpOnly = true,
             Expires = refreshToken.TokenExpirationDate,
             IsEssential = true,
-            Secure = true,
-            SameSite = SameSiteMode.Lax,
+            Secure = false, // true if prod env
+            SameSite = SameSiteMode.Lax
         });
         
         httpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
@@ -189,8 +189,8 @@ public class TokenService(
             Expires = refreshToken.TokenExpirationDate,
             HttpOnly = true,
             IsEssential = true,
-            Secure = true,
-            SameSite = SameSiteMode.Lax,
+            Secure = false, // true if prod env
+            SameSite = SameSiteMode.Lax
         });
     }
 
@@ -199,7 +199,7 @@ public class TokenService(
         httpContext.Response.Cookies.Delete("accessToken", new CookieOptions
         {
             Path = "/",
-            Secure = true,
+            Secure = false, // true if prod env
             HttpOnly = true,
             SameSite = SameSiteMode.Lax
         });
@@ -207,7 +207,7 @@ public class TokenService(
         httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions
         {
             Path = "/",
-            Secure = true,
+            Secure = false, // true if prod env
             HttpOnly = true,
             SameSite = SameSiteMode.Lax
         });

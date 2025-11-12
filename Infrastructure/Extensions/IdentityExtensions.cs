@@ -18,7 +18,7 @@ public static class IdentityExtensions
         var jwtSettngs = configuration.GetSection("Jwt");
         var authSettings = configuration.GetSection("AuthSettings");
         var googleOAuthSettings = configuration.GetSection("GoogleOAuth");
-        
+
         services.AddIdentity<User, IdentityRole<int>>(options =>
                 {
                     // Password settings
@@ -27,7 +27,7 @@ public static class IdentityExtensions
                     options.Password.RequireUppercase = true;
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequiredLength = 7;
-                   // options.Password.RequiredUniqueChars = 1; // (1 means a password like "aaaaaaaaa" would be allowed if only this rule was set up)
+                    // options.Password.RequiredUniqueChars = 1; // (1 means a password like "aaaaaaaaa" would be allowed if only this rule was set up)
 
                     // lockout settings
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
@@ -44,7 +44,7 @@ public static class IdentityExtensions
             .AddDefaultTokenProviders();
         services.Configure<DataProtectionTokenProviderOptions>(options =>
         {
-            options.TokenLifespan = TimeSpan.FromMinutes(authSettings.GetValue<int>("EmailTokenLifespanInMinutes")); 
+            options.TokenLifespan = TimeSpan.FromMinutes(authSettings.GetValue<int>("EmailTokenLifespanInMinutes"));
         });
         services.AddAuthentication(options =>
             {
@@ -54,9 +54,11 @@ public static class IdentityExtensions
             })
             .AddCookie().AddGoogle(options =>
             {
-                var clientId = googleOAuthSettings.GetValue<string>("ClientId") ?? throw new ConfigException("ClientId missing in appsettings.json");
-                var clientSecret = googleOAuthSettings.GetValue<string>("ClientSecret") ?? throw new ConfigException("ClientSecret missing in appsettings.json");
-                
+                var clientId = googleOAuthSettings.GetValue<string>("ClientId") ??
+                               throw new ConfigException("ClientId missing in appsettings.json");
+                var clientSecret = googleOAuthSettings.GetValue<string>("ClientSecret") ??
+                                   throw new ConfigException("ClientSecret missing in appsettings.json");
+
                 options.ClientId = clientId;
                 options.ClientSecret = clientSecret;
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -77,7 +79,23 @@ public static class IdentityExtensions
                     {
                         OnMessageReceived = context =>
                         {
-                            context.Token = context.Request.Cookies["accessToken"];
+                            var token = context.Request.Cookies["accessToken"];
+
+                            //if no cookie, checks query string (for SignalR connections)
+                            if (string.IsNullOrEmpty(token))
+                            {
+                                var accessToken = context.Request.Query["access_token"];
+                                var path = context.HttpContext.Request.Path;
+
+                                // only accepts query string tokens for SignalR hubs
+                                if (!string.IsNullOrEmpty(accessToken) &&
+                                    path.StartsWithSegments("/hubs"))
+                                {
+                                    token = accessToken;
+                                }
+                            }
+
+                            context.Token = token;
                             return Task.CompletedTask;
                         }
                     };

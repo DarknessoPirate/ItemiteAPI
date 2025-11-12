@@ -3,6 +3,7 @@ using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangeProfilePicture;
 using Application.Features.Users.ConfirmEmailChange;
+using Application.Features.Users.GetCurrentUser;
 using Application.Features.Users.RemoveBackgroundPicture;
 using Application.Features.Users.RemoveProfilePicture;
 using Domain.DTOs.File;
@@ -19,6 +20,19 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class UserController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var query = new GetCurrentUserQuery
+        {
+            UserId = requestContextService.GetUserId()
+        };
+        
+        var currentUser = await mediator.Send(query);
+        return Ok(currentUser);
+    }
+    
     [Authorize]
     [HttpPost("profile/picture")]
     [Consumes("multipart/form-data")]

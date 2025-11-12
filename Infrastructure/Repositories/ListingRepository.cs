@@ -63,9 +63,8 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return dbContext.Users
             .Where(u => u.Id == userId)
             .Include(u => u.FollowedListings)
-                .ThenInclude(f => f.Listing).ThenInclude(l => l.Categories)
-            .Include(u => u.FollowedListings)
-                .ThenInclude(f => f.Listing).ThenInclude(l => l.ListingPhotos).ThenInclude(lp => lp.Photo)
+            .ThenInclude(f => f.Listing).ThenInclude(l => l.Categories)
+            .ThenInclude(f => f.Listing).ThenInclude(l => l.ListingPhotos).ThenInclude(lp => lp.Photo)
             .SelectMany(u => u.FollowedListings.OrderByDescending(f => f.FollowedAt))
             .Select(f => f.Listing);
     }
