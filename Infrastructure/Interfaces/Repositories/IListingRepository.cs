@@ -14,6 +14,7 @@ public interface IListingRepository<T> where T : ListingBase
     Task<List<FollowedListing>> GetUserFollowedListingsAsync(int userId);
     IQueryable<ListingBase> GetListingsFollowedByUserQueryable(int userId);
     Task AddListingToFollowedAsync(FollowedListing followedListing);
+    void UnfollowListing(FollowedListing followedListing);
     Task<bool> ListingExistsAsync(int listingId);
     void UpdateListing(T listing);
     void DeleteListing(T listing);
