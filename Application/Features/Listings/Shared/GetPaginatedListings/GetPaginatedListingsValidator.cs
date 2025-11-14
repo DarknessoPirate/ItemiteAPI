@@ -8,7 +8,7 @@ public class GetPaginatedListingsValidator : AbstractValidator<GetPaginatedListi
     {
         RuleFor(q => q.Query.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
         RuleFor(q => q.Query.PriceFrom)
-            .GreaterThan(0)
+            .GreaterThanOrEqualTo(0)
             .LessThanOrEqualTo(q => q.Query.PriceTo ?? decimal.MaxValue)
             .When(q => q.Query.PriceFrom.HasValue);
 
