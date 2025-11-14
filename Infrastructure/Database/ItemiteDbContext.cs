@@ -18,6 +18,9 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<AuctionBid> AuctionBids { get; set; }
     public DbSet<ListingView> ListingViews { get; set; }
     public DbSet<FollowedListing> FollowedListings { get; set; }
+    
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<NotificationUser> NotificationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
