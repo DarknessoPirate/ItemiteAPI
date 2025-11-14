@@ -1,10 +1,12 @@
 using Application.Exceptions;
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Listings.Shared.DeleteListing;
@@ -15,6 +17,7 @@ public class DeleteListingHandler(
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
     IMediaService mediaService,
+    INotificationService notificationService,
     ILogger<DeleteListingHandler> logger
     ) : IRequestHandler<DeleteListingCommand>
 {
@@ -31,6 +34,11 @@ public class DeleteListingHandler(
         }
         
         var photosToDelete = listingToDelete.ListingPhotos.Select(p => p.Photo).ToList();
+        
+        // get listing name and followers before deleting a listing
+        var listingName = listingToDelete.Name;
+        var followers = await listingRepository.GetListingFollowersAsync(request.ListingId);
+        
         await unitOfWork.BeginTransactionAsync();
         try
         {
@@ -46,9 +54,17 @@ public class DeleteListingHandler(
             }
 
             await unitOfWork.CommitTransactionAsync();
+            
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
             await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
+            
+            var notificationInfo = new NotificationInfo
+            {
+                Message = $"Listing {listingName} has been deleted.",
+            };
+            
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), notificationInfo);
         }
         catch (Exception ex)
         {

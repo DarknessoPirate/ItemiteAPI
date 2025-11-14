@@ -1,14 +1,16 @@
 using Application.Exceptions;
-using Application.Features.Listings.ProductListings.UpdateProductListing;
 using AutoMapper;
 using Domain.Configs;
 using Domain.DTOs.AuctionListing;
+using Domain.DTOs.Listing;
+using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Listings.AuctionListings.UpdateAuctionListing;
@@ -21,7 +23,9 @@ public class UpdateAuctionListingHandler(
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    ILogger<UpdateAuctionListingHandler> logger
+    INotificationService notificationService,
+    ILogger<UpdateAuctionListingHandler> logger,
+    IConfiguration configuration
     ) : IRequestHandler<UpdateAuctionListingCommand, AuctionListingResponse>
 {
     public async Task<AuctionListingResponse> Handle(UpdateAuctionListingCommand request, CancellationToken cancellationToken)
@@ -93,7 +97,7 @@ public class UpdateAuctionListingHandler(
             var allListingPhotos = auctionListingToUpdate.ListingPhotos.ToList();
             if (request.UpdateDto.ExistingPhotoOrders == null && request.UpdateDto.ExistingPhotoIds == null)
             {
-                foreach (var listingPhoto in allListingPhotos)
+                foreach (var listingPhoto in allListingPhotos.Where(l => l.Order != 1))
                 {
                     var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
                     if (deletionResult.Error != null)
@@ -185,7 +189,21 @@ public class UpdateAuctionListingHandler(
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
             await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
 
-            return mapper.Map<AuctionListingResponse>(auctionListingToUpdate);
+            var followers = await auctionListingRepository.GetListingFollowersAsync(request.ListingId);
+            var auctionListingResponse = mapper.Map<AuctionListingResponse>(auctionListingToUpdate);
+
+            var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:4200";
+            
+            var notificationInfo = new NotificationInfo
+            {
+                Message = $"Auction {auctionListingToUpdate.Name} has been updated.",
+                UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.ListingId}",
+                NotificationImageUrl = auctionListingResponse.MainImageUrl,
+            };
+            
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), notificationInfo);
+            
+            return auctionListingResponse;
         }
         catch (Exception ex)
         {
