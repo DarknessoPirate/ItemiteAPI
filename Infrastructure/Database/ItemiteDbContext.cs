@@ -144,6 +144,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne(rt => rt.ReplacedThisToken)
             .HasForeignKey<RefreshToken>(rt => rt.ReplacedByTokenId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.ResourceType)
+            .HasConversion<string>();
 
         base.OnModelCreating(modelBuilder);
     }

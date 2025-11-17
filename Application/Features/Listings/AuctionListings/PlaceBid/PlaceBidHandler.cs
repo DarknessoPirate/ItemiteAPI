@@ -1,6 +1,7 @@
 using Domain.Configs;
 using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -18,7 +19,6 @@ public class PlaceBidHandler(
     IUnitOfWork unitOfWork,
     INotificationService notificationService,
     UserManager<User> userManager,
-    IConfiguration configuration,
     ILogger<PlaceBidHandler> logger
     ) : IRequestHandler<PlaceBidCommand, int>
 {
@@ -79,13 +79,12 @@ public class PlaceBidHandler(
 
         await cacheService.RemoveAsync($"{CacheKeys.BIDS}{auction.Id}");
         await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{auction.Id}");
-        
-        var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:4200";
 
         await notificationService.SendNotification([auction.OwnerId], request.UserId, new NotificationInfo
         {
             Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in your auction {auction.Name}",
-            UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.AuctionId}",
+            ResourceId = request.AuctionId,
+            ResourceType = ResourceType.Auction,
             NotificationImageUrl = auction.ListingPhotos.First(p => p.Order == 1).Photo.Url,
         });
 
@@ -94,7 +93,8 @@ public class PlaceBidHandler(
             await notificationService.SendNotification([formerHighestBid.BidderId], request.UserId, new NotificationInfo
             {
                 Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in auction {auction.Name}. You are no longer the highest bidder.",
-                UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.AuctionId}",
+                ResourceId = request.AuctionId,
+                ResourceType = ResourceType.Auction,
                 NotificationImageUrl = auction.ListingPhotos.First(p => p.Order == 1).Photo.Url,
             });
         }

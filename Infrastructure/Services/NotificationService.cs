@@ -57,6 +57,11 @@ public class NotificationService(
 
     public async Task SendNotification(List<int> userIds, int senderId, NotificationInfo notificationInfo)
     {
+        if (userIds.Count == 0)
+        {
+            logger.LogInformation("Notification has not been created - recipients count is 0");
+            return;
+        }
         var notificationEntity = mapper.Map<Notification>(notificationInfo);
         var recipientIds = userIds.Where(id => id != senderId).ToList();
 
@@ -92,7 +97,7 @@ public class NotificationService(
         
         logger.LogInformation($"Notification sent for users: {string.Join(",", userIds)}" );
         logger.LogInformation($"Notification content: {notificationInfo.Message}" );
-        logger.LogInformation($"Notification url: {notificationInfo.UrlToResource}" );
+        logger.LogInformation($"Notification url: {notificationInfo.ResourceType.ToString()}" );
     }
     
 }

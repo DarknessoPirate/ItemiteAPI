@@ -2,15 +2,14 @@ using Application.Exceptions;
 using AutoMapper;
 using Domain.Configs;
 using Domain.DTOs.AuctionListing;
-using Domain.DTOs.Listing;
 using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Listings.AuctionListings.UpdateAuctionListing;
@@ -24,8 +23,7 @@ public class UpdateAuctionListingHandler(
     IUnitOfWork unitOfWork,
     IMapper mapper,
     INotificationService notificationService,
-    ILogger<UpdateAuctionListingHandler> logger,
-    IConfiguration configuration
+    ILogger<UpdateAuctionListingHandler> logger
     ) : IRequestHandler<UpdateAuctionListingCommand, AuctionListingResponse>
 {
     public async Task<AuctionListingResponse> Handle(UpdateAuctionListingCommand request, CancellationToken cancellationToken)
@@ -191,13 +189,12 @@ public class UpdateAuctionListingHandler(
 
             var followers = await auctionListingRepository.GetListingFollowersAsync(request.ListingId);
             var auctionListingResponse = mapper.Map<AuctionListingResponse>(auctionListingToUpdate);
-
-            var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:4200";
             
             var notificationInfo = new NotificationInfo
             {
                 Message = $"Auction {auctionListingToUpdate.Name} has been updated.",
-                UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.ListingId}",
+                ResourceId = auctionListingToUpdate.Id,
+                ResourceType = ResourceType.Auction,
                 NotificationImageUrl = auctionListingResponse.MainImageUrl,
             };
             

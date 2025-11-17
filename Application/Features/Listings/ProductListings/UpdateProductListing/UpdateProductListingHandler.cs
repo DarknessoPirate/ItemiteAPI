@@ -4,12 +4,12 @@ using Domain.Configs;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.ProductListing;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Listings.ProductListings.UpdateProductListing;
@@ -22,7 +22,6 @@ public class UpdateProductListingHandler(
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    IConfiguration configuration,
     INotificationService notificationService,
     ILogger<UpdateProductListingHandler> logger
     ) : IRequestHandler<UpdateProductListingCommand, ProductListingResponse>
@@ -185,12 +184,11 @@ public class UpdateProductListingHandler(
             var productListingResponse = mapper.Map<ProductListingResponse>(productListingToUpdate);
             var followers = await productListingRepository.GetListingFollowersAsync(request.ListingId);
             
-            var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:4200";
-            
             var notificationInfo = new NotificationInfo
             {
                 Message = $"Product listing {productListingToUpdate.Name} has been updated.",
-                UrlToResource = $"{frontendBaseUrl}/product-listings/{request.ListingId}",
+                ResourceId = productListingToUpdate.Id,
+                ResourceType = ResourceType.Product,
                 NotificationImageUrl = productListingResponse.MainImageUrl,
             };
             
