@@ -55,7 +55,7 @@ public class NotificationService(
             .SendAsync("ListingUpdated", listingInfo);
     }
 
-    public async Task SendNotification(List<int> userIds, int senderId,NotificationInfo notificationInfo)
+    public async Task SendNotification(List<int> userIds, int senderId, NotificationInfo notificationInfo)
     {
         var notificationEntity = mapper.Map<Notification>(notificationInfo);
         var recipientIds = userIds.Where(id => id != senderId).ToList();
