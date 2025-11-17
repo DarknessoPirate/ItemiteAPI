@@ -32,6 +32,6 @@ public class DeleteUserNotificationHandler(
         notificationRepository.DeleteNotificationUser(notificationUser);
     
         await unitOfWork.SaveChangesAsync();
-        await cacheService.RemoveAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}");
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}*");
     }
 }

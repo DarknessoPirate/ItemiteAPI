@@ -75,7 +75,7 @@ public class NotificationService(
                 };
                 await notificationRepository.AddNotificationUser(notificationUser);
 
-                await cacheService.RemoveAsync($"{CacheKeys.NOTIFICATIONS}{userId}");
+                await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{userId}*");
             }
 
             await unitOfWork.CommitTransactionAsync();
