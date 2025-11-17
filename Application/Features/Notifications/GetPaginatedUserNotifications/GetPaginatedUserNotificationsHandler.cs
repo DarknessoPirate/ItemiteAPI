@@ -1,29 +1,39 @@
 using AutoMapper;
 using Domain.Configs;
 using Domain.DTOs.Notifications;
+using Domain.DTOs.Pagination;
 using Domain.Entities;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.Notifications.GetUserNotifications;
+namespace Application.Features.Notifications.GetPaginatedUserNotifications;
 
-public class GetUserNotificationsHandler(
+public class GetPaginatedUserNotificationsHandler(
     INotificationRepository notificationRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
     ICacheService cacheService
-    ) : IRequestHandler<GetUserNotificationsQuery, List<NotificationInfo>>
+    ) : IRequestHandler<GetPaginatedUserNotificationsQuery, PageResponse<NotificationInfo>>
 {
-    public async Task<List<NotificationInfo>> Handle(GetUserNotificationsQuery request, CancellationToken cancellationToken)
+    public async Task<PageResponse<NotificationInfo>> Handle(GetPaginatedUserNotificationsQuery request, CancellationToken cancellationToken)
     {
-        var notificationsFromCache = await cacheService.GetAsync<List<NotificationInfo>>($"{CacheKeys.NOTIFICATIONS}{request.UserId}");
+        var notificationsFromCache = await cacheService.GetAsync<PageResponse<NotificationInfo>>($"{CacheKeys.NOTIFICATIONS}{request.UserId}_{request.Query}");
         if (notificationsFromCache != null)
         {
             return notificationsFromCache;
         }
         
-        var notifications = await notificationRepository.GetUserNotifications(request.UserId);
+        var queryable =  notificationRepository.GetUserNotificationsQueryable(request.UserId);
+        
+        int totalItems = await queryable.CountAsync(cancellationToken);
+        
+        queryable = queryable
+            .Skip((request.Query.PageNumber - 1) * request.Query.PageSize)
+            .Take(request.Query.PageSize);
+
+        var notifications = await queryable.ToListAsync(cancellationToken);
         
         var readDate = DateTime.UtcNow;
         
@@ -52,8 +62,9 @@ public class GetUserNotificationsHandler(
             opt.Items["UserId"] = request.UserId;
         });
         
-        await cacheService.SetAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}", mappedNotifications);
+        var pageResponse = new PageResponse<NotificationInfo>(mappedNotifications, totalItems, request.Query.PageSize, request.Query.PageNumber);
         
-        return mappedNotifications;
+        await cacheService.SetAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}_{request.Query}", pageResponse);
+        return pageResponse;
     }
 }

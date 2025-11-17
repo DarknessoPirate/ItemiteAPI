@@ -1,7 +1,8 @@
 using Application.Features.Notifications.DeleteUserNotification;
-using Application.Features.Notifications.GetUserNotifications;
+using Application.Features.Notifications.GetPaginatedUserNotifications;
 using Application.Features.Notifications.GetUserUnreadNotificationsCount;
 using Domain.DTOs.Notifications;
+using Domain.DTOs.Pagination;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +16,15 @@ namespace Api.Controllers;
 public class NotificationController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<NotificationInfo>>> GetNotifications()
+    public async Task<ActionResult<PageResponse<NotificationInfo>>> GetNotifications([FromQuery] PaginateNotificationsQuery query)
     {
-        var query = new GetUserNotificationsQuery
+        var getNotificationsQuery = new GetPaginatedUserNotificationsQuery
         {
+            Query = query,
             UserId = requestContextService.GetUserId()
         };
         
-        var notifications = await mediator.Send(query);
+        var notifications = await mediator.Send(getNotificationsQuery);
         return Ok(notifications);
     }
 
@@ -36,7 +38,7 @@ public class NotificationController(IMediator mediator, IRequestContextService r
         var unreadNotificationsCount = await mediator.Send(query);
         return Ok(new {unreadNotificationsCount});
     }
-
+    
     [HttpDelete("{notificationId}")]
     public async Task<IActionResult> DeleteUserNotification(int notificationId)
     {

@@ -17,13 +17,12 @@ public class NotificationRepository(ItemiteDbContext dbContext) : INotificationR
         await dbContext.AddAsync(notificationUser);
     }
 
-    public async Task<List<Notification>> GetUserNotifications(int userId)
+    public IQueryable<Notification> GetUserNotificationsQueryable(int userId)
     {
-        return await dbContext.Notifications
+        return dbContext.Notifications
             .OrderByDescending(n => n.NotificationSent)
             .Include(n => n.NotificationUsers)
-            .Where(n => n.NotificationUsers.Any(nu => nu.UserId == userId))
-            .ToListAsync();
+            .Where(n => n.NotificationUsers.Any(nu => nu.UserId == userId));
     }
 
     public async Task<Notification?> GetNotification(int notificationId)

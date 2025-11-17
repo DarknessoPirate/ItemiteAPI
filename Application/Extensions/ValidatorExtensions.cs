@@ -12,12 +12,14 @@ using Application.Features.Listings.AuctionListings.GetBidHistory;
 using Application.Features.Listings.AuctionListings.PlaceBid;
 using Application.Features.Listings.ProductListings.CreateProductListing;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
+using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Messages.DeleteMessage;
 using Application.Features.Messages.GetChatPage;
 using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
+using Application.Features.Notifications.GetPaginatedUserNotifications;
 using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
@@ -58,5 +60,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangePhoneNumberCommand>, ChangePhoneNumberValidator>();
         services.AddScoped<IValidator<ChangeLocationCommand>, ChangeLocationValidator>();
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
+        services.AddScoped<IValidator<GetPaginatedFollowedListingsQuery>, GetPaginatedFollowListingsValidator>();
+        services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
     }
 }

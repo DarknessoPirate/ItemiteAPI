@@ -6,7 +6,7 @@ public interface INotificationRepository
 {
     Task AddNotification(Notification notification);
     Task AddNotificationUser(NotificationUser notificationUser);
-    Task<List<Notification>> GetUserNotifications(int userId);
+    IQueryable<Notification> GetUserNotificationsQueryable(int userId);
     Task<Notification?> GetNotification(int notificationId);
     Task<int> GetUserUnreadNotificationsCount(int userId);
     void UpdateNotification(Notification notification);
