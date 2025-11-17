@@ -201,7 +201,7 @@ public class UpdateAuctionListingHandler(
                 NotificationImageUrl = auctionListingResponse.MainImageUrl,
             };
             
-            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), notificationInfo);
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
             
             return auctionListingResponse;
         }

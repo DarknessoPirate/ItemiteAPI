@@ -55,9 +55,10 @@ public class NotificationService(
             .SendAsync("ListingUpdated", listingInfo);
     }
 
-    public async Task SendNotification(List<int> userIds, NotificationInfo notificationInfo)
+    public async Task SendNotification(List<int> userIds, int senderId,NotificationInfo notificationInfo)
     {
         var notificationEntity = mapper.Map<Notification>(notificationInfo);
+        var recipientIds = userIds.Where(id => id != senderId).ToList();
 
         await unitOfWork.BeginTransactionAsync();
         try
@@ -65,7 +66,7 @@ public class NotificationService(
             await notificationRepository.AddNotification(notificationEntity);
             await unitOfWork.SaveChangesAsync();
 
-            foreach (var userId in userIds)
+            foreach (var userId in recipientIds)
             {
                 var notificationUser = new NotificationUser
                 {
@@ -86,7 +87,7 @@ public class NotificationService(
             throw;
         }
         
-        await notificationHub.Clients.Users(userIds.Select(id => id.ToString()))
+        await notificationHub.Clients.Users(recipientIds.Select(i => i.ToString()))
             .SendAsync("Notification", notificationInfo);
         
         logger.LogInformation($"Notification sent for users: {string.Join(",", userIds)}" );

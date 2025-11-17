@@ -82,7 +82,7 @@ public class PlaceBidHandler(
         
         var frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:4200";
 
-        await notificationService.SendNotification([auction.OwnerId], new NotificationInfo
+        await notificationService.SendNotification([auction.OwnerId], request.UserId, new NotificationInfo
         {
             Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in your auction {auction.Name}",
             UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.AuctionId}",
@@ -91,7 +91,7 @@ public class PlaceBidHandler(
 
         if (formerHighestBid != null)
         {
-            await notificationService.SendNotification([formerHighestBid.BidderId], new NotificationInfo
+            await notificationService.SendNotification([formerHighestBid.BidderId], request.UserId, new NotificationInfo
             {
                 Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in auction {auction.Name}. You are no longer the highest bidder.",
                 UrlToResource = $"{frontendBaseUrl}/auction-listings/{request.AuctionId}",

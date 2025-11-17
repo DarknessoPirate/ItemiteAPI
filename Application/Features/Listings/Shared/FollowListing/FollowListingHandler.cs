@@ -68,7 +68,7 @@ public class FollowListingHandler(
             NotificationImageUrl = listingToFollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
         };
             
-        await notificationService.SendNotification([listingToFollow.OwnerId], notificationInfo);
+        await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);
         
         return followedListing.Id;
     }

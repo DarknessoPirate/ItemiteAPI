@@ -64,7 +64,7 @@ public class DeleteListingHandler(
                 Message = $"Listing {listingName} has been deleted.",
             };
             
-            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), notificationInfo);
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
         }
         catch (Exception ex)
         {

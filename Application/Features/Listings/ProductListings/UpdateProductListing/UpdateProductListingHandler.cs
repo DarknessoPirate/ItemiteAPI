@@ -194,7 +194,7 @@ public class UpdateProductListingHandler(
                 NotificationImageUrl = productListingResponse.MainImageUrl,
             };
             
-            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), notificationInfo);
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
 
             return productListingResponse;
         }

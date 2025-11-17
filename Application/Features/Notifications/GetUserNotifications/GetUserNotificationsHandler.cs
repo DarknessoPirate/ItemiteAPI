@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Configs;
 using Domain.DTOs.Notifications;
+using Domain.Entities;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
@@ -23,15 +24,16 @@ public class GetUserNotificationsHandler(
         }
         
         var notifications = await notificationRepository.GetUserNotifications(request.UserId);
-
-        var userNotifications = await notificationRepository.GetUserNotificationUsers(request.UserId);
         
         var readDate = DateTime.UtcNow;
         
         bool anyUpdated = false;
         
-        foreach (var userNotification in userNotifications)
+        foreach (var notification in notifications)
         {
+            var userNotification = notification.NotificationUsers
+                .First(nu => nu.UserId == request.UserId);
+            
             if (userNotification.ReadAt == null)
             {
                 userNotification.ReadAt = readDate;

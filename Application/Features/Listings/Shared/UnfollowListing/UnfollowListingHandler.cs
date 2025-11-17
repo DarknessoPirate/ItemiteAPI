@@ -56,7 +56,7 @@ public class UnfollowListingHandler(
             NotificationImageUrl = listingToUnfollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
         };
             
-        await notificationService.SendNotification([listingToUnfollow.OwnerId], notificationInfo);
+        await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);
 
         await unitOfWork.SaveChangesAsync();
     }

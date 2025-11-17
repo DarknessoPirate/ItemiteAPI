@@ -11,5 +11,5 @@ public interface INotificationService
     Task NotifyMessageDeleted(int recipientId, int messageId, string messageDeletedString);
     Task NotifyListingUpdated(List<int> userIds, ListingBasicInfo listingInfo);
     
-    Task SendNotification(List<int> userIds, NotificationInfo notificationInfo);
+    Task SendNotification(List<int> userIds, int senderId, NotificationInfo notificationInfo);
 }

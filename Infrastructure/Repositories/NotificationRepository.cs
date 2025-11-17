@@ -22,15 +22,25 @@ public class NotificationRepository(ItemiteDbContext dbContext) : INotificationR
         return await dbContext.Notifications
             .OrderByDescending(n => n.NotificationSent)
             .Include(n => n.NotificationUsers)
-            .Where(n => n.NotificationUsers.Any(u => u.UserId == userId) || n.ToEveryUser)
+            .Where(n => n.NotificationUsers.Any(nu => nu.UserId == userId))
             .ToListAsync();
     }
 
-    public async Task<List<NotificationUser>> GetUserNotificationUsers(int userId)
+    public async Task<Notification?> GetNotification(int notificationId)
     {
-        return await dbContext.NotificationUsers.Where(n => n.UserId == userId).ToListAsync();
+        return await dbContext.Notifications
+            .Include(n => n.NotificationUsers)
+            .FirstOrDefaultAsync(n => n.Id == notificationId);
     }
 
+    public async Task<int> GetUserUnreadNotificationsCount(int userId)
+    {
+        return await dbContext.Notifications
+            .Include(n => n.NotificationUsers)
+            .Where(n => n.NotificationUsers.Any(nu => nu.UserId == userId && nu.ReadAt == null))
+            .CountAsync();
+    }
+    
     public void UpdateNotification(Notification notification)
     {
         dbContext.Update(notification);
@@ -39,5 +49,15 @@ public class NotificationRepository(ItemiteDbContext dbContext) : INotificationR
     public void UpdateNotificationUser(NotificationUser notificationUser)
     {
         dbContext.Update(notificationUser);
+    }
+
+    public void DeleteNotification(Notification notification)
+    {
+        dbContext.Remove(notification);
+    }
+
+    public void DeleteNotificationUser(NotificationUser notificationUser)
+    {
+        dbContext.Remove(notificationUser);
     }
 }
