@@ -69,6 +69,14 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .SelectMany(u => u.FollowedListings.OrderByDescending(f => f.FollowedAt))
             .Select(f => f.Listing);
     }
+    
+    public IQueryable<ListingBase> GetUserListingsQueryable(int userId)
+    {
+        return dbContext.Set<T>().Include(p => p.Categories)
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
+            .Where(l => l.OwnerId == userId)
+            .OrderByDescending(l => l.DateCreated);
+    }
 
 
     public async Task AddListingToFollowedAsync(FollowedListing followedListing)

@@ -7,6 +7,7 @@ public interface IListingRepository<T> where T : ListingBase
     Task<List<T>> GetAllListingsAsync();
     Task<List<T>> GetUserListingsAsync(int userId);
     IQueryable<T> GetListingsQueryable();
+    IQueryable<ListingBase> GetUserListingsQueryable(int userId);
     Task<T?> GetListingWithPhotosByIdAsync(int listingId);
     Task<T?> GetListingByIdAsync(int listingId);
     Task CreateListingAsync(T listing);
