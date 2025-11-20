@@ -18,4 +18,11 @@ public class BidRepository(ItemiteDbContext dbContext) : IBidRepository
             .Include(b => b.Bidder)
             .Where(b => b.AuctionId == auctionId).OrderByDescending(b => b.BidPrice).ToListAsync();
     }
+
+    public async Task<AuctionBid?> GetCurrentHighestBid(int auctionId)
+    {
+        return await dbContext.AuctionBids
+            .Include(b => b.Bidder)
+            .Where(b => b.AuctionId == auctionId).OrderByDescending(b => b.BidPrice).FirstOrDefaultAsync();
+    }
 }

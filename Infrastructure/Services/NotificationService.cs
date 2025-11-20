@@ -1,5 +1,10 @@
+using AutoMapper;
+using Domain.Configs;
 using Domain.DTOs.Listing;
 using Domain.DTOs.Messages;
+using Domain.DTOs.Notifications;
+using Domain.Entities;
+using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Infrastructure.SignalR;
 using Microsoft.AspNetCore.SignalR;
@@ -10,7 +15,11 @@ namespace Infrastructure.Services;
 public class NotificationService(
     IHubContext<BroadcastHub> broadcastHub,
     IHubContext<NotificationHub> notificationHub,
-    ILogger<NotificationService> logger
+    ILogger<NotificationService> logger,
+    INotificationRepository notificationRepository,
+    IUnitOfWork unitOfWork,
+    IMapper mapper,
+    ICacheService cacheService
 ) : INotificationService
 {
     public async Task NotifyMessageReceived(int recipientId, MessageResponse message)
@@ -45,4 +54,50 @@ public class NotificationService(
         await notificationHub.Clients.Users(userIds.Select(id => id.ToString()))
             .SendAsync("ListingUpdated", listingInfo);
     }
+
+    public async Task SendNotification(List<int> userIds, int senderId, NotificationInfo notificationInfo)
+    {
+        if (userIds.Count == 0)
+        {
+            logger.LogInformation("Notification has not been created - recipients count is 0");
+            return;
+        }
+        var notificationEntity = mapper.Map<Notification>(notificationInfo);
+        var recipientIds = userIds.Where(id => id != senderId).ToList();
+
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            await notificationRepository.AddNotification(notificationEntity);
+            await unitOfWork.SaveChangesAsync();
+
+            foreach (var userId in recipientIds)
+            {
+                var notificationUser = new NotificationUser
+                {
+                    UserId = userId,
+                    NotificationId = notificationEntity.Id
+                };
+                await notificationRepository.AddNotificationUser(notificationUser);
+
+                await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{userId}*");
+            }
+
+            await unitOfWork.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            logger.LogError($"Error when sending a notification: {ex.Message}");
+            throw;
+        }
+        
+        await notificationHub.Clients.Users(recipientIds.Select(i => i.ToString()))
+            .SendAsync("Notification", notificationInfo);
+        
+        logger.LogInformation($"Notification sent for users: {string.Join(",", userIds)}" );
+        logger.LogInformation($"Notification content: {notificationInfo.Message}" );
+        logger.LogInformation($"Notification url: {notificationInfo.ResourceType.ToString()}" );
+    }
+    
 }

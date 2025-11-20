@@ -8,6 +8,7 @@ using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ResourceType = CloudinaryDotNet.Actions.ResourceType;
 
 namespace Infrastructure.Services;
 

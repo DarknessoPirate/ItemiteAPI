@@ -1,6 +1,9 @@
+using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,7 +12,8 @@ namespace Application.Features.Listings.Shared.FollowListing;
 public class FollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
     UserManager<User> userManager,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    INotificationService notificationService
     ) : IRequestHandler<FollowListingCommand, int>
 {
     public async Task<int> Handle(FollowListingCommand request, CancellationToken cancellationToken)
@@ -50,6 +54,16 @@ public class FollowListingHandler(
         listingRepository.UpdateListing(listingToFollow);
         
         await unitOfWork.SaveChangesAsync();
+            
+        var notificationInfo = new NotificationInfo
+        {
+            Message = $"User {user.UserName} has followed your listing {listingToFollow.Name}.",
+            ResourceId = listingToFollow.Id,
+            ResourceType = listingToFollow is ProductListing ? ResourceType.Product : ResourceType.Auction,
+            NotificationImageUrl = listingToFollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
+        };
+            
+        await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);
         
         return followedListing.Id;
     }

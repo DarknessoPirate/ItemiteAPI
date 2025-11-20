@@ -1,6 +1,8 @@
+using Domain.DTOs.Notifications;
+
 namespace Infrastructure.Interfaces.Services;
 
 public interface IBroadcastService
 {
-    Task SendMessageToAllUsers(string message);
+    Task SendMessageToAllUsers(NotificationInfo notificationInfo);
 }
