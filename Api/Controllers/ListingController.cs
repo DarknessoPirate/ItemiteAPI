@@ -2,6 +2,7 @@ using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
+using Application.Features.Listings.Shared.GetPaginatedUserListings;
 using Application.Features.Listings.Shared.HighlightListing;
 using Application.Features.Listings.Shared.UnfollowListing;
 using Domain.DTOs.Listing;
@@ -25,6 +26,19 @@ public class ListingController(IMediator mediator, IRequestContextService reques
             UserId = requestContextService.GetUserIdNullable()
         };
         var listings = await mediator.Send(getListingsQuery);
+        return Ok(listings);
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserListings([FromRoute] int userId, [FromQuery] PaginateUserListingsQuery query)
+    {
+        var getUserListingsQuery = new GetPaginatedUserListingsQuery
+        {
+            Query = query,
+            UserId = userId,
+            CurrentUserId = requestContextService.GetUserIdNullable()
+        };
+        var listings = await mediator.Send(getUserListingsQuery);
         return Ok(listings);
     }
 
