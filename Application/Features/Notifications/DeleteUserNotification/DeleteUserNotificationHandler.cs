@@ -30,8 +30,22 @@ public class DeleteUserNotificationHandler(
         }
     
         notificationRepository.DeleteNotificationUser(notificationUser);
-    
-        await unitOfWork.SaveChangesAsync();
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            if (await notificationRepository.GetNotificationUserCount(notification.Id) == 1)
+            {
+                // no more notification user relation entity -> notification entity can be deleted
+                notificationRepository.DeleteNotification(notification);
+            }
+
+            await unitOfWork.CommitTransactionAsync();
+        }
+        catch (Exception ex)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
         await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}*");
     }
 }

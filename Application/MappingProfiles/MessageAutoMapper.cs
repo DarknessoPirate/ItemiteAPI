@@ -14,7 +14,8 @@ public class MessageAutoMapper : Profile
             .ForMember(dest => dest.MessageId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.ListingId, opt => opt.MapFrom(src => src.ListingId))
             .ForMember(dest => dest.Photos, opt => opt.MapFrom(src =>
-                src.MessagePhotos.Select(mp => mp.Photo)));
+                src.MessagePhotos.Select(mp => mp.Photo)))
+            .ForMember(dest => dest.DateRead, opt => opt.MapFrom(src => src.ReadAt));
 
         CreateMap<Message, LastMessageInfo>()
             .ForMember(dest => dest.MessageId, opt => opt.MapFrom(src => src.Id))

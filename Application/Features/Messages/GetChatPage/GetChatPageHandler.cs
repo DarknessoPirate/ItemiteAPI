@@ -19,7 +19,8 @@ public class GetChatPageHandler(
     UserManager<User> userManager,
     IMessageRepository messageRepository,
     IListingRepository<ListingBase> listingRepository,
-    IMapper mapper
+    IMapper mapper,
+    IUnitOfWork unitOfWork
 ) : IRequestHandler<GetChatPageQuery, PageResponse<MessageResponse>>
 {
     public async Task<PageResponse<MessageResponse>> Handle(GetChatPageQuery request,
@@ -42,10 +43,20 @@ public class GetChatPageHandler(
             request.ListingId,
             request.PageNumber,
             request.PageSize);
+        
+        var unreadMessages = messages.Where(m => m.IsRead == false).ToList();
+        var readDate = DateTime.UtcNow;
+        foreach (var message in unreadMessages)
+        {
+            message.IsRead = true;
+            message.ReadAt = readDate;
+            messageRepository.Update(message);
+        }
 
+        await unitOfWork.SaveChangesAsync();
+        
         var messagesResponse = mapper.Map<List<MessageResponse>>(messages);
-
-        // TODO : change message IsRead to true for messages fetched
+        
         var totalMessages =
             await messageRepository.GetMessageCountBetweenUsersAsync(user.Id, request.OtherUserId, request.ListingId);
 

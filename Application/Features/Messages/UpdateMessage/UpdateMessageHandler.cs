@@ -3,6 +3,7 @@ using Domain.DTOs.Messages;
 using Domain.Entities;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -12,7 +13,8 @@ public class UpdateMessageHandler(
     IMessageRepository messageRepository,
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
-    IMapper mapper
+    IMapper mapper,
+    INotificationService notificationService
 ) : IRequestHandler<UpdateMessageCommand, MessageResponse>
 {
     public async Task<MessageResponse> Handle(UpdateMessageCommand request, CancellationToken cancellationToken)
@@ -36,6 +38,10 @@ public class UpdateMessageHandler(
         messageRepository.Update(message);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return mapper.Map<MessageResponse>(message);
+        var messageResponse = mapper.Map<MessageResponse>(message);
+        
+        await notificationService.NotifyMessageUpdated(message.RecipientId, messageResponse);
+        
+        return messageResponse;
     }
 }
