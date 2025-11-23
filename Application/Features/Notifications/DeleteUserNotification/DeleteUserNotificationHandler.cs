@@ -29,10 +29,11 @@ public class DeleteUserNotificationHandler(
             throw new BadRequestException("You did not receive this notification");
         }
     
-        notificationRepository.DeleteNotificationUser(notificationUser);
         await unitOfWork.BeginTransactionAsync();
         try
         {
+            notificationRepository.DeleteNotificationUser(notificationUser);
+            // notification user count will be 0 after SaveChangesAsync so I need to check if its currently 1
             if (await notificationRepository.GetNotificationUserCount(notification.Id) == 1)
             {
                 // no more notification user relation entity -> notification entity can be deleted
