@@ -7,7 +7,6 @@ using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Listings.AuctionListings.PlaceBid;
@@ -40,6 +39,11 @@ public class PlaceBidHandler(
         if (auction.OwnerId == request.UserId)
         {
             throw new BadRequestException("You cannot place a bid on an auction you have created");
+        }
+
+        if (auction.DateEnds <= DateTime.UtcNow)
+        {
+            throw new BadRequestException("Auction has ended");
         }
         
         var formerHighestBid = await bidRepository.GetCurrentHighestBid(auction.Id);
