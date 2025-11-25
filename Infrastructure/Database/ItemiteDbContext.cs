@@ -18,6 +18,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<AuctionBid> AuctionBids { get; set; }
     public DbSet<ListingView> ListingViews { get; set; }
     public DbSet<FollowedListing> FollowedListings { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,7 +33,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne() // no nav back to user (access only from user side)
             .HasForeignKey<User>(u => u.BackgroundPhotoId)
             .OnDelete(DeleteBehavior.SetNull);
-        
+
         modelBuilder.Entity<User>()
             .Property(u => u.AuthProvider)
             .HasConversion<string>();
@@ -42,7 +43,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithMany(l => l.ListingPhotos)
             .HasForeignKey(lp => lp.ListingId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<ListingPhoto>()
             .HasOne(lp => lp.Photo)
             .WithMany()
@@ -54,7 +55,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithMany(m => m.MessagePhotos)
             .HasForeignKey(mp => mp.MessageId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<MessagePhoto>()
             .HasOne(mp => mp.Photo)
             .WithMany()
@@ -117,13 +118,19 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithMany(u => u.OwnedListings)
             .HasForeignKey(l => l.OwnerId)
             .OnDelete(DeleteBehavior.Cascade); // when user is deleted, all their listings are deleted too
-        
+
+        modelBuilder.Entity<ProductListing>()
+            .HasOne(p => p.Payment)
+            .WithOne()
+            .HasForeignKey<ProductListing>(p => p.PaymentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<AuctionBid>()
             .HasOne(b => b.Auction)
             .WithMany(a => a.Bids)
             .HasForeignKey(a => a.AuctionId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<AuctionBid>()
             .HasOne(b => b.Bidder)
             .WithMany(u => u.Bids)
@@ -141,6 +148,37 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne(rt => rt.ReplacedThisToken)
             .HasForeignKey<RefreshToken>(rt => rt.ReplacedByTokenId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // payments 
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Listing)
+            .WithMany()
+            .HasForeignKey(p => p.ListingId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Buyer)
+            .WithMany()
+            .HasForeignKey(p => p.BuyerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Seller)
+            .WithMany()
+            .HasForeignKey(p => p.SellerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.TransferTrigger)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.ActualTransferMethod)
+            .HasConversion<string>();
 
         base.OnModelCreating(modelBuilder);
     }
