@@ -1,5 +1,7 @@
+using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
 using Application.Features.Payments.StartStripeOnboarding;
+using Domain.DTOs.Payments;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -40,4 +42,30 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         return Redirect(onboardingUrl);
     }
+// todo: add wrapper for easier success/failure tracking
+    [Authorize]
+    [HttpPost("purchase-product/{productListingId}")]
+    public async Task<IActionResult> PurchaseProduct(
+        [FromRoute] int productListingId,
+        [FromBody] PurchaseProductRequest request)
+    {
+        var userId = requestContextService.GetUserId();
+
+        var command = new PurchaseProductCommand
+        {
+            ProductListingId = productListingId, 
+            PaymentMethodId = request.PaymentMethodId, 
+            BuyerId = userId
+        };
+
+        var paymentId = await mediator.Send(command);
+
+        return Ok(new
+        {
+            success = true,
+            paymentId = paymentId,
+            message = "Purchase successful! Payment will be transferred to seller in 7 days."
+        });
+    }
+   
 }

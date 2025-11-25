@@ -18,6 +18,7 @@ using Application.Features.Messages.GetChatPage;
 using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
+using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
@@ -58,5 +59,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangePhoneNumberCommand>, ChangePhoneNumberValidator>();
         services.AddScoped<IValidator<ChangeLocationCommand>, ChangeLocationValidator>();
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
+        services.AddScoped<IValidator<PurchaseProductCommand>, PurchaseProductValidator>();
     }
 }

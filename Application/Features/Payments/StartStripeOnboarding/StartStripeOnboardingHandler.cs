@@ -24,8 +24,10 @@ public class StartStripeOnboardingHandler(
         var returnUrl = redirectSettings.Value.StripeReturnOnboardingUrl;
         var refreshUrl = redirectSettings.Value.StripeRefreshOnboardingUrl;
 
-        if (!string.IsNullOrEmpty(user.StripeConnectAccountId))
-            throw new BadRequestException("You already have an account");
+        if (!string.IsNullOrEmpty(user.StripeConnectAccountId) && await stripeConnectService.IsAccountFullyOnboardedAsync(user.StripeConnectAccountId))
+            throw new BadRequestException("You already have the stripe account set up");
+        
+        
 
 
         var onboardingUrl = await stripeConnectService.CreateConnectAccountAndGetOnboardingUrlAsync(
