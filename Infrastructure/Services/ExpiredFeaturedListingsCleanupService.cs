@@ -1,5 +1,7 @@
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,8 +43,12 @@ public class ExpiredFeaturedListingsCleanupService(
         var listingRepository = scope.ServiceProvider.GetRequiredService<IListingRepository<ListingBase>>();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
         
         var expirationDate = DateTime.UtcNow.AddDays(-7);
+        
+        logger.LogInformation($"Listings featured before: {expirationDate.ToString("g")} will be updated");
+        
         var expiredListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
         logger.LogInformation($"Expired featured listings count: {expiredListings.Count}");
         if (expiredListings.Count == 0)
@@ -58,6 +64,20 @@ public class ExpiredFeaturedListingsCleanupService(
         }
         await unitOfWork.SaveChangesAsync();
 
+        var userNotifications = new Dictionary<int, NotificationInfo>();
+        foreach (var listing in expiredListings)
+        {
+            userNotifications[listing.OwnerId] = new NotificationInfo
+            {
+                Message = $"Your listing {listing.Name} is no longer featured",
+                NotificationImageUrl = listing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url,
+                ResourceId = listing.Id,
+                ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
+            };
+        }
+        
+        await notificationService.SendNotificationsBatch(userNotifications);
+        
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
         foreach (var listingId in expiredListings.Select(l => l.Id))
         {

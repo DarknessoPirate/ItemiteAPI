@@ -108,6 +108,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     public async Task<List<T>> GetExpiredFeaturedListingsAsync(DateTime expirationDate)
     {
         var expiredListings = await dbContext.Set<T>()
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
             .Where(l => l.IsFeatured == true && l.FeaturedAt < expirationDate)
             .ToListAsync();
     

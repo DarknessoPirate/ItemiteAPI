@@ -16,4 +16,16 @@ public class ListingViewRepository(ItemiteDbContext dbContext) : ILIstingViewRep
     {
         return await dbContext.ListingViews.Where(lv => lv.UserId == userId).ToListAsync();
     }
+
+    public async Task<List<ListingView>> GetExpiredListingViewsAsync(DateTime expirationDate)
+    {
+        return await dbContext.ListingViews
+            .Where(lv => lv.ViewedAt < expirationDate)
+            .ToListAsync();
+    }
+
+    public void RemoveRange(IEnumerable<ListingView> listingViews)
+    {
+        dbContext.ListingViews.RemoveRange(listingViews);
+    }
 }
