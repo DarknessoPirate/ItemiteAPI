@@ -16,13 +16,17 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<List<T>> GetUserListingsAsync(int userId)
     {
-        var userListings = await dbContext.Set<T>().Where(l => l.OwnerId == userId).ToListAsync();
+        var userListings = await dbContext.Set<T>()
+            .Where(l => l.OwnerId == userId && !l.IsArchived)
+            .ToListAsync();
         return userListings;
     }
 
     public IQueryable<T> GetListingsQueryable()
     {
-       return dbContext.Set<T>().Include(p => p.Categories)
+       return dbContext.Set<T>()
+           .Where(l => !l.IsArchived)
+           .Include(p => p.Categories)
            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
     }
 
@@ -74,7 +78,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     {
         return dbContext.Set<T>().Include(p => p.Categories)
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
-            .Where(l => l.OwnerId == userId)
+            .Where(l => l.OwnerId == userId && !l.IsArchived)
             .OrderByDescending(l => l.DateCreated);
     }
 
