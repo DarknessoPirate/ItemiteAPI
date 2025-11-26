@@ -73,25 +73,23 @@ public class GetUserDedicatedListingsHandler(
             logger.LogInformation($"Category: {category.CategoryId} - {category.Points} points");
         }
         
-        var topThreeCategories = categoriesWithPoints
-            .OrderByDescending(c => c.Points)
-            .Take(3)
+        var topThreeCategoryIds = categoriesWithPoints
             .Select(c => c.CategoryId)
             .ToList();
         
-        var categoryLimits = GetCategoryLimits(topThreeCategories.Count);
+        var categoryLimits = GetCategoryLimits(topThreeCategoryIds.Count);
         
         var allPotentialListings = await queryable
-            .Where(l => l.OwnerId != request.UserId && l.Categories.Any(c => topThreeCategories.Contains(c.Id)))
+            .Where(l => l.OwnerId != request.UserId && l.Categories.Any(c => topThreeCategoryIds.Contains(c.Id)))
             .OrderByDescending(l => l.ViewsCount)
             .ThenByDescending(l => l.DateCreated)
             .ToListAsync(cancellationToken);
         
         var resultListings = new List<ListingBase>();
 
-        for (int i = 0; i < topThreeCategories.Count; i++)
+        for (int i = 0; i < topThreeCategoryIds.Count; i++)
         {
-            var categoryId = topThreeCategories[i];
+            var categoryId = topThreeCategoryIds[i];
             var limit = categoryLimits[i];
             
             var categoryListings = allPotentialListings
