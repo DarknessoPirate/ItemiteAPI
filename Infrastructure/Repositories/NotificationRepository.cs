@@ -25,6 +25,11 @@ public class NotificationRepository(ItemiteDbContext dbContext) : INotificationR
             .Where(n => n.NotificationUsers.Any(nu => nu.UserId == userId));
     }
 
+    public Task<int> GetNotificationUserCount(int notificationId)
+    {
+        return dbContext.NotificationUsers.CountAsync(n => n.NotificationId == notificationId);
+    }
+
     public async Task<Notification?> GetNotification(int notificationId)
     {
         return await dbContext.Notifications

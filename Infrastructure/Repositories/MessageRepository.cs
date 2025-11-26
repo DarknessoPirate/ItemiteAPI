@@ -148,6 +148,17 @@ public class MessageRepository(ItemiteDbContext dbContext) : IMessageRepository
 
         return unreadCounts;
     }
+    
+    public async Task<int> GetUnreadCountAsync(int listingId, int senderId, int recipientId)
+    {
+        return await dbContext.Messages
+            .Where(m => 
+                m.ListingId == listingId &&
+                m.SenderId == senderId &&
+                m.RecipientId == recipientId &&
+                !m.IsRead)
+            .CountAsync();
+    }
 
     public async Task<List<UnreadMessageCount>> GetUnreadMessageCountsForUserIdAsync(int userId)
     {

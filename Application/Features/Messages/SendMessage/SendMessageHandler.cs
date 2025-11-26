@@ -1,5 +1,6 @@
 using AutoMapper;
 using Domain.DTOs.Messages;
+using Domain.DTOs.Notifications;
 using Domain.DTOs.Photo;
 using Domain.Entities;
 using Domain.Enums;
@@ -22,6 +23,7 @@ public class SendMessageHandler(
     IMediaService mediaService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
+    INotificationService notificationService,
     ILogger<SendMessageHandler> logger
 ) : IRequestHandler<SendMessageCommand, SendMessageResult>
 {
@@ -61,6 +63,12 @@ public class SendMessageHandler(
                 throw new BadRequestException("You can only reply to users who have contacted you first");
         }
 
+        // get unread messages count before sending new message
+        var unreadCount = await messageRepository.GetUnreadCountAsync(
+            request.SendMessageDto.ListingId,
+            request.SenderId,
+            request.SendMessageDto.RecipientId);
+        
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         var uploadedPhotosPublicIds = new List<string>();
 
@@ -160,9 +168,26 @@ public class SendMessageHandler(
             }
 
             await unitOfWork.CommitTransactionAsync(cancellationToken);
+            
+
+            var messageResponse = mapper.Map<MessageResponse>(message);
+            
+            await notificationService.NotifyMessageReceived(request.SendMessageDto.RecipientId, messageResponse);
+            
+            // send notification only if there were no unread messages before
+            if (unreadCount == 0)
+            {
+                await notificationService.SendNotification([request.SendMessageDto.RecipientId], request.SenderId, new NotificationInfo
+                {
+                    Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
+                    ResourceId = request.SendMessageDto.ListingId,
+                    ResourceType = ResourceType.ChatPage
+                });
+            }
+            
             return new SendMessageResult
             {
-                message = mapper.Map<MessageResponse>(message),
+                message = messageResponse,
                 UploadResults = photoResults
             };
         }

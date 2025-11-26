@@ -15,6 +15,7 @@ public class DeleteMessageHandler(
     IPhotoRepository photoRepository,
     IMediaService mediaService,
     IUnitOfWork unitOfWork,
+    INotificationService notificationService,
     ILogger<DeleteMessageHandler> logger
 )
     : IRequestHandler<DeleteMessageCommand>
@@ -60,5 +61,7 @@ public class DeleteMessageHandler(
             }
         }
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        await notificationService.NotifyMessageDeleted(message.RecipientId, message.Id, message.Content);
     }
 }
