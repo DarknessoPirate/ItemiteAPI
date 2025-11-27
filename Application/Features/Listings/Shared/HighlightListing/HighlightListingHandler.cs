@@ -25,6 +25,11 @@ public class HighlightListingHandler(
             throw new NotFoundException("No proper listings to highlight");
         }
 
+        if (listingsToFeature.Any(l => l.IsArchived))
+        {
+            throw new BadRequestException("You can't feature archived listings");
+        }
+
         var currentDate = DateTime.UtcNow;
        
         
