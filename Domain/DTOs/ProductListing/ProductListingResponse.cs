@@ -14,6 +14,7 @@ public class ProductListingResponse
     public int Views { get; set; }
     public int Followers { get; set; }
     public DateTime DateCreated { get; set; }
+    public DateTime DateEnds { get; set; }
     public bool IsArchived { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsNegotiable { get; set; }

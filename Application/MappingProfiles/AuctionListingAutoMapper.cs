@@ -13,8 +13,8 @@ public class AuctionListingAutoMapper : Profile
             .ForMember(dest => dest.Location, opt =>
                 opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null))
             .ForMember(dest => dest.DateEnds, opt =>
-                opt.MapFrom(src => src.DateEnds ?? DateTime.UtcNow.AddDays(15)));
-        
+                opt.MapFrom(src => GetMaxDateEnds(src.DateEnds)));
+
         CreateMap<AuctionListing, AuctionListingResponse>()
             .ForMember(p => p.Categories, o =>
                 o.MapFrom(p => p.Categories))
@@ -22,8 +22,10 @@ public class AuctionListingAutoMapper : Profile
                 o.MapFrom(p => p.Owner))
             .ForMember(p => p.MainImageUrl, o =>
                 o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
-            .ForMember(p => p.Location, opt => 
-                opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
+            .ForMember(p => p.Location, opt =>
+                opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null))
+            .ForMember(p => p.Views, opt =>
+                opt.MapFrom(src => src.ViewsCount));
     }
     
     private bool IsLocationComplete(Location? location)
@@ -36,4 +38,16 @@ public class AuctionListingAutoMapper : Profile
                && !string.IsNullOrWhiteSpace(location.City) 
                && !string.IsNullOrWhiteSpace(location.State);
     }
+    
+    private DateTime GetMaxDateEnds(DateTime? date)
+    {
+        var now = DateTime.UtcNow;
+        var maxDate = now.AddDays(30);
+
+        if (!date.HasValue)
+            return maxDate;
+        
+        return date.Value > maxDate ? maxDate : date.Value;
+    }
+
 }
