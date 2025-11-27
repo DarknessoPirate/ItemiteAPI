@@ -1,3 +1,4 @@
+using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Notifications.SendGlobalNotification;
 using Domain.DTOs.Notifications;
 using Infrastructure.Helpers.EmailTemplates;
@@ -24,5 +25,17 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         
         await mediator.Send(command);
         return Ok();
+    }
+    
+    [HttpDelete("{listingId}")]
+    public async Task<IActionResult> DeleteListing([FromRoute] int listingId)
+    {
+        var command = new DeleteListingCommand
+        {
+            ListingId = listingId,
+            UserId = requestContextService.GetUserId()
+        };
+        await mediator.Send(command);
+        return NoContent();
     }
 }

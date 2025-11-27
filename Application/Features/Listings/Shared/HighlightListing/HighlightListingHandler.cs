@@ -1,5 +1,6 @@
 using Domain.Configs;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -25,6 +26,8 @@ public class HighlightListingHandler(
         }
 
         var currentDate = DateTime.UtcNow;
+       
+        
         foreach (var listingToFeature in listingsToFeature)
         {
             listingToFeature.IsFeatured = true;
@@ -34,10 +37,14 @@ public class HighlightListingHandler(
 
         await unitOfWork.SaveChangesAsync();
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-        foreach (var listingId in listingsToFeature.Select(l => l.Id))
+        foreach (var listing in listingsToFeature)
         {
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}{listingId}");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}{listingId}");
+            var listingType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction;
+            
+            if (listingType == ResourceType.Product)
+                await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}");
+            else
+                await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}");
         }
         
         
