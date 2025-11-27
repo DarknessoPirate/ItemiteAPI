@@ -1,5 +1,6 @@
 using Domain.Configs;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,16 +42,17 @@ public class ExpiredFeaturedListingsCleanupService(
         var listingRepository = scope.ServiceProvider.GetRequiredService<IListingRepository<ListingBase>>();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
         
         var expirationDate = DateTime.UtcNow.AddDays(-7);
-        var expiredListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
-        logger.LogInformation($"Expired featured listings count: {expiredListings.Count}");
-        if (expiredListings.Count == 0)
+        var expiredFeaturedListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
+        logger.LogInformation($"Expired featured listings count: {expiredFeaturedListings.Count}");
+        if (expiredFeaturedListings.Count == 0)
         {
             logger.LogInformation("ExpiredFeaturedListingsCleanupService finished without updating any listings");
             return;
         }
-        foreach (var listing in expiredListings)
+        foreach (var listing in expiredFeaturedListings)
         {
             listing.IsFeatured = false;
             listing.FeaturedAt = null;
@@ -59,11 +61,20 @@ public class ExpiredFeaturedListingsCleanupService(
         await unitOfWork.SaveChangesAsync();
 
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-        foreach (var listingId in expiredListings.Select(l => l.Id))
+        
+        
+        foreach (var listing in expiredFeaturedListings)
         {
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}*_{listingId}");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{listingId}");
+            var listingType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction;
+            
+            if (listingType == ResourceType.Product)
+                await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}");
+            else
+                await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}");
         }
+        
+        // TODO: Send notification batch (Dedicated listings for user must be merged first)
+        // notificationService.sendNotificationsBatch(userNotifications)
         
         logger.LogInformation("ExpiredFeaturedListingsCleanupService finished");
     }

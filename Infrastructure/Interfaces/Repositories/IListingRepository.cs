@@ -20,4 +20,5 @@ public interface IListingRepository<T> where T : ListingBase
     void UpdateListing(T listing);
     void DeleteListing(T listing);
     Task<List<T>> GetExpiredFeaturedListingsAsync(DateTime expirationDate);
+    Task<List<T>> GetListingsToArchiveAsync(DateTime currentDate);
 }
