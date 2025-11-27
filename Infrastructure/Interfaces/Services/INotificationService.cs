@@ -12,4 +12,5 @@ public interface INotificationService
     Task NotifyListingUpdated(List<int> userIds, ListingBasicInfo listingInfo);
     
     Task SendNotification(List<int> userIds, int senderId, NotificationInfo notificationInfo);
+    Task SendNotificationsBatch(Dictionary<int, NotificationInfo> userNotifications);
 }

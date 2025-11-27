@@ -3,9 +3,11 @@ using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Listings.Shared.GetPaginatedUserListings;
+using Application.Features.Listings.Shared.GetUserDedicatedListings;
 using Application.Features.Listings.Shared.HighlightListing;
 using Application.Features.Listings.Shared.UnfollowListing;
 using Domain.DTOs.Listing;
+using Domain.Enums;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +42,18 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         };
         var listings = await mediator.Send(getUserListingsQuery);
         return Ok(listings);
+    }
+    
+    [HttpGet("dedicated")]
+    public async Task<IActionResult> GetDedicatedListings([FromQuery] ListingType? listingType)
+    {
+        var query = new GetUserDedicatedListingsQuery
+        {
+            UserId = requestContextService.GetUserIdNullable(),
+            ListingType = listingType
+        };
+        var dedicatedListings = await mediator.Send(query);
+        return Ok(dedicatedListings);
     }
 
     [Authorize]

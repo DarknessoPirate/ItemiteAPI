@@ -100,4 +100,61 @@ public class NotificationService(
         logger.LogInformation($"Notification url: {notificationInfo.ResourceType.ToString()}" );
     }
     
+    public async Task SendNotificationsBatch(Dictionary<int, NotificationInfo> userNotifications)
+    {
+        if (userNotifications.Count == 0)
+        {
+            logger.LogInformation("Notifications batch is empty");
+            return;
+        }
+    
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var notificationEntities = new List<Notification>();
+            
+            foreach (var (userId, notificationInfo) in userNotifications)
+            {
+                var notificationEntity = mapper.Map<Notification>(notificationInfo);
+                await notificationRepository.AddNotification(notificationEntity);
+                notificationEntities.Add(notificationEntity);
+            }
+            
+            await unitOfWork.SaveChangesAsync();
+            
+            for (int i = 0; i < notificationEntities.Count; i++)
+            {
+                var notification = notificationEntities[i];
+                var userId = userNotifications.Keys.ElementAt(i);
+                
+                var notificationUser = new NotificationUser
+                {
+                    UserId = userId,
+                    NotificationId = notification.Id
+                };
+                await notificationRepository.AddNotificationUser(notificationUser);
+            }
+            
+            await unitOfWork.CommitTransactionAsync(); 
+            
+            foreach (var userId in userNotifications.Keys)
+            {
+                await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{userId}*");
+            }
+        }
+        catch (Exception ex)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            logger.LogError($"Error when sending notifications batch: {ex.Message}");
+            throw;
+        }
+        
+        foreach (var (userId, notificationInfo) in userNotifications)
+        {
+            await notificationHub.Clients.User(userId.ToString())
+                .SendAsync("Notification", notificationInfo);
+        }
+        
+        logger.LogInformation($"Batch notifications sent for {userNotifications.Count} users");
+    }
 }
