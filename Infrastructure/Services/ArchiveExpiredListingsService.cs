@@ -1,4 +1,5 @@
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Interfaces.Repositories;
@@ -65,10 +66,20 @@ public class ArchiveExpiredListingsService(
                 listingRepository.UpdateListing(listing);
             }
             
-            // TODO: Send notification batch (Dedicated listings for user must be merged first)
-            // notificationService.sendNotificationsBatch(userNotifications)
-
             await unitOfWork.CommitTransactionAsync();
+            
+            var userNotifications = new Dictionary<int, NotificationInfo>();
+            foreach (var listing in expiredListings)
+            {
+                userNotifications[listing.OwnerId] = new NotificationInfo
+                {
+                    Message = $"Your listing {listing.Name} has been archived",
+                    NotificationImageUrl = listing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url,
+                    ResourceId = listing.Id,
+                    ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
+                };
+            }
+            await notificationService.SendNotificationsBatch(userNotifications);
             
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
 
