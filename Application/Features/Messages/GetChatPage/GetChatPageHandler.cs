@@ -21,9 +21,9 @@ public class GetChatPageHandler(
     IListingRepository<ListingBase> listingRepository,
     IMapper mapper,
     IUnitOfWork unitOfWork
-) : IRequestHandler<GetChatPageQuery, PageResponse<MessageResponse>>
+) : IRequestHandler<GetChatPageQuery, CursorPageResponse<MessageResponse>>
 {
-    public async Task<PageResponse<MessageResponse>> Handle(GetChatPageQuery request,
+    public async Task<CursorPageResponse<MessageResponse>> Handle(GetChatPageQuery request,
         CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
@@ -41,8 +41,8 @@ public class GetChatPageHandler(
             request.UserId,
             request.OtherUserId,
             request.ListingId,
-            request.PageNumber,
-            request.PageSize);
+            request.Cursor,
+            request.Limit + 1); // fetching one more message to check if the next cursor exists
         
         var unreadMessages = messages.Where(m => m.IsRead == false).ToList();
         var readDate = DateTime.UtcNow;
@@ -55,16 +55,27 @@ public class GetChatPageHandler(
 
         await unitOfWork.SaveChangesAsync();
         
-        var messagesResponse = mapper.Map<List<MessageResponse>>(messages);
+        bool hasMore = messages.Count > request.Limit;
         
-        var totalMessages =
-            await messageRepository.GetMessageCountBetweenUsersAsync(user.Id, request.OtherUserId, request.ListingId);
+        
+        // skip additional message which was fetched on 45 line
+        var messagesToReturn = hasMore ? messages.Skip(1).ToList() : messages;
+        
+        var messagesResponse = mapper.Map<List<MessageResponse>>(messagesToReturn);
+        
+        
+        string? nextCursor = null;
+        if (hasMore)
+        {
+            var oldestMessage = messagesToReturn.First();
+            nextCursor = Cursor.Encode(oldestMessage.DateSent, oldestMessage.Id);
+        }
 
-        return new PageResponse<MessageResponse>(
-            messagesResponse,
-            totalMessages,
-            request.PageSize,
-            request.PageNumber
+        return new CursorPageResponse<MessageResponse>(
+           messagesResponse,
+           nextCursor,
+           messagesToReturn.Count,
+           request.Limit
         );
     }
 }

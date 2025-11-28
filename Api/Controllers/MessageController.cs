@@ -110,16 +110,16 @@ public class MessageController(IMediator mediator, IRequestContextService reques
     public async Task<ActionResult<PageResponse<MessageResponse>>> GetChatPage(
         [FromRoute] int listingId,
         [FromRoute] int otherUserId,
-        [FromQuery] int pageNumber,
-        [FromQuery] int pageSize)
+        [FromQuery] string? cursor,
+        [FromQuery] int limit)
     {
         var query = new GetChatPageQuery
         {
             UserId = requestContextService.GetUserId(),
             ListingId = listingId,
             OtherUserId = otherUserId,
-            PageNumber = pageNumber,
-            PageSize = pageSize
+            Cursor = cursor,
+            Limit = limit
         };
 
         var response = await mediator.Send(query);

@@ -1,6 +1,8 @@
 using Domain.DTOs.Messages;
+using Domain.DTOs.Pagination;
 using Domain.Entities;
 using Infrastructure.Database;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -190,28 +192,43 @@ public class MessageRepository(ItemiteDbContext dbContext) : IMessageRepository
     }
 
     public async Task<List<Message>> FindMessagesBetweenUsersAsync(int userId, int otherUserId, int listingId,
-        int pageNumber, int pageSize)
+        string? cursor, int limit)
     {
-        var messageIds = await dbContext.Messages
+        var query = dbContext.Messages
             .Where(m => m.ListingId == listingId &&
                         ((m.RecipientId == userId && m.SenderId == otherUserId) ||
-                         (m.RecipientId == otherUserId && m.SenderId == userId)))
+                         (m.RecipientId == otherUserId && m.SenderId == userId)));
+    
+        if (!string.IsNullOrWhiteSpace(cursor))
+        {
+            var decodedCursor = Cursor.Decode(cursor);
+            if (decodedCursor == null)
+            {
+                throw new BadRequestException("Invalid cursor");
+            }
+        
+            query = query.Where(m => m.DateSent < decodedCursor.DateSent || 
+                                     (m.DateSent == decodedCursor.DateSent && m.Id < decodedCursor.LastId));
+        }
+        
+        var messageIds = await query
             .OrderByDescending(m => m.DateSent)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .ThenByDescending(m => m.Id)
+            .Take(limit)
             .Select(m => m.Id)
             .ToListAsync();
-
+        
         var messages = await dbContext.Messages
             .Where(m => messageIds.Contains(m.Id))
             .Include(m => m.MessagePhotos)
             .ThenInclude(mp => mp.Photo)
             .OrderBy(m => m.DateSent)
+            .ThenBy(m => m.Id)
             .ToListAsync();
 
         return messages;
     }
-
+    
     public async Task<bool> HasUserMessagedAboutListingAsync(int senderId, int recipientId, int listingId)
     {
         return await dbContext.Messages
