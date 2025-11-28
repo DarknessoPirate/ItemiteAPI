@@ -12,5 +12,7 @@ public class GetUserChatsValidator : AbstractValidator<GetUserChatsQuery>
             .GreaterThan(-1).WithMessage("Invalid page number");
         RuleFor(x => x.PageSize)
             .GreaterThan(0).LessThanOrEqualTo(100).WithMessage("Invalid page size");
+        RuleFor(x => x.Perspective)
+            .IsInEnum().WithMessage("Invalid perspective");
     }
 }

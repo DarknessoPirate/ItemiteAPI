@@ -13,5 +13,6 @@ public class MessageResponse
     public int SenderId { get; set; }
     public int ListingId { get; set; }
     public int RecipientId { get; set; }
+    public bool IsDeleted { get; set; }
     public List<PhotoResponse> Photos { get; set; } = [];
 }

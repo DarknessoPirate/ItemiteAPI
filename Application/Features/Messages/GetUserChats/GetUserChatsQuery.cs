@@ -1,5 +1,6 @@
 using Domain.DTOs.Messages;
 using Domain.DTOs.Pagination;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.Messages.GetUserChats;
@@ -7,6 +8,7 @@ namespace Application.Features.Messages.GetUserChats;
 public class GetUserChatsQuery : IRequest<PageResponse<ChatInfoResponse>>
 {
     public int UserId { get; set; }
+    public Perspective Perspective { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

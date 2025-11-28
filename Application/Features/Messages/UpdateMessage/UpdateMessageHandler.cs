@@ -29,6 +29,10 @@ public class UpdateMessageHandler(
 
         if (message.SenderId != user.Id)
             throw new UnauthorizedException("You can only edit your own messages");
+        if (message.IsDeleted)
+        {
+            throw new BadRequestException("You cannot edit deleted message");
+        }
 
         if (String.IsNullOrEmpty(request.NewContent) && message.MessagePhotos.Count == 0)
             throw new BadRequestException("Cannot send an empty message without photos");
