@@ -1,4 +1,5 @@
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Interfaces.Repositories;
@@ -45,13 +46,18 @@ public class ExpiredFeaturedListingsCleanupService(
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
         
         var expirationDate = DateTime.UtcNow.AddDays(-7);
+
         var expiredFeaturedListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
         logger.LogInformation($"Expired featured listings count: {expiredFeaturedListings.Count}");
+        
         if (expiredFeaturedListings.Count == 0)
         {
             logger.LogInformation("ExpiredFeaturedListingsCleanupService finished without updating any listings");
             return;
         }
+        
+        logger.LogInformation($"Listings featured before: {expirationDate.ToString("g")} will be updated");
+       
         foreach (var listing in expiredFeaturedListings)
         {
             listing.IsFeatured = false;
@@ -60,6 +66,20 @@ public class ExpiredFeaturedListingsCleanupService(
         }
         await unitOfWork.SaveChangesAsync();
 
+        var userNotifications = new Dictionary<int, NotificationInfo>();
+        foreach (var listing in expiredListings)
+        {
+            userNotifications[listing.OwnerId] = new NotificationInfo
+            {
+                Message = $"Your listing {listing.Name} is no longer featured",
+                NotificationImageUrl = listing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url,
+                ResourceId = listing.Id,
+                ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
+            };
+        }
+        
+        await notificationService.SendNotificationsBatch(userNotifications);
+        
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
         
         

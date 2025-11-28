@@ -59,5 +59,6 @@ public static class InfrastructureExtensions
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
         services.AddHostedService<ArchiveExpiredListingsService>();
+        services.AddHostedService<OldListingViewsCleanupService>();
     }
 }
