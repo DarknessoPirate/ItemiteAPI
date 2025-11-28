@@ -41,6 +41,11 @@ public class PlaceBidHandler(
             throw new BadRequestException("You cannot place a bid on an auction you have created");
         }
 
+        if (auction.IsArchived)
+        {
+            throw new BadRequestException("You cannot place a bid on an archived auction");
+        }
+        
         if (auction.DateEnds <= DateTime.UtcNow)
         {
             throw new BadRequestException("Auction has ended");

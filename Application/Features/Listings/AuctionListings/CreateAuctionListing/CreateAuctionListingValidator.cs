@@ -25,7 +25,8 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
             .NotNull().WithMessage("Starting bid is null")
             .GreaterThan(0).WithMessage("Starting bid must be greater than 0");
         RuleFor(x => x.AuctionListingDto.DateEnds)
-            .GreaterThan(DateTime.Now.AddHours(1)).WithMessage("Auction must last at least one hour");
+            .GreaterThan(DateTime.UtcNow.AddHours(1)).WithMessage("Auction must last at least one hour")
+            .LessThan(DateTime.UtcNow.AddDays(30)).WithMessage("Auction can't be longer than 30 days");
         RuleFor(x => x.Images)
             .NotNull().WithMessage("Images array is null")
             .NotEmpty().WithMessage("Images array is empty")

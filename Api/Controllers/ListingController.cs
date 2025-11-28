@@ -1,4 +1,4 @@
-using Application.Features.Listings.Shared.DeleteListing;
+using Application.Features.Listings.Shared.ArchiveListing;
 using Application.Features.Listings.Shared.FollowListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
@@ -69,19 +69,6 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         var followedListings = await mediator.Send(getFollowedListingsQuery);
         return Ok(followedListings); 
     }
-    
-    [Authorize]
-    [HttpDelete("{listingId}")]
-    public async Task<IActionResult> DeleteProductListing([FromRoute] int listingId)
-    {
-        var command = new DeleteListingCommand
-        {
-            ListingId = listingId,
-            UserId = requestContextService.GetUserId()
-        };
-        await mediator.Send(command);
-        return NoContent();
-    }
 
     [Authorize]
     [HttpPost("feature")]
@@ -95,6 +82,21 @@ public class ListingController(IMediator mediator, IRequestContextService reques
         
         var resultMessage = await mediator.Send(command);
         return Ok(new { resultMessage });
+    }
+
+
+    [Authorize]
+    [HttpDelete("archive/{listingId}")]
+    public async Task<IActionResult> ArchiveListing([FromRoute] int listingId)
+    {
+        var command = new ArchiveListingCommand
+        {
+            ListingId = listingId,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        await mediator.Send(command);
+        return NoContent();
     }
 
     [Authorize]

@@ -46,17 +46,19 @@ public class ExpiredFeaturedListingsCleanupService(
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
         
         var expirationDate = DateTime.UtcNow.AddDays(-7);
+
+        var expiredFeaturedListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
+        logger.LogInformation($"Expired featured listings count: {expiredFeaturedListings.Count}");
         
-        logger.LogInformation($"Listings featured before: {expirationDate.ToString("g")} will be updated");
-        
-        var expiredListings = await listingRepository.GetExpiredFeaturedListingsAsync(expirationDate);
-        logger.LogInformation($"Expired featured listings count: {expiredListings.Count}");
-        if (expiredListings.Count == 0)
+        if (expiredFeaturedListings.Count == 0)
         {
             logger.LogInformation("ExpiredFeaturedListingsCleanupService finished without updating any listings");
             return;
         }
-        foreach (var listing in expiredListings)
+        
+        logger.LogInformation($"Listings featured before: {expirationDate.ToString("g")} will be updated");
+       
+        foreach (var listing in expiredFeaturedListings)
         {
             listing.IsFeatured = false;
             listing.FeaturedAt = null;
@@ -65,7 +67,7 @@ public class ExpiredFeaturedListingsCleanupService(
         await unitOfWork.SaveChangesAsync();
 
         var userNotifications = new Dictionary<int, NotificationInfo>();
-        foreach (var listing in expiredListings)
+        foreach (var listing in expiredFeaturedListings)
         {
             userNotifications[listing.OwnerId] = new NotificationInfo
             {
@@ -75,14 +77,17 @@ public class ExpiredFeaturedListingsCleanupService(
                 ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
             };
         }
-        
         await notificationService.SendNotificationsBatch(userNotifications);
         
         await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
-        foreach (var listingId in expiredListings.Select(l => l.Id))
+        foreach (var listing in expiredFeaturedListings)
         {
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.PRODUCT_LISTING}*_{listingId}");
-            await cacheService.RemoveByPatternAsync($"{CacheKeys.AUCTION_LISTING}*_{listingId}");
+            var listingType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction;
+            
+            if (listingType == ResourceType.Product)
+                await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{listing.Id}");
+            else
+                await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{listing.Id}");
         }
         
         logger.LogInformation("ExpiredFeaturedListingsCleanupService finished");

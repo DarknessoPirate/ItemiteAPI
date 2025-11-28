@@ -118,4 +118,11 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     
         return expiredListings;
     }
+
+    public async Task<List<T>> GetListingsToArchiveAsync(DateTime currentDate)
+    {
+        return await dbContext.Set<T>()
+            .Where(l => l.DateEnds <= currentDate && !l.IsArchived)
+            .ToListAsync();
+    }
 }

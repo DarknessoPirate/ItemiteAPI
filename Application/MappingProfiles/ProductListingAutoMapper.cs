@@ -22,8 +22,8 @@ public class ProductListingAutoMapper : Profile
                 o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
             .ForMember(p => p.Location, opt => 
                 opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null))
-            .ForMember(p => p.Views, o =>
-            o.MapFrom(p => p.ViewsCount));
+            .ForMember(p => p.Views, opt =>
+                opt.MapFrom(src => src.ViewsCount));
     }
     
     private bool IsLocationComplete(Location? location)
