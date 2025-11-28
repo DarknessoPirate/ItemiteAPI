@@ -1,6 +1,7 @@
 using Domain.DTOs.Messages;
 using Domain.DTOs.Pagination;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Database;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -78,13 +79,16 @@ public class MessageRepository(ItemiteDbContext dbContext) : IMessageRepository
         return (messages, totalCount);
     }
 
-    public async Task<(List<Message>, int)> FindLatestMessagesForUserIdAsync(int userId, int pageNumber, int pageSize)
+    public async Task<(List<Message>, int)> FindLatestMessagesForUserIdAsync(int userId, int pageNumber, int pageSize, Perspective perspective)
     {
         // fetches all messages where the user is participant but not owner of the listing
         var allMessages = await dbContext.Messages
             .Include(m => m.Listing)
             .Where(m => (m.SenderId == userId || m.RecipientId == userId)
-                        && m.Listing.OwnerId != userId) // EXCLUDES OWNED LISTINGS
+                        && (perspective == Perspective.Buyer 
+                            ? m.Listing.OwnerId != userId 
+                            : m.Listing.OwnerId == userId)
+                        )
             .Select(m => new
             {
                 m.Id,
@@ -162,13 +166,15 @@ public class MessageRepository(ItemiteDbContext dbContext) : IMessageRepository
             .CountAsync();
     }
 
-    public async Task<List<UnreadMessageCount>> GetUnreadMessageCountsForUserIdAsync(int userId)
+    public async Task<List<UnreadMessageCount>> GetUnreadMessageCountsForUserIdAsync(int userId, Perspective perspective)
     {
         var unreadCounts = await dbContext.Messages
             .Include(m => m.Listing)
             .Where(m => m.RecipientId == userId
                         && !m.IsRead
-                        && m.Listing.OwnerId != userId)
+                        && (perspective == Perspective.Buyer 
+                            ? m.Listing.OwnerId != userId 
+                            : m.Listing.OwnerId == userId))
             .GroupBy(m => new { m.SenderId, m.ListingId })
             .Select(g => new UnreadMessageCount
             {

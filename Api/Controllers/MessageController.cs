@@ -7,6 +7,7 @@ using Application.Features.Messages.UpdateMessage;
 using Domain.DTOs.File;
 using Domain.DTOs.Messages;
 using Domain.DTOs.Pagination;
+using Domain.Enums;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -92,13 +93,15 @@ public class MessageController(IMediator mediator, IRequestContextService reques
     [HttpGet("chats")]
     public async Task<ActionResult<PageResponse<ChatInfoResponse>>> GetUserChats(
         [FromQuery] int pageNumber,
-        [FromQuery] int pageSize)
+        [FromQuery] int pageSize,
+        [FromQuery] Perspective perspective)
     {
         var query = new GetUserChatsQuery
         {
             UserId = requestContextService.GetUserId(),
             PageNumber = pageNumber,
-            PageSize = pageSize
+            PageSize = pageSize,
+            Perspective = perspective
         };
 
         var result = await mediator.Send(query);

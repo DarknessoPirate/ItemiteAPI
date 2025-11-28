@@ -44,7 +44,13 @@ public class GetChatPageHandler(
             request.Cursor,
             request.Limit + 1); // fetching one more message to check if the next cursor exists
         
-        var unreadMessages = messages.Where(m => m.IsRead == false).ToList();
+        bool hasMore = messages.Count > request.Limit;
+        
+        
+        // skip additional message which was fetched on 45 line
+        var messagesToReturn = hasMore ? messages.Skip(1).ToList() : messages;
+        
+        var unreadMessages = messagesToReturn.Where(m => m.IsRead == false && m.SenderId != request.UserId).ToList();
         var readDate = DateTime.UtcNow;
         foreach (var message in unreadMessages)
         {
@@ -54,12 +60,6 @@ public class GetChatPageHandler(
         }
 
         await unitOfWork.SaveChangesAsync();
-        
-        bool hasMore = messages.Count > request.Limit;
-        
-        
-        // skip additional message which was fetched on 45 line
-        var messagesToReturn = hasMore ? messages.Skip(1).ToList() : messages;
         
         var messagesResponse = mapper.Map<List<MessageResponse>>(messagesToReturn);
         

@@ -34,9 +34,9 @@ public class GetUserChatsHandler(
 
         var (latestMessages, totalChatsCount) =
             await messageRepository.FindLatestMessagesForUserIdAsync(request.UserId, request.PageNumber,
-                request.PageSize);
+                request.PageSize, request.Perspective);
 
-        var unreadCounts = await messageRepository.GetUnreadMessageCountsForUserIdAsync(request.UserId);
+        var unreadCounts = await messageRepository.GetUnreadMessageCountsForUserIdAsync(request.UserId, request.Perspective);
 
         var chats = latestMessages.Select(message =>
         {

@@ -1,6 +1,5 @@
 using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
-using Application.Features.Auth.RefreshToken;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
 using Application.Features.Categories.CreateCategory;
@@ -17,6 +16,7 @@ using Application.Features.Listings.Shared.GetPaginatedListings;
 using Application.Features.Messages.DeleteMessage;
 using Application.Features.Messages.GetChatPage;
 using Application.Features.Messages.GetListingChats;
+using Application.Features.Messages.GetUserChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Application.Features.Notifications.GetPaginatedUserNotifications;
@@ -62,5 +62,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
         services.AddScoped<IValidator<GetPaginatedFollowedListingsQuery>, GetPaginatedFollowListingsValidator>();
         services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
+        services.AddScoped<IValidator<GetUserChatsQuery>, GetUserChatsValidator>();
     }
 }
