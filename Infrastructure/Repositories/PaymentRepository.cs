@@ -8,7 +8,7 @@ namespace Infrastructure.Repositories;
 
 public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
 {
-    public async Task<Payment?> GetPaymentByIdAsync(int paymentId)
+    public async Task<Payment?> FindByIdAsync(int paymentId)
     {
         return await context.Payments
             .Include(p => p.Listing)
@@ -17,7 +17,13 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .FirstOrDefaultAsync(p => p.Id == paymentId);
     }
 
-    public async Task<Payment?> GetPaymentByStripeChargeIdAsync(string stripeChargeId)
+    public async Task<Payment?> FindByListingIdAsync(int listingId)
+    {
+        return await context.Payments
+            .FirstOrDefaultAsync(p => p.ListingId == listingId);
+    }
+
+    public async Task<Payment?> FindByStripeChargeIdAsync(string stripeChargeId)
     {
         return await context.Payments
             .Include(p => p.Listing)
@@ -26,7 +32,7 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .FirstOrDefaultAsync(p => p.StripeChargeId == stripeChargeId);
     }
 
-    public async Task<List<Payment>> GetPaymentsByStatusAsync(PaymentStatus status)
+    public async Task<List<Payment>> FindAllByStatusAsync(PaymentStatus status)
     {
         return await context.Payments
             .Include(p => p.Listing)
@@ -36,7 +42,7 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .ToListAsync();
     }
 
-    public async Task<List<Payment>> GetPendingPaymentsForTransferAsync()
+    public async Task<List<Payment>> FindAllPendingAsync()
     {
         var now = DateTime.UtcNow;
 
@@ -45,9 +51,16 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .Include(p => p.Seller)
             .Where(p =>
                 p.Status == PaymentStatus.Pending &&
-                p.TransferTrigger == TransferTrigger.TimeBased &&
-                p.ScheduledTransferDate != null &&
-                p.ScheduledTransferDate <= now)
+                (
+                    // Time-based: scheduled date has passed
+                    (p.TransferTrigger == TransferTrigger.TimeBased &&
+                     p.ScheduledTransferDate != null &&
+                     p.ScheduledTransferDate <= now)
+                    ||
+                    // Delivery confirmed: ready to transfer immediately
+                    (p.TransferTrigger == TransferTrigger.DeliveryConfirmed)
+                )
+            )
             .ToListAsync();
     }
 
@@ -71,12 +84,12 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .ToListAsync();
     }
 
-    public async Task CreatePaymentAsync(Payment payment)
+    public async Task AddAsync(Payment payment)
     {
         await context.Payments.AddAsync(payment);
     }
 
-    public void UpdatePayment(Payment payment)
+    public void Update(Payment payment)
     {
         context.Payments.Update(payment);
     }

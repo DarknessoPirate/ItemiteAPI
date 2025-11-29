@@ -4,5 +4,4 @@ public enum TransferMethod
 {
     Automatic,
     ManualApproval,
-    BuyerConfirmedDelivery
 }

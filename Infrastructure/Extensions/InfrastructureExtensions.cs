@@ -62,6 +62,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
+        services.AddHostedService<PaymentTransferBackgroundService>();
     }
 }
 

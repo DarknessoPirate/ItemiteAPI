@@ -44,6 +44,8 @@ public class Payment
     
     [Required]
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+
+    public int TransferAttempts { get; set; } = 0;
     
     [Required]
     public TransferTrigger TransferTrigger { get; set; }
@@ -52,12 +54,12 @@ public class Payment
     public int? ApprovedByUserId { get; set; }
     public User? ApprovedBy { get; set; }
     
-    // === Timestamps ===
+    //
     public DateTime ChargeDate { get; set; } = DateTime.UtcNow;
     public DateTime? TransferDate { get; set; } // When money was transferred to seller
     public DateTime? ScheduledTransferDate { get; set; } // when it's scheduled for transfer
     
-    // === Optional Details ===
+    // 
     [MaxLength(500)]
     public string? Notes { get; set; } // Admin notes, dispute info, etc.
 }

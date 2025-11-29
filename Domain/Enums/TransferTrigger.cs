@@ -4,5 +4,6 @@ public enum TransferTrigger
 {
     TimeBased, // transform after x days
     Manual, // admin/platform approval
-    DeliveryConfirmed // buyer confirms delivery
+    DeliveryConfirmed, // buyer confirms delivery,
+    ShipmentConfirmed
 }
