@@ -1,4 +1,5 @@
 
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Api.Extensions;
 using Application.Extensions;
@@ -18,10 +19,13 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-
+        
+        var cultureInfo = System.Globalization.CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+        
         builder.ConfigureSerilog();
-
+        
         builder.Services.AddHttpLogging(logging =>
         {
             logging.LoggingFields = HttpLoggingFields.All;
