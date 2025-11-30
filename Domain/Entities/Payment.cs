@@ -42,6 +42,8 @@ public class Payment
     public int SellerId { get; set; }
     public User Seller { get; set; } = null!;
     
+    public Dispute? Dispute { get; set; }
+    
     [Required]
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 

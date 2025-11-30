@@ -19,6 +19,8 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<ListingView> ListingViews { get; set; }
     public DbSet<FollowedListing> FollowedListings { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<Dispute> Disputes { get; set; }
+    public DbSet<DisputeEvidence> DisputeEvidences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -179,6 +181,49 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         modelBuilder.Entity<Payment>()
             .Property(p => p.ActualTransferMethod)
             .HasConversion<string>();
+
+        modelBuilder.Entity<Dispute>()
+            .HasOne(d => d.Payment)
+            .WithOne(p => p.Dispute)
+            .HasForeignKey<Dispute>(d => d.PaymentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Dispute>()
+            .HasOne(d => d.InitiatedBy)
+            .WithMany()
+            .HasForeignKey(d => d.InitiatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Dispute>()
+            .HasOne(d => d.ResolvedBy)
+            .WithMany()
+            .HasForeignKey(d => d.ResolvedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Dispute>()
+            .Property(d => d.Reason)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Dispute>()
+            .Property(d => d.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Dispute>()
+            .Property(d => d.Resolution)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<DisputeEvidence>()
+            .HasOne(de => de.Dispute)
+            .WithMany(d => d.Evidence)
+            .HasForeignKey(de => de.DisputeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<DisputeEvidence>()
+            .HasOne(de => de.Photo)
+            .WithMany()
+            .HasForeignKey(de => de.PhotoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
 
         base.OnModelCreating(modelBuilder);
     }
