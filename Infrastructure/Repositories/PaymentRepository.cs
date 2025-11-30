@@ -32,14 +32,48 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .FirstOrDefaultAsync(p => p.StripeChargeId == stripeChargeId);
     }
 
-    public async Task<List<Payment>> FindAllByStatusAsync(PaymentStatus status)
+    public async Task<(List<Payment> Payments, int TotalCount)> GetPaymentsByStatusPaginatedAsync(
+        PaymentStatus status,
+        int pageNumber,
+        int pageSize,
+        CancellationToken cancellationToken = default)
     {
-        return await context.Payments
+        var query = context.Payments
             .Include(p => p.Listing)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
-            .Where(p => p.Status == status)
-            .ToListAsync();
+            .Include(p => p.ApprovedBy)
+            .Where(p => p.Status == status);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+
+    public async Task<(List<Payment> Payments, int TotalCount)> GetLatestPaymentsPaginatedAsync(int pageNumber, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        var baseQuery = context.Payments.AsQueryable();
+
+        var totalCount = await baseQuery.CountAsync(cancellationToken);
+
+        var items = await baseQuery
+            .Include(p => p.Listing)
+            .Include(p => p.Buyer)
+            .Include(p => p.Seller)
+            .Include(p => p.ApprovedBy)
+            .OrderByDescending(p => p.ChargeDate)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<List<Payment>> FindAllPendingAsync()
