@@ -1,11 +1,17 @@
+using Application.Features.Payments.GetAllPayments;
+using Application.Features.Payments.GetPaymentsByStatus;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
 using Application.Features.Payments.StartStripeOnboarding;
+using Domain.DTOs.Pagination;
 using Domain.DTOs.Payments;
+using Domain.Enums;
 using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
+using GetPaymentsByStatusQuery = Application.Features.Payments.GetPaymentsByStatus.GetPaymentsByStatusQuery;
 
 namespace Api.Controllers;
 
@@ -42,7 +48,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         return Redirect(onboardingUrl);
     }
-// todo: add wrapper for easier success/failure tracking
+    
     [Authorize]
     [HttpPost("purchase-product/{productListingId}")]
     public async Task<IActionResult> PurchaseProduct(
@@ -53,19 +59,46 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         var command = new PurchaseProductCommand
         {
-            ProductListingId = productListingId, 
-            PaymentMethodId = request.PaymentMethodId, 
+            ProductListingId = productListingId,
+            PaymentMethodId = request.PaymentMethodId,
             BuyerId = userId
         };
 
         var paymentId = await mediator.Send(command);
 
-        return Ok(new
+        return Ok(new PurchaseProductResponse
         {
-            success = true,
-            paymentId = paymentId,
-            message = "Purchase successful! Payment will be transferred to seller in 7 days."
+            PaymentId = paymentId,
+            Message = "Purchase successful! Payment will be transferred to seller in 7 days."
         });
     }
-   
+
+    [Authorize(Roles = "Admin,Moderator")]
+    [HttpGet("admin/with-status")]
+    public async Task<PageResponse<PaymentResponse>> GetPaymentsByStatus([FromQuery] int pageSize, [FromQuery] int pageNumber, [FromQuery] PaymentStatus paymentStatus)
+    {
+        var command = new GetPaymentsByStatusQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            PaymentStatus = paymentStatus,
+            PageSize = pageSize,
+            PageNumber = pageNumber
+        };
+
+        return await mediator.Send(command);
+    }
+
+    [Authorize(Roles = "Admin,Moderator")]
+    [HttpGet]
+    public async Task<PageResponse<PaymentResponse>> GetLatestPayments([FromQuery] int pageSize, [FromQuery] int pageNumber)
+    {
+        var command = new GetLatestPaymentsQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            PageSize = pageSize,
+            PageNumber = pageNumber
+        };
+
+        return await mediator.Send(command);
+    }
 }

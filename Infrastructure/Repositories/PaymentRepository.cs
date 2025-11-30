@@ -12,6 +12,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
     {
         return await context.Payments
             .Include(p => p.Listing)
+            .ThenInclude(l => l.ListingPhotos)
+            .ThenInclude(lp => lp.Photo)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
             .FirstOrDefaultAsync(p => p.Id == paymentId);
@@ -27,6 +29,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
     {
         return await context.Payments
             .Include(p => p.Listing)
+            .ThenInclude(l => l.ListingPhotos)
+            .ThenInclude(lp => lp.Photo)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
             .FirstOrDefaultAsync(p => p.StripeChargeId == stripeChargeId);
@@ -40,6 +44,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
     {
         var query = context.Payments
             .Include(p => p.Listing)
+            .ThenInclude(l => l.ListingPhotos)
+            .ThenInclude(lp => lp.Photo)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
             .Include(p => p.ApprovedBy)
@@ -56,7 +62,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
     }
 
 
-    public async Task<(List<Payment> Payments, int TotalCount)> GetLatestPaymentsPaginatedAsync(int pageNumber, int pageSize,
+    public async Task<(List<Payment> Payments, int TotalCount)> GetLatestPaymentsPaginatedAsync(int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken)
     {
         var baseQuery = context.Payments.AsQueryable();
@@ -65,6 +72,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
 
         var items = await baseQuery
             .Include(p => p.Listing)
+            .ThenInclude(l => l.ListingPhotos)
+            .ThenInclude(lp => lp.Photo)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
             .Include(p => p.ApprovedBy)
