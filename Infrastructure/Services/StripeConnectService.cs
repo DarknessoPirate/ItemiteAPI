@@ -51,8 +51,11 @@ public class StripeConnectService(
         }
         catch (StripeException ex)
         {
-            logger.LogError("Stripe charge failed: {}", ex.StripeError.Message);
-            throw new StripeErrorException($"Stripe charge failed", detailedMessage: ex.StripeError.Message);
+            logger.LogError(ex, "Stripe charge failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe charge failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
         }
     }
 
@@ -91,8 +94,11 @@ public class StripeConnectService(
         }
         catch (StripeException ex)
         {
-            logger.LogError("Stripe transfer failed: {}", ex.StripeError.Message);
-            throw new StripeErrorException($"Stripe transfer failed", detailedMessage: ex.StripeError.Message);
+            logger.LogError(ex, "Stripe transfer failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe transfer failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
         }
     }
 

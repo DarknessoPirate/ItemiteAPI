@@ -128,7 +128,7 @@ public class PaymentTransferBackgroundService : BackgroundService
             {
                 payment.ScheduledTransferDate = DateTime.UtcNow.AddHours(1); // add 1h to scheduled date to retry later
                 payment.Notes = string.IsNullOrEmpty(payment.Notes)
-                    ? $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}] Transfer attempt {payment.TransferAttempts} failed: {ex.Message}. Retry scheduled."
+                    ? $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}] Transfer attempt {payment.TransferAttempts} failed with message: {ex.Message}. Retry scheduled."
                     : $"{payment.Notes}\n[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}] Transfer attempt {payment.TransferAttempts} failed: {ex.Message}. Retry scheduled.";
 
                 _logger.LogWarning(ex,
