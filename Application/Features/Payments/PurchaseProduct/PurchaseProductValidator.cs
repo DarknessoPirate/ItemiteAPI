@@ -13,9 +13,5 @@ public class PurchaseProductValidator : AbstractValidator<PurchaseProductCommand
         RuleFor(x => x.PaymentMethodId)
             .NotEmpty().WithMessage("Payment method is required")
             .MinimumLength(3).WithMessage("Invalid payment method");
-
-        RuleFor(x => x.BuyerId)
-            .NotEmpty().WithMessage("Buyer ID is required")
-            .GreaterThan(0).WithMessage("Buyer ID must be greater than 0");
     }
 }

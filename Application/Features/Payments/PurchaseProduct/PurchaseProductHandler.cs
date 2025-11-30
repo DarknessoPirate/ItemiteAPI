@@ -98,7 +98,7 @@ public class PurchaseProductHandler(
                 ChargeDate = DateTime.UtcNow
             };
 
-            await paymentRepository.CreatePaymentAsync(payment);
+            await paymentRepository.AddAsync(payment);
             await unitOfWork.SaveChangesAsync(cancellationToken); // save here because it needs to generate id
             
             product.IsSold = true;
