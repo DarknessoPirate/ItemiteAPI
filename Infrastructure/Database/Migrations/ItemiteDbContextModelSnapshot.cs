@@ -489,6 +489,61 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NotificationImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("NotificationSent")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ResourceId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ResourceType")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Domain.Entities.NotificationUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("NotificationUsers");
+                });
+
             modelBuilder.Entity("Domain.Entities.Photo", b =>
                 {
                     b.Property<int>("Id")
@@ -1081,6 +1136,25 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Photo");
                 });
 
+            modelBuilder.Entity("Domain.Entities.NotificationUser", b =>
+                {
+                    b.HasOne("Domain.Entities.Notification", "Notification")
+                        .WithMany("NotificationUsers")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
                     b.HasOne("Domain.Entities.User", "ApprovedBy")
@@ -1264,6 +1338,11 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("MessagePhotos");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Navigation("NotificationUsers");
+                });
+
             modelBuilder.Entity("Domain.Entities.Payment", b =>
                 {
                     b.Navigation("Dispute");
@@ -1279,6 +1358,8 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Bids");
 
                     b.Navigation("FollowedListings");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("OwnedListings");
 

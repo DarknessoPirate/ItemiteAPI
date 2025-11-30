@@ -16,13 +16,17 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<List<T>> GetUserListingsAsync(int userId)
     {
-        var userListings = await dbContext.Set<T>().Where(l => l.OwnerId == userId).ToListAsync();
+        var userListings = await dbContext.Set<T>()
+            .Where(l => l.OwnerId == userId && !l.IsArchived)
+            .ToListAsync();
         return userListings;
     }
 
     public IQueryable<T> GetListingsQueryable()
     {
-       return dbContext.Set<T>().Include(p => p.Categories)
+       return dbContext.Set<T>()
+           .Where(l => !l.IsArchived)
+           .Include(p => p.Categories)
            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
     }
 
@@ -69,6 +73,14 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .SelectMany(u => u.FollowedListings.OrderByDescending(f => f.FollowedAt))
             .Select(f => f.Listing);
     }
+    
+    public IQueryable<ListingBase> GetUserListingsQueryable(int userId)
+    {
+        return dbContext.Set<T>().Include(p => p.Categories)
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
+            .Where(l => l.OwnerId == userId && !l.IsArchived)
+            .OrderByDescending(l => l.DateCreated);
+    }
 
 
     public async Task AddListingToFollowedAsync(FollowedListing followedListing)
@@ -100,9 +112,17 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     public async Task<List<T>> GetExpiredFeaturedListingsAsync(DateTime expirationDate)
     {
         var expiredListings = await dbContext.Set<T>()
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
             .Where(l => l.IsFeatured == true && l.FeaturedAt < expirationDate)
             .ToListAsync();
     
         return expiredListings;
+    }
+
+    public async Task<List<T>> GetListingsToArchiveAsync(DateTime currentDate)
+    {
+        return await dbContext.Set<T>()
+            .Where(l => l.DateEnds <= currentDate && !l.IsArchived)
+            .ToListAsync();
     }
 }

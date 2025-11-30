@@ -1,8 +1,10 @@
 using Application.Exceptions;
 using AutoMapper;
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.DTOs.ProductListing;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
@@ -20,6 +22,7 @@ public class UpdateProductListingHandler(
     ICacheService cacheService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
+    INotificationService notificationService,
     ILogger<UpdateProductListingHandler> logger
     ) : IRequestHandler<UpdateProductListingCommand, ProductListingResponse>
 {
@@ -86,7 +89,7 @@ public class UpdateProductListingHandler(
             var allListingPhotos = productListingToUpdate.ListingPhotos.ToList();
             if (request.UpdateDto.ExistingPhotoOrders == null && request.UpdateDto.ExistingPhotoIds == null)
             {
-                foreach (var listingPhoto in allListingPhotos)
+                foreach (var listingPhoto in allListingPhotos.Where(l => l.Order != 1))
                 {
                     var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
                     if (deletionResult.Error != null)
@@ -177,8 +180,21 @@ public class UpdateProductListingHandler(
 
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
+            
+            var productListingResponse = mapper.Map<ProductListingResponse>(productListingToUpdate);
+            var followers = await productListingRepository.GetListingFollowersAsync(request.ListingId);
+            
+            var notificationInfo = new NotificationInfo
+            {
+                Message = $"Product listing {productListingToUpdate.Name} has been updated.",
+                ResourceId = productListingToUpdate.Id,
+                ResourceType = ResourceType.Product,
+                NotificationImageUrl = productListingResponse.MainImageUrl,
+            };
+            
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
 
-            return mapper.Map<ProductListingResponse>(productListingToUpdate);
+            return productListingResponse;
         }
         catch (Exception ex)
         {

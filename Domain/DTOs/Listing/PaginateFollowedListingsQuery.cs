@@ -7,7 +7,8 @@ public class PaginateFollowedListingsQuery
     
     public override string ToString()
     {
-        return $"{PageSize.ToString()}_" +
+        return "followed_" +
+               $"{PageSize.ToString()}_" +
                $"{PageNumber.ToString()}";
     }
 }

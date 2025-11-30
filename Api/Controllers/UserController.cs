@@ -7,6 +7,7 @@ using Application.Features.Users.ChangeProfilePicture;
 using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
 using Application.Features.Users.GetCurrentUser;
+using Application.Features.Users.GetUserInfo;
 using Application.Features.Users.RemoveBackgroundPicture;
 using Application.Features.Users.RemoveProfilePicture;
 using Domain.DTOs.File;
@@ -34,6 +35,17 @@ public class UserController(IMediator mediator, IRequestContextService requestCo
         
         var currentUser = await mediator.Send(query);
         return Ok(currentUser);
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUser([FromRoute] int userId)
+    {
+        var query = new GetUserInfoQuery
+        {
+            UserId = userId
+        };
+        var user = await mediator.Send(query);
+        return Ok(user);
     }
     
     [Authorize]

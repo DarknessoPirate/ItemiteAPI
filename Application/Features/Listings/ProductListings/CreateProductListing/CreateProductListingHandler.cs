@@ -99,6 +99,7 @@ public class CreateProductListingHandler(
             }
 
             productListing.ListingPhotos = listingPhotos;
+            productListing.DateEnds = DateTime.UtcNow.AddDays(30);
             await productListingRepository.CreateListingAsync(productListing);
             await unitOfWork.CommitTransactionAsync();
 

@@ -9,4 +9,5 @@ public interface IUserRepository
     Task<User?> GetUserWithProfilePhotoAsync(int userId);
     Task<User?> GetUserWithBackgroundPhotoAsync(int userId);
     Task<User?> GetUserWithAllFieldsAsync(int userId);
+    Task<List<User>> GetAllUsers();
 }

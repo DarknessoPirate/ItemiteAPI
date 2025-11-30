@@ -1,3 +1,4 @@
+using Domain.DTOs.Notifications;
 using Infrastructure.Interfaces.Services;
 using Infrastructure.SignalR;
 using Microsoft.AspNetCore.SignalR;
@@ -9,9 +10,9 @@ public class BroadcastService(
 )
     : IBroadcastService
 {
-    public async Task SendMessageToAllUsers(string message)
+    public async Task SendMessageToAllUsers(NotificationInfo notificationInfo)
     {
         await broadcastHub.Clients
-            .All.SendAsync("SiteMessage", message);
+            .All.SendAsync("SiteMessage", notificationInfo);
     }
 }

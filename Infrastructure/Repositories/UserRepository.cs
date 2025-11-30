@@ -43,4 +43,10 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
             .Include(u => u.Location)
             .FirstOrDefaultAsync(u => u.Id == userId);
     }
+
+    // will be used for admin panel to send notification to every user
+    public async Task<List<User>> GetAllUsers()
+    {
+        return await context.Users.ToListAsync();
+    }
 }

@@ -6,4 +6,5 @@ public interface IBidRepository
 {
     Task CreateBid(AuctionBid bid);
     Task<List<AuctionBid>> GetAuctionBids(int auctionId);
+    Task<AuctionBid?> GetCurrentHighestBid(int auctionId);
 }

@@ -1,6 +1,9 @@
+using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
+using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,7 +12,8 @@ namespace Application.Features.Listings.Shared.UnfollowListing;
 public class UnfollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
     UserManager<User> userManager,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    INotificationService notificationService
     ) : IRequestHandler<UnfollowListingCommand>
 {
     public async Task Handle(UnfollowListingCommand request, CancellationToken cancellationToken)
@@ -38,6 +42,16 @@ public class UnfollowListingHandler(
         listingToUnfollow.Followers -= 1;
         listingRepository.UnfollowListing(followedListingToUnfollow);
         listingRepository.UpdateListing(listingToUnfollow);
+            
+        var notificationInfo = new NotificationInfo
+        {
+            Message = $"User {user.UserName} has unfollowed your listing {listingToUnfollow.Name}.",
+            ResourceId = listingToUnfollow.Id,
+            ResourceType = listingToUnfollow is ProductListing ? ResourceType.Product : ResourceType.Auction,
+            NotificationImageUrl = listingToUnfollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
+        };
+            
+        await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);
 
         await unitOfWork.SaveChangesAsync();
     }

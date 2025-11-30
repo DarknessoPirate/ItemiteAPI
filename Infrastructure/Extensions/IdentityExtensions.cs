@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Domain.Entities;
 using Infrastructure.Database;
@@ -5,6 +6,7 @@ using Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -97,6 +99,25 @@ public static class IdentityExtensions
 
                             context.Token = token;
                             return Task.CompletedTask;
+                        },
+                        OnTokenValidated = async context =>
+                        {
+                            var db = context.HttpContext.RequestServices.GetRequiredService<ItemiteDbContext>();
+
+                            var jwtId = context.Principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+                            if (jwtId == null)
+                            {
+                                context.Fail("Missing jti");
+                                return;
+                            }
+
+                            var tokenInDb = await db.RefreshTokens
+                                .FirstOrDefaultAsync(x => x.JwtId == jwtId);
+
+                            if (tokenInDb == null || tokenInDb.IsRevoked)
+                            {
+                                context.Fail("Token revoked");
+                            }
                         }
                     };
                 }

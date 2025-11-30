@@ -11,6 +11,7 @@ public interface IMessageRepository
     Task<(List<Message>, int)> FindLatestMessagesByListingIdAsync(int listingId, int pageNumber, int pageSize);
     Task<(List<Message>, int)> FindLatestMessagesForUserIdAsync(int userId, int pageNumber, int pageSize);
     Task<List<UnreadMessageCount>> GetUnreadMessageCountsForListingIdAsync(int listingId, int recipientId);
+    Task<int> GetUnreadCountAsync(int listingId, int senderId, int recipientId);
     Task<List<UnreadMessageCount>> GetUnreadMessageCountsForUserIdAsync(int userId);
     Task<int> GetMessageCountBetweenUsersAsync(int userId, int otherUserId, int listingId);
     Task<List<Message>> FindMessagesBetweenUsersAsync(int userId, int otherUserId, int listingId, int pageNumber, int pageSize);

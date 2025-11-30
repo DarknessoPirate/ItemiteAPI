@@ -21,6 +21,9 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Dispute> Disputes { get; set; }
     public DbSet<DisputeEvidence> DisputeEvidences { get; set; }
+    
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<NotificationUser> NotificationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -150,6 +153,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne(rt => rt.ReplacedThisToken)
             .HasForeignKey<RefreshToken>(rt => rt.ReplacedByTokenId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.ResourceType)
+            .HasConversion<string>();
 
         // payments 
         modelBuilder.Entity<Payment>()

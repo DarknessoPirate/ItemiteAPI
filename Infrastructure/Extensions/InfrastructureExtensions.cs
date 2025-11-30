@@ -58,10 +58,14 @@ public static class InfrastructureExtensions
         services.AddScoped<IPhotoRepository, PhotoRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IBroadcastService, BroadcastService>();
         services.AddScoped<ILIstingViewRepository, ListingViewRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
+        services.AddHostedService<ArchiveExpiredListingsService>();
+        services.AddHostedService<OldListingViewsCleanupService>();
         services.AddHostedService<PaymentTransferBackgroundService>();
     }
 }
