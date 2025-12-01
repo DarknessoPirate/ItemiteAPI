@@ -12,6 +12,4 @@ public static class CacheKeys
     public const string AUCTION_LISTING = "auction_listing_";
     
     public const string BIDS = "bids_";
-    
-    public const string NOTIFICATIONS = "notifications_";
 }
