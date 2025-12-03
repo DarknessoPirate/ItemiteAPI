@@ -9,9 +9,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Features.Payments.GetAllPayments;
 
-// admin endpoint handler to get the list of all payments to have an overview
-// get the list of all payments with their relevant data (status, listing, users etc.)
-
+/// <summary>
+/// ADMIN handler to get the paginated list of payments (all status types)
+/// get the list of all payments with their relevant data (status, listing, users etc.)
+/// </summary>
 public class GetLatestPaymentsHandler(
     UserManager<User> userManager,
     IPaymentRepository paymentRepository,

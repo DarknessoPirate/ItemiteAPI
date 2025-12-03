@@ -9,6 +9,12 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Features.Payments.StartStripeOnboarding;
 
+/// <summary>
+/// Starts the stripe onboarding with the user account's email and generates a link
+/// to the stripe website to fully finish the onboarding. For the stripe connect
+/// service to work user needs to be fully onboarded using this generated link.
+/// If stripe onboarding is not complete, user can't receive payments.
+/// </summary>
 public class StartStripeOnboardingHandler(
     IStripeConnectService stripeConnectService,
     UserManager<User> userManager,
@@ -26,8 +32,6 @@ public class StartStripeOnboardingHandler(
 
         if (!string.IsNullOrEmpty(user.StripeConnectAccountId) && await stripeConnectService.IsAccountFullyOnboardedAsync(user.StripeConnectAccountId))
             throw new BadRequestException("You already have the stripe account set up");
-        
-        
 
 
         var onboardingUrl = await stripeConnectService.CreateConnectAccountAndGetOnboardingUrlAsync(

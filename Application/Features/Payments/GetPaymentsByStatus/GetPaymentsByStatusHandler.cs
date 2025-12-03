@@ -10,25 +10,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Payments.GetPaymentsByStatus;
 
+/// <summary>
+/// ADMIN handler to fetch the paginated payment list, with the specified PaymentStatus
+/// </summary>
 public class GetPaymentsByStatusHandler(
     UserManager<User> userManager,
     IPaymentRepository paymentRepository,
     IMapper mapper
-    
-    
-    ) : IRequestHandler<GetPaymentsByStatusQuery, PageResponse<PaymentResponse>>
+) : IRequestHandler<GetPaymentsByStatusQuery, PageResponse<PaymentResponse>>
 {
-    public async Task<PageResponse<PaymentResponse>> Handle(GetPaymentsByStatusQuery request, CancellationToken cancellationToken)
+    public async Task<PageResponse<PaymentResponse>> Handle(GetPaymentsByStatusQuery request,
+        CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
             throw new BadRequestException("Admin user not found");
 
         var (payments, totalItems) = await paymentRepository.GetPaymentsByStatusPaginatedAsync(
-                request.PaymentStatus,
-                request.PageNumber,
-                request.PageSize,
-                cancellationToken);
+            request.PaymentStatus,
+            request.PageNumber,
+            request.PageSize,
+            cancellationToken);
 
         var mappedPayments = mapper.Map<List<PaymentResponse>>(payments);
 

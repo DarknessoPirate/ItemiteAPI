@@ -8,6 +8,10 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Features.Payments.RefreshStripeOnboarding;
 
+/// <summary>
+/// If the original link does not work, the user is routed to the endpoint that
+/// uses this handler to generate a fresh onboarding link for the user's account
+/// </summary>
 public class RefreshStripeOnboardingHandler(
     UserManager<User> userManager,
     IStripeConnectService stripeConnectService,
@@ -25,7 +29,7 @@ public class RefreshStripeOnboardingHandler(
 
         var returnUrl = redirectSettings.Value.StripeReturnOnboardingUrl;
         var refreshUrl = redirectSettings.Value.StripeRefreshOnboardingUrl;
-        
+
         return await stripeConnectService.GenerateOnboardingLinkAsync(
             user.StripeConnectAccountId,
             returnUrl,

@@ -12,6 +12,11 @@ using Stripe;
 
 namespace Application.Features.Payments.PurchaseProduct;
 
+/// <summary>
+/// BUYER Handler to purchase the listed product, will create a payment entity and mark the listing as IsSold
+/// This will create a charge for the user's payment method.
+/// Seller needs to be onboarded on stripe for the purchase to work
+/// </summary>
 public class PurchaseProductHandler(
     IListingRepository<ProductListing> productListingRepository,
     IPaymentRepository paymentRepository,
@@ -22,7 +27,8 @@ public class PurchaseProductHandler(
     ILogger<PurchaseProductCommand> logger
 ) : IRequestHandler<PurchaseProductCommand, PurchaseProductResponse>
 {
-    public async Task<PurchaseProductResponse> Handle(PurchaseProductCommand request, CancellationToken cancellationToken)
+    public async Task<PurchaseProductResponse> Handle(PurchaseProductCommand request,
+        CancellationToken cancellationToken)
     {
         var product = await productListingRepository.GetListingByIdAsync(request.ProductListingId);
         if (product == null)
@@ -101,13 +107,13 @@ public class PurchaseProductHandler(
 
             await paymentRepository.AddAsync(payment);
             await unitOfWork.SaveChangesAsync(cancellationToken); // save here because it needs to generate id
-            
+
             product.IsSold = true;
             product.PaymentId = payment.Id;
             productListingRepository.UpdateListing(product);
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
-            
+
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{product.Id}");
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
 
@@ -125,7 +131,7 @@ public class PurchaseProductHandler(
         {
             await unitOfWork.RollbackTransactionAsync();
             logger.LogError(ex, $"Error processing purchase for product {request.ProductListingId}: {ex.Message}");
-            throw; 
+            throw;
         }
     }
 }

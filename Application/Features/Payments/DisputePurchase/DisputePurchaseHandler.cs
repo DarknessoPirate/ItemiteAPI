@@ -16,12 +16,14 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Features.Payments.DisputePurchase;
 
-// User endpoint handler to create a dispute for a payment
+/// <summary>
+/// BUYER'S handler to create a dispute for a payment, this will pause the seller's automatic transfer until
+/// the dispute is manually resolved with the appropriate decision
+/// </summary>
 public class DisputePurchaseHandler(
     UserManager<User> userManager,
     IDisputeRepository disputeRepository,
     IPaymentRepository paymentRepository,
-    IListingRepository<ListingBase> listingRepository,
     IMediaService mediaService,
     IPhotoRepository photoRepository,
     IMapper mapper,
@@ -121,7 +123,6 @@ public class DisputePurchaseHandler(
 
             var createdDispute = await disputeRepository.FindDetailedByIdAsync(dispute.Id);
             return mapper.Map<DisputeResponse>(createdDispute);
-            
         }
         catch (Exception ex)
         {
