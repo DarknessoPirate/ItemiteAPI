@@ -14,6 +14,9 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .Include(p => p.Listing)
             .ThenInclude(l => l.ListingPhotos)
             .ThenInclude(lp => lp.Photo)
+            .Include(p => p.Dispute)
+            .ThenInclude(d => d.Evidence)
+            .ThenInclude(e => e.Photo)
             .Include(p => p.Buyer)
             .Include(p => p.Seller)
             .FirstOrDefaultAsync(p => p.Id == paymentId);

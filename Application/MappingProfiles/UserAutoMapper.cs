@@ -13,12 +13,15 @@ public class UserAutoMapper : Profile
       CreateMap<RegisterRequest, User>()
          .ForMember(dest => dest.Location, opt => 
             opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
-      CreateMap<User, UserBasicResponse>();
+      CreateMap<User, UserBasicResponse>()
+         .ForMember(dest => dest.ProfilePhotoUrl, opt =>
+            opt.MapFrom(src => src.ProfilePhoto != null ? src.ProfilePhoto.Url : null));
+         ;
       CreateMap<User, UserResponse>()
          .ForMember(u => u.PhotoUrl, o =>
-            o.MapFrom(u => u.ProfilePhoto.Url))
+            o.MapFrom(src => src.ProfilePhoto != null ? src.ProfilePhoto.Url : null))
          .ForMember(u => u.BackgroundUrl, o =>
-            o.MapFrom(u => u.BackgroundPhoto.Url))
+            o.MapFrom(u => u.BackgroundPhoto != null ? u.BackgroundPhoto.Url : null))
          .ForMember(u => u.Location, opt => 
             opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
    }

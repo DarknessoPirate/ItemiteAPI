@@ -43,6 +43,8 @@ public static class ConfigExtensions
         services.AddOptions<PaymentSettings>()
             .Bind(configuration.GetSection("PaymentSettings"))
             .ValidateDataAnnotations()
+            .Validate(settings => settings.DisputeTimeWindowInDays <= settings.TransferDelayDays,
+                "PaymentSettings:DisputeTimeWindowInDays must be less than or equal to TransferDelayDays")
             .ValidateOnStart();
 
         services.Configure<SeedSettings>(configuration.GetSection("SeedSettings"));

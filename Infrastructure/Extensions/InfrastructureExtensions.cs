@@ -63,6 +63,7 @@ public static class InfrastructureExtensions
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
         services.AddHostedService<ArchiveExpiredListingsService>();
         services.AddHostedService<OldListingViewsCleanupService>();

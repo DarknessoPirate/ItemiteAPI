@@ -9,4 +9,6 @@ public class PaymentSettings
 
     [Range(1, 30, ErrorMessage = "PaymentSettings:TransferDelayDays must be in range <1,30> in appsettings")]
     public int TransferDelayDays { get; set; }
+    
+    public int DisputeTimeWindowInDays { get; set; }
 }

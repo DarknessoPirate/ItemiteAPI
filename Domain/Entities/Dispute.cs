@@ -15,7 +15,7 @@ public class Dispute
     [Required] 
     [MaxLength(500)] public string Description { get; set; }
     public DisputeStatus Status { get; set; }
-    public DisputeResolution Resolution { get; set; }
+    public DisputeResolution? Resolution { get; set; }
     public int? ResolvedById { get; set; }
     public User? ResolvedBy { get; set; }
     

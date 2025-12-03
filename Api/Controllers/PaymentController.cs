@@ -1,8 +1,10 @@
+using Application.Features.Payments.DisputePurchase;
 using Application.Features.Payments.GetAllPayments;
 using Application.Features.Payments.GetPaymentsByStatus;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
 using Application.Features.Payments.StartStripeOnboarding;
+using Domain.DTOs.File;
 using Domain.DTOs.Pagination;
 using Domain.DTOs.Payments;
 using Domain.Enums;
@@ -48,7 +50,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         return Redirect(onboardingUrl);
     }
-    
+
     [Authorize]
     [HttpPost("purchase-product/{productListingId}")]
     public async Task<IActionResult> PurchaseProduct(
@@ -64,18 +66,39 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
             BuyerId = userId
         };
 
-        var paymentId = await mediator.Send(command);
+        var response = await mediator.Send(command);
 
-        return Ok(new PurchaseProductResponse
+        return Ok(response);
+    }
+
+    [Authorize]
+    [HttpPost("dispute/{paymentId}")]
+    public async Task<ActionResult<DisputeResponse>> DisputePurchase([FromRoute] int paymentId,
+        [FromForm] DisputePurchaseRequest request, [FromForm] IFormFileCollection photos)
+    {
+        var command = new DisputePurchaseCommand
         {
+            UserId = requestContextService.GetUserId(),
             PaymentId = paymentId,
-            Message = "Purchase successful! Payment will be transferred to seller in 7 days."
-        });
+            Reason = request.Reason,
+            Description = request.Description,
+            EvidencePhotos = photos.Select(p => new FileWrapper(
+                p.FileName,
+                p.Length,
+                p.ContentType,
+                p.OpenReadStream()
+            )).ToList()
+        };
+
+        var response = await mediator.Send(command);
+        
+        return Ok(response);
     }
 
     [Authorize(Roles = "Admin,Moderator")]
     [HttpGet("admin/with-status")]
-    public async Task<PageResponse<PaymentResponse>> GetPaymentsByStatus([FromQuery] int pageSize, [FromQuery] int pageNumber, [FromQuery] PaymentStatus paymentStatus)
+    public async Task<PageResponse<PaymentResponse>> GetPaymentsByStatus([FromQuery] int pageSize,
+        [FromQuery] int pageNumber, [FromQuery] PaymentStatus paymentStatus)
     {
         var command = new GetPaymentsByStatusQuery
         {
@@ -90,7 +113,8 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
     [Authorize(Roles = "Admin,Moderator")]
     [HttpGet]
-    public async Task<PageResponse<PaymentResponse>> GetLatestPayments([FromQuery] int pageSize, [FromQuery] int pageNumber)
+    public async Task<PageResponse<PaymentResponse>> GetLatestPayments([FromQuery] int pageSize,
+        [FromQuery] int pageNumber)
     {
         var command = new GetLatestPaymentsQuery
         {
