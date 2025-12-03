@@ -20,6 +20,8 @@ using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
 using Application.Features.Notifications.GetPaginatedUserNotifications;
+using Application.Features.Reports.CreateReport;
+using Application.Features.Reports.GetPaginatedReports;
 using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
@@ -62,5 +64,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
         services.AddScoped<IValidator<GetPaginatedFollowedListingsQuery>, GetPaginatedFollowListingsValidator>();
         services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
+        services.AddScoped<IValidator<CreateReportCommand>, CreateReportValidator>();
+        services.AddScoped<IValidator<GetPaginatedReportsQuery>, GetPaginatedReportsValidator>();
     }
 }
