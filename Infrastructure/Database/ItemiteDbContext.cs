@@ -21,6 +21,9 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<NotificationUser> NotificationUsers { get; set; }
+    
+    public DbSet<Report> Reports { get; set; }
+    public DbSet<ReportPhoto> ReportPhotos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,6 +151,28 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         modelBuilder.Entity<Notification>()
             .Property(n => n.ResourceType)
             .HasConversion<string>();
+        
+        modelBuilder.Entity<Report>()
+            .Property(r => r.ResourceType)
+            .HasConversion<string>();
+        
+        modelBuilder.Entity<ReportPhoto>()
+            .HasOne(rp => rp.Report)
+            .WithMany(r => r.ReportPhotos)
+            .HasForeignKey(rp => rp.ReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ReportPhoto>()
+            .HasOne(rp => rp.Photo)
+            .WithMany()
+            .HasForeignKey(rp => rp.PhotoId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Report>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reports)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
