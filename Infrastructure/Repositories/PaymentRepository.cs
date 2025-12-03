@@ -110,6 +110,21 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .ToListAsync();
     }
 
+    public async Task<Dictionary<PaymentStatus, int>> GetPaymentCountsByStatusAsync()
+    {
+        var counts = await context.Payments
+            .GroupBy(p => p.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Status, x => x.Count);
+        
+        foreach (PaymentStatus status in Enum.GetValues<PaymentStatus>())
+        {
+            counts.TryAdd(status, 0);
+        }
+
+        return counts;
+    }
+
     public async Task<List<Payment>> GetUserPurchasesAsync(int userId)
     {
         return await context.Payments

@@ -20,6 +20,7 @@ public interface IPaymentRepository
 
     Task<List<Payment>> FindAllPendingAsync();
 
+    Task<Dictionary<PaymentStatus, int>> GetPaymentCountsByStatusAsync();
     Task<List<Payment>> GetUserPurchasesAsync(int userId);
     Task<List<Payment>> GetUserSalesAsync(int userId);
     Task AddAsync(Payment payment);

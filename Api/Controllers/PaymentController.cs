@@ -1,5 +1,6 @@
 using Application.Features.Payments.DisputePurchase;
 using Application.Features.Payments.GetAllPayments;
+using Application.Features.Payments.GetPaymentCountsByStatus;
 using Application.Features.Payments.GetPaymentsByStatus;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
@@ -97,7 +98,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
     [Authorize(Roles = "Admin,Moderator")]
     [HttpGet("admin/with-status")]
-    public async Task<PageResponse<PaymentResponse>> GetPaymentsByStatus([FromQuery] int pageSize,
+    public async Task<ActionResult<PageResponse<PaymentResponse>>> GetPaymentsByStatus([FromQuery] int pageSize,
         [FromQuery] int pageNumber, [FromQuery] PaymentStatus paymentStatus)
     {
         var command = new GetPaymentsByStatusQuery
@@ -108,12 +109,14 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
             PageNumber = pageNumber
         };
 
-        return await mediator.Send(command);
+        var response = await mediator.Send(command);
+
+        return Ok(response);
     }
 
     [Authorize(Roles = "Admin,Moderator")]
-    [HttpGet]
-    public async Task<PageResponse<PaymentResponse>> GetLatestPayments([FromQuery] int pageSize,
+    [HttpGet("admin/get-latest-payments")]
+    public async Task<ActionResult<PageResponse<PaymentResponse>>> GetLatestPayments([FromQuery] int pageSize,
         [FromQuery] int pageNumber)
     {
         var command = new GetLatestPaymentsQuery
@@ -123,6 +126,23 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
             PageNumber = pageNumber
         };
 
-        return await mediator.Send(command);
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+
+    [Authorize(Roles = "Admin,Moderator")]
+    [HttpGet("admin/get-payment-counts")]
+    public async Task<ActionResult<PaymentStatusCountsResponse>> GetPaymentCountsByStatus()
+    {
+        var command = new GetPaymentCountsByStatusQuery
+        {
+            UserId = requestContextService.GetUserId()
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+
     }
 }
