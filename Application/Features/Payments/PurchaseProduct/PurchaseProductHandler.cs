@@ -1,4 +1,5 @@
 using Domain.Configs;
+using Domain.DTOs.Payments;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -19,9 +20,9 @@ public class PurchaseProductHandler(
     ICacheService cacheService,
     IOptions<PaymentSettings> paymentSettings,
     ILogger<PurchaseProductCommand> logger
-) : IRequestHandler<PurchaseProductCommand, int>
+) : IRequestHandler<PurchaseProductCommand, PurchaseProductResponse>
 {
-    public async Task<int> Handle(PurchaseProductCommand request, CancellationToken cancellationToken)
+    public async Task<PurchaseProductResponse> Handle(PurchaseProductCommand request, CancellationToken cancellationToken)
     {
         var product = await productListingRepository.GetListingByIdAsync(request.ProductListingId);
         if (product == null)
@@ -113,13 +114,18 @@ public class PurchaseProductHandler(
             logger.LogInformation(
                 $"Payment successful - Product: {product.Id}, Buyer: {request.BuyerId}, Amount: {product.Price} PLN");
 
-            return payment.Id;
+            return new PurchaseProductResponse
+            {
+                PaymentId = payment.Id,
+                Message =
+                    $"Purchase successful. Money will be transferred to the seller within {paymentSettings.Value.TransferDelayDays} days"
+            };
         }
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
             logger.LogError(ex, $"Error processing purchase for product {request.ProductListingId}: {ex.Message}");
-            throw; // Re-throw to let global exception handler deal with it
+            throw; 
         }
     }
 }
