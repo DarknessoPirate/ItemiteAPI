@@ -28,6 +28,7 @@ using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangePhoneNumber;
 using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
+using Application.Features.Users.GetPaginatedUsers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -66,5 +67,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
         services.AddScoped<IValidator<CreateReportCommand>, CreateReportValidator>();
         services.AddScoped<IValidator<GetPaginatedReportsQuery>, GetPaginatedReportsValidator>();
+        services.AddScoped<IValidator<GetPaginatedUsersQuery>, GetPaginatedUsersValidator>();
     }
 }

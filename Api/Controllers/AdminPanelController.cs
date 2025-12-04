@@ -2,6 +2,7 @@ using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Notifications.SendGlobalNotification;
 using Application.Features.Notifications.SendNotification;
 using Application.Features.Reports.GetPaginatedReports;
+using Application.Features.Users.GetPaginatedUsers;
 using Application.Features.Users.LockUser;
 using Application.Features.Users.UnlockUser;
 using Domain.DTOs.Notifications;
@@ -16,7 +17,8 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+//[Authorize(Roles = "Admin")]
+[Authorize]
 public class AdminPanelController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpPost("global-notification")]
@@ -89,5 +91,16 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         };
         await mediator.Send(command);
         return Ok();
+    }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers([FromQuery] PaginateUsersQuery query)
+    {
+        var getUsersQuery = new GetPaginatedUsersQuery
+        {
+            Query = query
+        };
+        var users = await mediator.Send(getUsersQuery);
+        return Ok(users);
     }
 }
