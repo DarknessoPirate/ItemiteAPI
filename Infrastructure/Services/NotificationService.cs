@@ -18,8 +18,7 @@ public class NotificationService(
     ILogger<NotificationService> logger,
     INotificationRepository notificationRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
-    ICacheService cacheService
+    IMapper mapper
 ) : INotificationService
 {
     public async Task NotifyMessageReceived(int recipientId, MessageResponse message)
@@ -79,8 +78,6 @@ public class NotificationService(
                     NotificationId = notificationEntity.Id
                 };
                 await notificationRepository.AddNotificationUser(notificationUser);
-
-                await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{userId}*");
             }
 
             await unitOfWork.CommitTransactionAsync();
@@ -136,11 +133,6 @@ public class NotificationService(
             }
             
             await unitOfWork.CommitTransactionAsync(); 
-            
-            foreach (var userId in userNotifications.Keys)
-            {
-                await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{userId}*");
-            }
         }
         catch (Exception ex)
         {

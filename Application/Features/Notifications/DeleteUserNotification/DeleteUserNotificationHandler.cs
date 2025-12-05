@@ -9,7 +9,6 @@ namespace Application.Features.Notifications.DeleteUserNotification;
 
 public class DeleteUserNotificationHandler(
     INotificationRepository notificationRepository,
-    ICacheService cacheService,
     IUnitOfWork unitOfWork
     ) : IRequestHandler<DeleteUserNotificationCommand>
 {
@@ -47,6 +46,5 @@ public class DeleteUserNotificationHandler(
             await unitOfWork.RollbackTransactionAsync();
             throw;
         }
-        await cacheService.RemoveByPatternAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}*");
     }
 }

@@ -14,10 +14,8 @@ public class GetChatPageValidator : AbstractValidator<GetChatPageQuery>
         RuleFor(x => x.OtherUserId)
             .NotEqual(x => x.UserId).WithMessage("You can't specify yourself as the other user")
             .GreaterThan(0).WithMessage("Invalid other user id");
-        RuleFor(x => x.PageNumber)
-            .GreaterThan(0).WithMessage("Invalid page number");
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0).LessThanOrEqualTo(100).WithMessage("Invalid page size");
+        RuleFor(x => x.Limit)
+            .GreaterThan(0).LessThanOrEqualTo(100).WithMessage("Invalid limit size");
 
     }
 }
