@@ -116,8 +116,10 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
         return await context.Payments
             .Include(p => p.Listing)
             .Include(p => p.Buyer)
+            .Include(p => p.Seller)
             .Where(p =>
-                p.Status == PaymentStatus.RefundScheduled &&
+                (p.Status == PaymentStatus.RefundScheduled ||
+                 p.Status == PaymentStatus.PartialRefundScheduled) &&
                 p.ScheduledRefundDate != null &&
                 p.ScheduledRefundDate <= now
             )
@@ -156,7 +158,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
         return (items, totalCount);
     }
 
-    public async Task<(List<Payment>, int TotalCount)> GetUserSalesPaginatedAsync(int userId, int pageNumber, int pageSize)
+    public async Task<(List<Payment>, int TotalCount)> GetUserSalesPaginatedAsync(int userId, int pageNumber,
+        int pageSize)
     {
         var query = GetBaseDetailedQuery()
             .Where(p => p.SellerId == userId);

@@ -61,7 +61,7 @@ public class StripeConnectService(
 
 
     /// <summary>
-    /// Transfers money from the platform account to seller's Stripe Connect account
+    /// Transfers money from the platform account to seller's Stripe Connect account.
     /// </summary>
     /// <param name="amount">Amount to transfer in chosen currency (e.g., 95.00)</param>
     /// <param name="currency">Currency code (e.g., "pln")</param>
@@ -98,6 +98,45 @@ public class StripeConnectService(
                 ex.StripeError?.Message,
                 ex.StripeError?.Code);
             throw new StripeErrorException($"Stripe transfer failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates a refund for a charge. It is marked as a refund in the system and transfer fees don't apply.
+    /// </summary>
+    /// <param name="chargeId">The Stripe charge ID to refund</param>
+    /// <param name="amount">Amount to refund (null for full refund)</param>
+    /// <param name="reason">Reason for refund</param>
+    /// <param name="metadata">Additional metadata</param>
+    /// <returns>The created Refund object</returns>
+    public async Task<Refund> CreateRefundAsync(string chargeId, decimal? amount = null, string? reason = null,
+        Dictionary<string, string>? metadata = null)
+    {
+        var refundService = new RefundService();
+        var refundOptions = new RefundCreateOptions
+        {
+            Charge = chargeId,
+            Reason = reason,
+            Metadata = metadata ?? new Dictionary<string, string>()
+        };
+
+        if (amount.HasValue)
+        {
+            refundOptions.Amount = (long)(amount.Value * 100);
+        }
+
+        try
+        {
+            var refund = await refundService.CreateAsync(refundOptions);
+            return refund;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe refund failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe refund failed: {ex.StripeError?.Message}",
                 detailedMessage: ex.StripeError?.Message);
         }
     }

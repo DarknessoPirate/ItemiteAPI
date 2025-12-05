@@ -22,4 +22,10 @@ public interface IStripeConnectService
         string destinationAccountId,
         string description,
         Dictionary<string, string>? metadata = null);
+
+    Task<Refund> CreateRefundAsync(
+        string chargeId,
+        decimal? amount = null,
+        string? reason = null,
+        Dictionary<string, string>? metadata = null);
 }

@@ -7,7 +7,7 @@ namespace Application.Features.Payments.GetPaymentsByStatus;
 
 public class GetPaymentsByStatusQuery : IRequest<PageResponse<PaymentResponse>>
 {
-    public int UserId { get; set; }
+    public int AdminUserId { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public int PageSize { get; set; }
     public int PageNumber { get; set; }
