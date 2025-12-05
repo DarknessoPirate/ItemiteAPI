@@ -19,10 +19,11 @@ public interface IPaymentRepository
         CancellationToken cancellationToken);
 
     Task<List<Payment>> FindAllPendingAsync();
+    Task<List<Payment>> FindAllScheduledRefundsAsync();
 
     Task<Dictionary<PaymentStatus, int>> GetPaymentCountsByStatusAsync();
-    Task<List<Payment>> GetUserPurchasesAsync(int userId);
-    Task<List<Payment>> GetUserSalesAsync(int userId);
+    Task<(List<Payment>, int TotalCount)> GetUserPurchasesPaginatedAsync(int userId, int pageNumber, int pageSize);
+    Task<(List<Payment>, int TotalCount)> GetUserSalesPaginatedAsync(int userId, int pageNumber, int pageSize);
     Task AddAsync(Payment payment);
     void Update(Payment payment);
 }

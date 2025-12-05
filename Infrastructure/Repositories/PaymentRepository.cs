@@ -8,34 +8,44 @@ namespace Infrastructure.Repositories;
 
 public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
 {
-    public async Task<Payment?> FindByIdAsync(int paymentId)
+    private IQueryable<Payment> GetBaseDetailedQuery()
     {
-        return await context.Payments
+        return context.Payments
             .Include(p => p.Listing)
             .ThenInclude(l => l.ListingPhotos)
             .ThenInclude(lp => lp.Photo)
+            .Include(p => p.Buyer)
+            .ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.Seller)
+            .ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.ApprovedBy)
+            .ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.Dispute)
+            .ThenInclude(d => d.InitiatedBy)
+            .ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.Dispute)
+            .ThenInclude(d => d.ResolvedBy)
+            .ThenInclude(u => u.ProfilePhoto)
             .Include(p => p.Dispute)
             .ThenInclude(d => d.Evidence)
-            .ThenInclude(e => e.Photo)
-            .Include(p => p.Buyer)
-            .Include(p => p.Seller)
+            .ThenInclude(e => e.Photo);
+    }
+
+    public async Task<Payment?> FindByIdAsync(int paymentId)
+    {
+        return await GetBaseDetailedQuery()
             .FirstOrDefaultAsync(p => p.Id == paymentId);
     }
 
     public async Task<Payment?> FindByListingIdAsync(int listingId)
     {
-        return await context.Payments
+        return await GetBaseDetailedQuery()
             .FirstOrDefaultAsync(p => p.ListingId == listingId);
     }
 
     public async Task<Payment?> FindByStripeChargeIdAsync(string stripeChargeId)
     {
-        return await context.Payments
-            .Include(p => p.Listing)
-            .ThenInclude(l => l.ListingPhotos)
-            .ThenInclude(lp => lp.Photo)
-            .Include(p => p.Buyer)
-            .Include(p => p.Seller)
+        return await GetBaseDetailedQuery()
             .FirstOrDefaultAsync(p => p.StripeChargeId == stripeChargeId);
     }
 
@@ -45,18 +55,13 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var query = context.Payments
-            .Include(p => p.Listing)
-            .ThenInclude(l => l.ListingPhotos)
-            .ThenInclude(lp => lp.Photo)
-            .Include(p => p.Buyer)
-            .Include(p => p.Seller)
-            .Include(p => p.ApprovedBy)
+        var query = GetBaseDetailedQuery()
             .Where(p => p.Status == status);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
+            .OrderByDescending(p => p.ChargeDate) // Add ordering
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -69,17 +74,11 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
         int pageSize,
         CancellationToken cancellationToken)
     {
-        var baseQuery = context.Payments.AsQueryable();
+        var query = GetBaseDetailedQuery();
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
 
-        var items = await baseQuery
-            .Include(p => p.Listing)
-            .ThenInclude(l => l.ListingPhotos)
-            .ThenInclude(lp => lp.Photo)
-            .Include(p => p.Buyer)
-            .Include(p => p.Seller)
-            .Include(p => p.ApprovedBy)
+        var items = await query
             .OrderByDescending(p => p.ChargeDate)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -110,13 +109,28 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
             .ToListAsync();
     }
 
+    public async Task<List<Payment>> FindAllScheduledRefundsAsync()
+    {
+        var now = DateTime.UtcNow;
+
+        return await context.Payments
+            .Include(p => p.Listing)
+            .Include(p => p.Buyer)
+            .Where(p =>
+                p.Status == PaymentStatus.RefundScheduled &&
+                p.ScheduledRefundDate != null &&
+                p.ScheduledRefundDate <= now
+            )
+            .ToListAsync();
+    }
+
     public async Task<Dictionary<PaymentStatus, int>> GetPaymentCountsByStatusAsync()
     {
         var counts = await context.Payments
             .GroupBy(p => p.Status)
             .Select(g => new { Status = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.Status, x => x.Count);
-        
+
         foreach (PaymentStatus status in Enum.GetValues<PaymentStatus>())
         {
             counts.TryAdd(status, 0);
@@ -125,24 +139,37 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
         return counts;
     }
 
-    public async Task<List<Payment>> GetUserPurchasesAsync(int userId)
+    public async Task<(List<Payment>, int TotalCount)> GetUserPurchasesPaginatedAsync(int userId, int pageNumber,
+        int pageSize)
     {
-        return await context.Payments
-            .Include(p => p.Listing)
-            .Include(p => p.Seller)
-            .Where(p => p.BuyerId == userId)
+        var query = GetBaseDetailedQuery()
+            .Where(p => p.BuyerId == userId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(p => p.ChargeDate)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
-    public async Task<List<Payment>> GetUserSalesAsync(int userId)
+    public async Task<(List<Payment>, int TotalCount)> GetUserSalesPaginatedAsync(int userId, int pageNumber, int pageSize)
     {
-        return await context.Payments
-            .Include(p => p.Listing)
-            .Include(p => p.Buyer)
-            .Where(p => p.SellerId == userId)
+        var query = GetBaseDetailedQuery()
+            .Where(p => p.SellerId == userId);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(p => p.ChargeDate)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task AddAsync(Payment payment)
