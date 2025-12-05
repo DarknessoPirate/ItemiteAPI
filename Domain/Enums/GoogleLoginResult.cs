@@ -7,4 +7,5 @@ public enum GoogleLoginResult
     NoEmailFailure,
     UsernameUniqueFailure,
     EmailUniqueFailure,
+    AccountLocked
 }

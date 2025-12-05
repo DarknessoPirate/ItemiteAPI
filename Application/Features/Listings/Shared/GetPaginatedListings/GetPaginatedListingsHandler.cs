@@ -64,6 +64,12 @@ public class GetPaginatedListingsHandler(
         queryable = FilterByCategories(queryable, request.Query.CategoryIds);
         queryable = FilterProductByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
         queryable = FilterByDistance(queryable, request.Query.Longitude, request.Query.Latitude, request.Query.Distance);
+        
+        if (!string.IsNullOrEmpty(request.Query.Search))
+        {
+            queryable = queryable.Where(u => u.Name.Contains(request.Query.Search) || u.Description.Contains(request.Query.Search));
+        }
+        
         queryable = SortProductListings(queryable, request.Query.SortBy, request.Query.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
@@ -86,6 +92,12 @@ public class GetPaginatedListingsHandler(
         queryable = FilterByCategories(queryable, request.Query.CategoryIds);
         queryable = FilterAuctionByPrice(queryable, request.Query.PriceFrom, request.Query.PriceTo);
         queryable = FilterByDistance(queryable, request.Query.Longitude, request.Query.Latitude, request.Query.Distance);
+        
+        if (!string.IsNullOrEmpty(request.Query.Search))
+        {
+            queryable = queryable.Where(u => u.Name.Contains(request.Query.Search) || u.Description.Contains(request.Query.Search));
+        }
+        
         queryable = SortAuctionListings(queryable, request.Query.SortBy, request.Query.SortDirection);
 
         int totalItems = await queryable.CountAsync(cancellationToken);
@@ -114,6 +126,12 @@ public class GetPaginatedListingsHandler(
         
         productQuery = FilterByDistance(productQuery, request.Query.Longitude, request.Query.Latitude , request.Query.Distance);
         auctionQuery = FilterByDistance(auctionQuery, request.Query.Longitude, request.Query.Latitude , request.Query.Distance);
+        
+        if (!string.IsNullOrEmpty(request.Query.Search))
+        {
+            productQuery = productQuery.Where(u => u.Name.Contains(request.Query.Search) || u.Description.Contains(request.Query.Search));
+            auctionQuery = auctionQuery.Where(u => u.Name.Contains(request.Query.Search) || u.Description.Contains(request.Query.Search));
+        }
         
         productQuery = SortProductListings(productQuery, request.Query.SortBy, request.Query.SortDirection);
         auctionQuery = SortAuctionListings(auctionQuery, request.Query.SortBy, request.Query.SortDirection);

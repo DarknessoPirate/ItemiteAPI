@@ -49,6 +49,12 @@ public class LoginGoogleCallbackHandler(
         {
             return (int) GoogleLoginResult.EmailUniqueFailure;
         }
+        
+        if (await userManager.IsLockedOutAsync(user))
+        {
+            return (int) GoogleLoginResult.AccountLocked;
+        }
+        
         var tokens = await tokenService.GenerateTokenPairAsync(
             user,
             request.IpAddress,

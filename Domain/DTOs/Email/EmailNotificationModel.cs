@@ -1,6 +1,6 @@
 namespace Domain.DTOs.Email;
 
-public class EmailGlobalNotificationModel
+public class EmailNotificationModel
 {
     public string Title { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;

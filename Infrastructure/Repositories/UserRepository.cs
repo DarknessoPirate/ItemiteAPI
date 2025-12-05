@@ -49,4 +49,11 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
     {
         return await context.Users.ToListAsync();
     }
+
+    public IQueryable<User> GetUsersQueryable()
+    {
+        return context.Users
+            .Include(u => u.ProfilePhoto)
+            .Include(u => u.BackgroundPhoto);
+    }
 }
