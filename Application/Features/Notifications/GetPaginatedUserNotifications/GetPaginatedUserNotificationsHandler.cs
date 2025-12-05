@@ -13,18 +13,11 @@ namespace Application.Features.Notifications.GetPaginatedUserNotifications;
 public class GetPaginatedUserNotificationsHandler(
     INotificationRepository notificationRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
-    ICacheService cacheService
+    IMapper mapper
     ) : IRequestHandler<GetPaginatedUserNotificationsQuery, PageResponse<NotificationInfo>>
 {
     public async Task<PageResponse<NotificationInfo>> Handle(GetPaginatedUserNotificationsQuery request, CancellationToken cancellationToken)
     {
-        var notificationsFromCache = await cacheService.GetAsync<PageResponse<NotificationInfo>>($"{CacheKeys.NOTIFICATIONS}{request.UserId}_{request.Query}");
-        if (notificationsFromCache != null)
-        {
-            return notificationsFromCache;
-        }
-        
         var queryable =  notificationRepository.GetUserNotificationsQueryable(request.UserId);
         
         int totalItems = await queryable.CountAsync(cancellationToken);
@@ -62,9 +55,6 @@ public class GetPaginatedUserNotificationsHandler(
             opt.Items["UserId"] = request.UserId;
         });
         
-        var pageResponse = new PageResponse<NotificationInfo>(mappedNotifications, totalItems, request.Query.PageSize, request.Query.PageNumber);
-        
-        await cacheService.SetAsync($"{CacheKeys.NOTIFICATIONS}{request.UserId}_{request.Query}", pageResponse);
-        return pageResponse;
+        return new PageResponse<NotificationInfo>(mappedNotifications, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
 }
