@@ -42,7 +42,6 @@ public class UpdateAuctionListingHandler(
         auctionListingToUpdate.Name = request.UpdateDto.Name;
         auctionListingToUpdate.Description = request.UpdateDto.Description;
         
-        
         if (request.UpdateDto.StartingBid > auctionListingToUpdate.CurrentBid)
         {
             throw new BadRequestException("Starting bid can't be greater than current bid");

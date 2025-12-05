@@ -17,8 +17,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-//[Authorize(Roles = "Admin")]
-[Authorize]
+[Authorize(Roles = "Admin,Moderator")]
 public class AdminPanelController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
     [HttpPost("global-notification")]
