@@ -30,9 +30,9 @@ public class DisputePurchaseHandler(
     IUnitOfWork unitOfWork,
     IOptions<PaymentSettings> paymentSettings,
     ILogger<DisputePurchaseHandler> logger
-) : IRequestHandler<DisputePurchaseCommand, DisputeResponse>
+) : IRequestHandler<DisputePurchaseCommand, DisputeUserResponse>
 {
-    public async Task<DisputeResponse> Handle(DisputePurchaseCommand request, CancellationToken cancellationToken)
+    public async Task<DisputeUserResponse> Handle(DisputePurchaseCommand request, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
@@ -122,7 +122,7 @@ public class DisputePurchaseHandler(
                 $"Dispute created successfully. Dispute ID: {dispute.Id}, Payment ID: {payment.Id}");
 
             var createdDispute = await disputeRepository.FindDetailedByIdAsync(dispute.Id);
-            return mapper.Map<DisputeResponse>(createdDispute);
+            return mapper.Map<DisputeUserResponse>(createdDispute);
         }
         catch (Exception ex)
         {

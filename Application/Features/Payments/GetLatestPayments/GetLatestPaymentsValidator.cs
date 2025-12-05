@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Application.Features.Payments.GetAllPayments;
+namespace Application.Features.Payments.GetLatestPayments;
 
 public class GetLatestPaymentsValidator : AbstractValidator<GetLatestPaymentsQuery>
 {

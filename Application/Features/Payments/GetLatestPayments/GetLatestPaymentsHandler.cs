@@ -7,7 +7,7 @@ using Infrastructure.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.Features.Payments.GetAllPayments;
+namespace Application.Features.Payments.GetLatestPayments;
 
 /// <summary>
 /// ADMIN handler to get the paginated list of payments (all status types)
@@ -22,8 +22,8 @@ public class GetLatestPaymentsHandler(
     public async Task<PageResponse<PaymentResponse>> Handle(GetLatestPaymentsQuery query,
         CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(query.UserId.ToString());
-        if (user == null)
+        var adminUser = await userManager.FindByIdAsync(query.AdminUserId.ToString());
+        if (adminUser  == null)
             throw new BadRequestException("Invalid user id");
 
         var (payments, totalCount) =

@@ -495,6 +495,18 @@ namespace Infrastructure.Database.Migrations
                     b.Property<decimal>("PlatformFeePercentage")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal?>("RefundAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("RefundAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RefundDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ScheduledRefundDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("ScheduledTransferDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -512,6 +524,9 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("StripeRefundId")
+                        .HasColumnType("text");
 
                     b.Property<string>("StripeTransferId")
                         .HasMaxLength(255)

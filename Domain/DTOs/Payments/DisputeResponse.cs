@@ -9,8 +9,10 @@ namespace Domain.DTOs.Payments;
 
 public class DisputeResponse
 {
+    public int Id { get; set; }
     public ListingBasicResponse Listing { get; set; }
     public UserBasicResponse DisputedBy { get; set; }
+    public UserBasicResponse? ResolvedBy { get; set; }
     public DisputeReason Reason { get; set; }
     public string Description { get; set; }
     public DisputeStatus Status { get; set; }

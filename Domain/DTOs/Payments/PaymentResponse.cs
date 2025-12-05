@@ -19,8 +19,9 @@ public class PaymentResponse
     public UserBasicResponse Buyer { get; set; } = null!;
     public UserBasicResponse Seller { get; set; } = null!;
     public UserBasicResponse ApprovedBy { get; set; }
-    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
-    public int TransferAttempts { get; set; } = 0;
+    public DisputeResponse? Dispute { get; set; }
+    public PaymentStatus Status { get; set; } 
+    public int TransferAttempts { get; set; }
     public TransferTrigger TransferTrigger { get; set; }
     public TransferMethod? ActualTransferMethod { get; set; }
     public DateTime ChargeDate { get; set; } = DateTime.UtcNow;

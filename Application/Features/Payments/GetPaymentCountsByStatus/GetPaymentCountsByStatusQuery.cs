@@ -5,5 +5,5 @@ namespace Application.Features.Payments.GetPaymentCountsByStatus;
 
 public class GetPaymentCountsByStatusQuery : IRequest<PaymentStatusCountsResponse>
 {
-    public int UserId { get; set; }    
+    public int AdminUserId { get; set; }    
 }

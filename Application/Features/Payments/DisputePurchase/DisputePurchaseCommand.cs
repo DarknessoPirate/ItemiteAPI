@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Features.Payments.DisputePurchase;
 
-public class DisputePurchaseCommand : IRequest<DisputeResponse>
+public class DisputePurchaseCommand : IRequest<DisputeUserResponse>
 {
     public int UserId { get; set; }
     public int PaymentId { get; set; }

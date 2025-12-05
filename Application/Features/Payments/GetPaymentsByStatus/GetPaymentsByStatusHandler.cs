@@ -22,8 +22,8 @@ public class GetPaymentsByStatusHandler(
     public async Task<PageResponse<PaymentResponse>> Handle(GetPaymentsByStatusQuery request,
         CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
-        if (user == null)
+        var adminUser = await userManager.FindByIdAsync(request.AdminUserId.ToString());
+        if (adminUser == null)
             throw new BadRequestException("Admin user not found");
 
         var (payments, totalItems) = await paymentRepository.GetPaymentsByStatusPaginatedAsync(
