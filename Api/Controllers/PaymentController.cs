@@ -1,7 +1,10 @@
+using Application.Features.Payments.ConfirmDelivery;
 using Application.Features.Payments.DisputePurchase;
-using Application.Features.Payments.GetAllPayments;
+using Application.Features.Payments.GetLatestPayments;
 using Application.Features.Payments.GetPaymentCountsByStatus;
 using Application.Features.Payments.GetPaymentsByStatus;
+using Application.Features.Payments.GetUserPurchases;
+using Application.Features.Payments.GetUserSales;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
 using Application.Features.Payments.StartStripeOnboarding;
@@ -26,10 +29,9 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
     [HttpPost("stripe/connect/start")]
     public async Task<IActionResult> StartStripeConnect()
     {
-        var userId = requestContextService.GetUserId();
         var command = new StartStripeOnboardingCommand
         {
-            UserId = userId,
+            UserId = requestContextService.GetUserId()
         };
 
         var onboardingUrl = await mediator.Send(command);
@@ -40,11 +42,9 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
     [HttpGet("stripe/connect/refresh-onboarding-link")]
     public async Task<IActionResult> RefreshOnboardingLink()
     {
-        var userId = requestContextService.GetUserId();
-
         var command = new RefreshStripeOnboardingCommand
         {
-            UserId = userId
+            UserId = requestContextService.GetUserId()
         };
 
         var onboardingUrl = await mediator.Send(command);
@@ -58,19 +58,68 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
         [FromRoute] int productListingId,
         [FromBody] PurchaseProductRequest request)
     {
-        var userId = requestContextService.GetUserId();
-
         var command = new PurchaseProductCommand
         {
             ProductListingId = productListingId,
             PaymentMethodId = request.PaymentMethodId,
-            BuyerId = userId
+            BuyerId = requestContextService.GetUserId()
         };
 
         var response = await mediator.Send(command);
 
         return Ok(response);
     }
+
+    [Authorize]
+    [HttpGet("my-purchases")]
+    public async Task<ActionResult<PageResponse<PaymentBuyerResponse>>> GetMyPurchases([FromQuery] int pageSize,
+        [FromQuery] int pageNumber)
+    {
+        var command = new GetUserPurchasesQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            PageSize = pageSize,
+            PageNumber = pageNumber
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+
+
+    [Authorize]
+    [HttpGet("my-sales")]
+    public async Task<ActionResult<PageResponse<PaymentSellerResponse>>> GetMySales([FromQuery] int pageSize,
+        [FromQuery] int pageNumber)
+    {
+        var command = new GetUserSalesQuery
+        {
+            UserId = requestContextService.GetUserId(),
+            PageSize = pageSize,
+            PageNumber = pageNumber
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+    
+    [Authorize]
+    [HttpPost("confirm-delivery/{listindId}")]
+    public async Task<IActionResult> ConfirmDelivery([FromRoute] int listindId)
+    {
+        var command = new ConfirmDeliveryCommand()
+        {
+            UserId = requestContextService.GetUserId(),
+            ListingId = listindId
+        };
+
+        await mediator.Send(command);
+
+        return Ok();
+    }
+
 
     [Authorize]
     [HttpPost("dispute/{paymentId}")]
@@ -92,7 +141,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
         };
 
         var response = await mediator.Send(command);
-        
+
         return Ok(response);
     }
 
@@ -103,7 +152,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
     {
         var command = new GetPaymentsByStatusQuery
         {
-            UserId = requestContextService.GetUserId(),
+            AdminUserId = requestContextService.GetUserId(),
             PaymentStatus = paymentStatus,
             PageSize = pageSize,
             PageNumber = pageNumber
@@ -121,7 +170,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
     {
         var command = new GetLatestPaymentsQuery
         {
-            UserId = requestContextService.GetUserId(),
+            AdminUserId = requestContextService.GetUserId(),
             PageSize = pageSize,
             PageNumber = pageNumber
         };
@@ -137,12 +186,11 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
     {
         var command = new GetPaymentCountsByStatusQuery
         {
-            UserId = requestContextService.GetUserId()
+            AdminUserId = requestContextService.GetUserId()
         };
 
         var response = await mediator.Send(command);
 
         return Ok(response);
-
     }
 }
