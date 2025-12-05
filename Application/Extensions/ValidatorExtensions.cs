@@ -9,6 +9,7 @@ using Application.Features.Categories.UpdateCategory;
 using Application.Features.Listings.AuctionListings.CreateAuctionListing;
 using Application.Features.Listings.AuctionListings.GetBidHistory;
 using Application.Features.Listings.AuctionListings.PlaceBid;
+using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 using Application.Features.Listings.ProductListings.CreateProductListing;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
@@ -63,5 +64,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetPaginatedFollowedListingsQuery>, GetPaginatedFollowListingsValidator>();
         services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
         services.AddScoped<IValidator<GetUserChatsQuery>, GetUserChatsValidator>();
+        services.AddScoped<IValidator<UpdateAuctionListingCommand>, UpdateAuctionListingValidator>();
     }
 }
