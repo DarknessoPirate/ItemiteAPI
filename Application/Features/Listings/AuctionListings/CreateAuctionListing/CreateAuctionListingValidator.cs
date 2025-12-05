@@ -30,7 +30,8 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
         RuleFor(x => x.Images)
             .NotNull().WithMessage("Images array is null")
             .NotEmpty().WithMessage("Images array is empty")
-            .Must(images => images.Count > 0).WithMessage("Images array must contain at least one image");
+            .Must(images => images.Count > 0).WithMessage("Images array must contain at least one image")
+            .Must(images => images.Count <= 6).WithMessage("Listing cannot have more than 6 images");
         RuleFor(x => x.AuctionListingDto.ImageOrders)
             .Must(orders => orders.Contains(1)).WithMessage("Image orders must contain 1 for being main image")
             .Must(orders => orders.Count == orders.Distinct().Count()).WithMessage("Image orders must be unique");

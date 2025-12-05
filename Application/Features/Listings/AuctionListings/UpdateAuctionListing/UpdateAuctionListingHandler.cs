@@ -39,14 +39,23 @@ public class UpdateAuctionListingHandler(
             throw new ForbiddenException("You are not allowed to update this auction");
         }
         
+        if (CalculateFinalPhotoCount(request) > 6)
+        {
+            throw new BadRequestException("An auction listing can have a maximum of 6 photos.");
+        }
+
+        
         auctionListingToUpdate.Name = request.UpdateDto.Name;
         auctionListingToUpdate.Description = request.UpdateDto.Description;
-        
-        if (request.UpdateDto.StartingBid > auctionListingToUpdate.CurrentBid)
+
+        if (request.UpdateDto.StartingBid != null)
         {
-            throw new BadRequestException("Starting bid can't be greater than current bid");
+            if (auctionListingToUpdate.CurrentBid != null)
+            {
+                throw new BadRequestException("You cannot update starting bid, because someone already placed a bid");
+            }
+            auctionListingToUpdate.StartingBid = request.UpdateDto.StartingBid.Value;
         }
-        auctionListingToUpdate.StartingBid = request.UpdateDto.StartingBid;
         
         if (request.UpdateDto.Location == null || !IsLocationComplete(request.UpdateDto.Location))
         {
@@ -92,92 +101,69 @@ public class UpdateAuctionListingHandler(
         try
         {
             var allListingPhotos = auctionListingToUpdate.ListingPhotos.ToList();
-            if (request.UpdateDto.ExistingPhotoOrders == null && request.UpdateDto.ExistingPhotoIds == null)
+            
+            if (request.UpdateDto.ExistingPhotoIds.Any(id => allListingPhotos.All(lp => lp.PhotoId != id)))
             {
-                foreach (var listingPhoto in allListingPhotos.Where(l => l.Order != 1))
-                {
-                    var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
-                    if (deletionResult.Error != null)
-                    {
-                        throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
-                    }
-                    await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
-                    auctionListingToUpdate.ListingPhotos.Remove(listingPhoto);
-                }
-            }
-            else if (request.UpdateDto.ExistingPhotoOrders != null && request.UpdateDto.ExistingPhotoIds != null)
-            {
-                var photosToDelete = allListingPhotos
-                    .Where(lp => !request.UpdateDto.ExistingPhotoIds.Contains(lp.PhotoId))
-                    .ToList();
-                
-                foreach (var listingPhoto in photosToDelete)
-                {
-                    var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.Photo.PublicId);
-                    if (deletionResult.Error != null)
-                    {
-                        throw new CloudinaryException($"Failed to delete photo {listingPhoto.Photo.Id}: {deletionResult.Error.Message}");
-                    }
-                    await photoRepository.DeletePhotoAsync(listingPhoto.PhotoId);
-                    auctionListingToUpdate.ListingPhotos.Remove(listingPhoto);
-                }
-               
-                for (int i = 0; i < request.UpdateDto.ExistingPhotoIds.Count; i++)
-                {
-                    var photoId = request.UpdateDto.ExistingPhotoIds[i];
-                    var newOrder = request.UpdateDto.ExistingPhotoOrders[i];
-                    
-                    var listingPhoto = auctionListingToUpdate.ListingPhotos
-                        .FirstOrDefault(lp => lp.PhotoId == photoId);
-        
-                    if (listingPhoto != null)
-                    {
-                        listingPhoto.Order = newOrder;
-                    }
-                }
+                throw new BadRequestException("One or more of the provided ExistingPhotoIds do not exist in this listing.");
             }
             
-            if (request.NewImages != null && request.NewImages.Any())
+            var photosToDelete = allListingPhotos
+                .Where(p => !request.UpdateDto.ExistingPhotoIds.Contains(p.PhotoId))
+                .ToList();
+
+            foreach (var lp in photosToDelete)
             {
-                var savedPhotosPublicIds = new List<string>();
-    
-                for (int i = 0; i < request.NewImages.Count; i++)
+                var result = await mediaService.DeleteImageAsync(lp.Photo.PublicId);
+                if (result.Error != null)
+                    throw new CloudinaryException($"Failed to delete photo {lp.Photo.Id}: {result.Error.Message}");
+
+                await photoRepository.DeletePhotoAsync(lp.PhotoId);
+                auctionListingToUpdate.ListingPhotos.Remove(lp);
+            }
+            
+            for (int i = 0; i < request.UpdateDto.ExistingPhotoIds.Count; i++)
+            {
+                var photoId = request.UpdateDto.ExistingPhotoIds[i];
+                var newOrder = request.UpdateDto.ExistingPhotoOrders[i];
+                
+                var listingPhoto = auctionListingToUpdate.ListingPhotos
+                    .FirstOrDefault(lp => lp.PhotoId == photoId);
+        
+                if (listingPhoto != null)
                 {
-                    var image = request.NewImages[i];
-                    var uploadResult = await mediaService.UploadPhotoAsync(image.File);
-        
-                    if (uploadResult.Error != null)
-                    {
-                        foreach (var savedPhoto in savedPhotosPublicIds)
-                        {
-                            await mediaService.DeleteImageAsync(savedPhoto);
-                        }
-                        throw new CloudinaryException(uploadResult.Error.Message);
-                    }
-        
-                    savedPhotosPublicIds.Add(uploadResult.PublicId);
-        
-                    var photo = new Photo
-                    {
-                        Url = uploadResult.SecureUrl.AbsoluteUri,
-                        PublicId = uploadResult.PublicId,
-                        FileName = image.File.FileName
-                    };
-        
-                    await photoRepository.AddPhotoAsync(photo);
-                    
-                    int order = request.NewImages != null && request.NewImages.Count > i
-                        ? request.NewImages.Select(i => i.Order).ToArray()[i]
-                        : auctionListingToUpdate.ListingPhotos.Max(lp => lp.Order) + i + 1;
-        
-                    var listingPhoto = new ListingPhoto
-                    {
-                        Photo = photo,
-                        Order = order
-                    };
-        
-                    auctionListingToUpdate.ListingPhotos.Add(listingPhoto);
+                    listingPhoto.Order = newOrder;
                 }
+            }
+                
+           
+            var savedPhotosPublicIds = new List<string>();
+            for (int i = 0; i < request.NewImages.Count; i++)
+            {
+                var image = request.NewImages[i];
+                var uploadResult = await mediaService.UploadPhotoAsync(image.File);
+                if (uploadResult.Error != null)
+                {
+                    foreach (var savedPhoto in savedPhotosPublicIds)
+                    {
+                        await mediaService.DeleteImageAsync(savedPhoto);
+                    }
+                    throw new CloudinaryException(uploadResult.Error.Message);
+                }
+                
+                savedPhotosPublicIds.Add(uploadResult.PublicId);
+                
+                var photo = new Photo
+                {
+                    FileName = image.File.FileName, Url = uploadResult.SecureUrl.AbsoluteUri, PublicId = uploadResult.PublicId
+                };
+                
+                await photoRepository.AddPhotoAsync(photo);
+                
+                var listingPhoto = new ListingPhoto
+                {
+                    Photo = photo, Order = image.Order
+                };
+                auctionListingToUpdate.ListingPhotos.Add(listingPhoto);
             }
 
             auctionListingRepository.UpdateListing(auctionListingToUpdate);
@@ -217,5 +203,16 @@ public class UpdateAuctionListingHandler(
                && !string.IsNullOrWhiteSpace(location.Country) 
                && !string.IsNullOrWhiteSpace(location.City) 
                && !string.IsNullOrWhiteSpace(location.State);
+    }
+    
+    private int CalculateFinalPhotoCount(UpdateAuctionListingCommand request)
+    {
+        int newImages = request.NewImages?.Count ?? 0;
+        
+        if (request.UpdateDto.ExistingPhotoIds == null || request.UpdateDto.ExistingPhotoOrders == null)
+            return 1 + newImages;
+
+        int existing = request.UpdateDto.ExistingPhotoIds.Count;
+        return existing + newImages;
     }
 }
