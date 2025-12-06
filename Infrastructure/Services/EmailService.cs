@@ -10,8 +10,8 @@ using Microsoft.Extensions.Options;
 namespace Infrastructure.Services;
 
 public class EmailService(
-    IFluentEmailFactory fluentEmailFactory,
-    IOptions<AuthSettings> authSettings
+    IOptions<RedirectSettings> redirectSettings,
+    IFluentEmailFactory fluentEmailFactory
 ) : IEmailService
 {
     public async Task SendConfirmationAsync(User user, string emailToken)
@@ -22,9 +22,9 @@ public class EmailService(
             { "email", user.Email! }
         };
 
-        var emailConfirmationUri = authSettings.Value.EmailVerificationUri;
+        var emailConfirmationUrl = redirectSettings.Value.EmailVerificationUrl;
 
-        var confirmationLink = QueryHelpers.AddQueryString(emailConfirmationUri, queryParam!);
+        var confirmationLink = QueryHelpers.AddQueryString(emailConfirmationUrl, queryParam!);
 
         var template = "Helpers/EmailTemplates/EmailConfirmation.cshtml";
         
@@ -54,9 +54,9 @@ public class EmailService(
             { "email", user.Email! }
         };
 
-        var passwordResetUri = authSettings.Value.PasswordResetUri;
+        var passwordResetUrl = redirectSettings.Value.PasswordResetUrl;
 
-        var passwordResetLink = QueryHelpers.AddQueryString(passwordResetUri, queryParam!);
+        var passwordResetLink = QueryHelpers.AddQueryString(passwordResetUrl, queryParam!);
 
         var template = "Helpers/EmailTemplates/PasswordReset.cshtml";
         
@@ -86,9 +86,9 @@ public class EmailService(
             { "currentEmail", user.Email! }
         };
 
-        var emailChangeConfirmationUri = authSettings.Value.EmailChangeConfirmationUri;
+        var emailChangeConfirmationUrl = redirectSettings.Value.EmailChangeConfirmationUrl;
 
-        var confirmationLink = QueryHelpers.AddQueryString(emailChangeConfirmationUri, queryParam!);
+        var confirmationLink = QueryHelpers.AddQueryString(emailChangeConfirmationUrl, queryParam!);
 
         var template = "Helpers/EmailTemplates/EmailChangeConfirmation.cshtml";
         

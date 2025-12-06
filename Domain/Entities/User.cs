@@ -12,6 +12,7 @@ public class User : IdentityUser<int>
     public string? PendingNewEmail { get; set; }
     public DateTime? EmailChangeTokenExpirationDate { get; set; }
     public AuthProvider AuthProvider { get; set; }
+    public string? StripeConnectAccountId { get; set; } = null;
 
     public int? ProfilePhotoId { get; set; }
     public Photo? ProfilePhoto { get; set; }
