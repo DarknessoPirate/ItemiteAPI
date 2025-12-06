@@ -28,16 +28,16 @@ public class ConfirmDeliveryHandler(
 
         var payment = await paymentRepository.FindByListingIdAsync(request.ListingId);
         if (payment == null)
-            throw new BadRequestException("Invalid payment id");
+            throw new BadRequestException("Invalid listing id");
 
         if (payment.BuyerId != request.UserId)
             throw new ForbiddenException("Not authorized to confirm delivery");
-
-        if (payment.Status == PaymentStatus.Transferred) // don't need the confirmation if already transferred
-            return;
-
+        
         if (payment.Status != PaymentStatus.Pending)
             throw new BadRequestException("Invalid operation on the payment");
+
+        if (payment.TransferTrigger == TransferTrigger.DeliveryConfirmed)
+            throw new BadRequestException("Delivery already confirmed");
 
         payment.TransferTrigger = TransferTrigger.DeliveryConfirmed;
         paymentRepository.Update(payment);

@@ -7,6 +7,7 @@ using Application.Features.Payments.GetUserPurchases;
 using Application.Features.Payments.GetUserSales;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Payments.RefreshStripeOnboarding;
+using Application.Features.Payments.ResolveDispute;
 using Application.Features.Payments.StartStripeOnboarding;
 using Domain.DTOs.File;
 using Domain.DTOs.Pagination;
@@ -104,7 +105,7 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         return Ok(response);
     }
-    
+
     [Authorize]
     [HttpPost("confirm-delivery/{listindId}")]
     public async Task<IActionResult> ConfirmDelivery([FromRoute] int listindId)
@@ -187,6 +188,25 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
         var command = new GetPaymentCountsByStatusQuery
         {
             AdminUserId = requestContextService.GetUserId()
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+
+    [Authorize(Roles = "Admin,Moderator")]
+    [HttpPost("admin/resolve-dispute/{disputeId}")]
+    public async Task<ActionResult<DisputeResponse>> ResolveDispute([FromRoute] int disputeId, [FromBody] ResolveDisputeRequest request)
+    {
+        var command = new ResolveDisputeCommand
+        {
+            AdminUserId = requestContextService.GetUserId(),
+            DisputeId = disputeId,
+            Resolution = request.Resolution,
+            PartialRefundAmount = request.PartialRefundAmount,
+            ReviewerNotes = request.ReviewerNotes
+            
         };
 
         var response = await mediator.Send(command);

@@ -15,11 +15,6 @@ public class PaymentResponse
     public decimal PlatformFeeAmount { get; set; } // calculated fee amount
     public decimal SellerAmount { get; set; } // amount seller receives (TotalAmount - PlatformFeeAmount)
     public string Currency { get; set; }
-    public ListingBasicResponse Listing { get; set; } = null!;
-    public UserBasicResponse Buyer { get; set; } = null!;
-    public UserBasicResponse Seller { get; set; } = null!;
-    public UserBasicResponse ApprovedBy { get; set; }
-    public DisputeResponse? Dispute { get; set; }
     public PaymentStatus Status { get; set; } 
     public int TransferAttempts { get; set; }
     public TransferTrigger TransferTrigger { get; set; }
@@ -27,5 +22,15 @@ public class PaymentResponse
     public DateTime ChargeDate { get; set; } = DateTime.UtcNow;
     public DateTime? TransferDate { get; set; } // When money was transferred to seller
     public DateTime? ScheduledTransferDate { get; set; } // when it's scheduled for transfer
+    public string? StripeRefundId { get; set; } 
+    public decimal? RefundAmount { get; set; } 
+    public DateTime? RefundDate { get; set; } 
+    public DateTime? ScheduledRefundDate { get; set; }
+    public int RefundAttempts { get; set; }
     public string? Notes { get; set; } // Admin notes, dispute info, etc.
+    public ListingBasicResponse Listing { get; set; } = null!;
+    public UserBasicResponse Buyer { get; set; } = null!;
+    public UserBasicResponse Seller { get; set; } = null!;
+    public UserBasicResponse ApprovedBy { get; set; }
+    public DisputeResponse? Dispute { get; set; }
 }
