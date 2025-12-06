@@ -25,27 +25,32 @@ public class UpdateAuctionListingValidator : AbstractValidator<UpdateAuctionList
             .NotNull().WithMessage("Category id is null")
             .GreaterThan(0).WithMessage("Category id must be greater than 0");
         RuleFor(x => x.UpdateDto.StartingBid)
-            .NotEmpty().WithMessage("Starting bid is empty")
-            .NotNull().WithMessage("Starting bid is null")
             .GreaterThan(0).WithMessage("Starting bid must be greater than 0");
+        
+        RuleFor(x => x.UpdateDto.ExistingPhotoIds)
+            .NotNull().WithMessage("ExistingPhotoIds cannot be null");
+
+        RuleFor(x => x.UpdateDto.ExistingPhotoOrders)
+            .NotNull().WithMessage("ExistingPhotoOrders cannot be null");
+
+        RuleFor(x => x.NewImages)
+            .NotNull().WithMessage("NewImages cannot be null");
+
+        RuleFor(x => x)
+            .Must(x => x.UpdateDto.ExistingPhotoOrders.Count == x.UpdateDto.ExistingPhotoIds.Count)
+            .WithMessage("ExistingPhotoOrders count must match ExistingPhotoIds count");
+
+        RuleFor(x => x)
+            .Must(HaveUniqueImageOrders)
+            .WithMessage("Image orders must be unique across existing and new images");
+
+        RuleFor(x => x)
+            .Must(HaveMainImage)
+            .WithMessage("At least one image must have order = 1");
+        
         RuleFor(x => x.UpdateDto.Location)
             .NotEmpty().WithMessage("Location is empty")
             .NotNull().WithMessage("Location is null");
-        RuleFor(x => x)
-            .Must(HaveUniqueImageOrders)
-            .WithMessage("Image orders must be unique across all images (existing and new)")
-            .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
-                       || (x.NewImages != null && x.NewImages.Any()));
-        RuleFor(x => x)
-            .Must(HaveMainImage)
-            .WithMessage("At least one image must have order = 1 (main image)")
-            .When(x => (x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoOrders.Any()) 
-                       || (x.NewImages != null && x.NewImages.Any()));
-        RuleFor(x => x.UpdateDto)
-            .Must(x => x.ExistingPhotoOrders!.Count == x.ExistingPhotoIds!.Count)
-            .WithMessage("Existing photo orders and ids must have same size")
-            .When(x => x.UpdateDto.ExistingPhotoOrders != null && x.UpdateDto.ExistingPhotoIds != null &&
-                        x.UpdateDto.ExistingPhotoOrders.Any() && x.UpdateDto.ExistingPhotoIds.Any());
         
         RuleFor(x => x.UpdateDto.Location)
             .Must(LocationIsCompleteOrNull)
@@ -101,35 +106,17 @@ public class UpdateAuctionListingValidator : AbstractValidator<UpdateAuctionList
     }
     private bool HaveUniqueImageOrders(UpdateAuctionListingCommand command)
     {
-        var allOrders = new List<int>();
-        
-        if (command.UpdateDto.ExistingPhotoOrders != null)
-        {
-            allOrders.AddRange(command.UpdateDto.ExistingPhotoOrders);
-        }
-        
-        if (command.NewImages != null)
-        {
-            allOrders.AddRange(command.NewImages.Select(i => i.Order));
-        }
-    
-        return allOrders.Count == allOrders.Distinct().Count();
+        var orders = new List<int>();
+
+        orders.AddRange(command.UpdateDto.ExistingPhotoOrders);
+        orders.AddRange(command.NewImages.Select(x => x.Order));
+
+        return orders.Count == orders.Distinct().Count();
     }
 
     private bool HaveMainImage(UpdateAuctionListingCommand command)
     {
-        var allOrders = new List<int>();
-    
-        if (command.UpdateDto.ExistingPhotoOrders != null)
-        {
-            allOrders.AddRange(command.UpdateDto.ExistingPhotoOrders);
-        }
-    
-        if (command.NewImages != null)
-        {
-            allOrders.AddRange(command.NewImages.Select(i => i.Order));
-        }
-    
-        return allOrders.Contains(1);
+        return command.UpdateDto.ExistingPhotoOrders.Contains(1)
+               || command.NewImages.Any(i => i.Order == 1);
     }
 }

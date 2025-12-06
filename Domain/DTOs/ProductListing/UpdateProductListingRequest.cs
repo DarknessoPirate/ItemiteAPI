@@ -11,7 +11,7 @@ public class UpdateProductListingRequest
     public decimal Price { get; set; }
     public bool? IsNegotiable { get; set; } = false;
     public int CategoryId { get; set; }
-    
-    public List<int>? ExistingPhotoIds { get; set; }
-    public List<int>? ExistingPhotoOrders { get; set; }
+
+    public List<int> ExistingPhotoIds { get; set; } = [];
+    public List<int> ExistingPhotoOrders { get; set; } = [];
 }

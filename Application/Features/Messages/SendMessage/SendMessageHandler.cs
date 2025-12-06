@@ -20,16 +20,19 @@ public class SendMessageHandler(
     IMessageRepository messageRepository,
     IPhotoRepository photoRepository,
     IListingRepository<ListingBase> listingRepository,
+    IUserRepository userRepository,
     IMediaService mediaService,
     IUnitOfWork unitOfWork,
     IMapper mapper,
     INotificationService notificationService,
-    ILogger<SendMessageHandler> logger
+    ILogger<SendMessageHandler> logger,
+    ICacheService cacheService
 ) : IRequestHandler<SendMessageCommand, SendMessageResult>
 {
     public async Task<SendMessageResult> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
-        var sender = await userManager.FindByIdAsync(request.SenderId.ToString());
+        // var sender = await userManager.FindByIdAsync(request.SenderId.ToString());
+        var sender = await userRepository.GetUserWithProfilePhotoAsync(request.SenderId);
         if (sender == null)
             throw new BadRequestException("Sender not found");
 
@@ -180,6 +183,7 @@ public class SendMessageHandler(
                 await notificationService.SendNotification([request.SendMessageDto.RecipientId], request.SenderId, new NotificationInfo
                 {
                     Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
+                    NotificationImageUrl = sender.ProfilePhoto?.Url,
                     ResourceId = request.SendMessageDto.ListingId,
                     ResourceType = ResourceType.ChatPage
                 });
