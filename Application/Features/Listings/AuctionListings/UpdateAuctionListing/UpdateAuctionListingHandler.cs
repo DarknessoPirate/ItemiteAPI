@@ -48,6 +48,9 @@ public class UpdateAuctionListingHandler(
         auctionListingToUpdate.Name = request.UpdateDto.Name;
         auctionListingToUpdate.Description = request.UpdateDto.Description;
 
+        var currentDateEnds = auctionListingToUpdate.DateEnds;
+        auctionListingToUpdate.DateEnds = request.UpdateDto.DateEnds ?? currentDateEnds;
+
         if (request.UpdateDto.StartingBid != null)
         {
             if (auctionListingToUpdate.CurrentBid != null)

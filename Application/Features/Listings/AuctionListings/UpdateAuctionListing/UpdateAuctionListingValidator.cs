@@ -26,6 +26,9 @@ public class UpdateAuctionListingValidator : AbstractValidator<UpdateAuctionList
             .GreaterThan(0).WithMessage("Category id must be greater than 0");
         RuleFor(x => x.UpdateDto.StartingBid)
             .GreaterThan(0).WithMessage("Starting bid must be greater than 0");
+        RuleFor(x => x.UpdateDto.DateEnds)
+            .GreaterThan(DateTime.UtcNow.AddHours(1)).WithMessage("Auction must last at least one hour")
+            .LessThan(DateTime.UtcNow.AddDays(30)).WithMessage("Auction can't be longer than 30 days");
         
         RuleFor(x => x.UpdateDto.ExistingPhotoIds)
             .NotNull().WithMessage("ExistingPhotoIds cannot be null");

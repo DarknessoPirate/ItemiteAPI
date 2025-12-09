@@ -9,6 +9,7 @@ public class UpdateAuctionListingRequest
     public Location? Location { get; set; }
     public int CategoryId { get; set; }
     public decimal? StartingBid { get; set; }
+    public DateTime? DateEnds { get; set; } 
 
     public List<int> ExistingPhotoIds { get; set; } = [];
     public List<int> ExistingPhotoOrders { get; set; } = [];
