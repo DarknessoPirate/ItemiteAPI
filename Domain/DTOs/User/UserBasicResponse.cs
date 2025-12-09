@@ -5,5 +5,5 @@ public class UserBasicResponse
     public int Id { get; set; }
     public string UserName { get; set; }
     public string Email { get; set; }
-    // TODO: ADD PROFILE PHOTO URL
+    public string? ProfilePhotoUrl { get; set; }
 }
