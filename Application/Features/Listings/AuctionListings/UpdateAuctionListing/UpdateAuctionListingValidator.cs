@@ -15,11 +15,11 @@ public class UpdateAuctionListingValidator : AbstractValidator<UpdateAuctionList
         RuleFor(x => x.UpdateDto.Name)
             .NotEmpty().WithMessage("Auction name is empty")
             .NotNull().WithMessage("Auction name is null")
-            .Length(2, 30).WithMessage("Auction name must be between 2 and 30 characters");
+            .Length(2, 50).WithMessage("Auction name must be between 2 and 50 characters");
         RuleFor(x => x.UpdateDto.Description)
             .NotEmpty().WithMessage("Auction description is empty")
             .NotNull().WithMessage("Auction description is null")
-            .Length(2, 500).WithMessage("Auction description must be between 2 and 500 characters");
+            .Length(2, 2500).WithMessage("Auction description must be between 2 and 2500 characters");
         RuleFor(x => x.UpdateDto.CategoryId)
             .NotEmpty().WithMessage("Category id is empty")
             .NotNull().WithMessage("Category id is null")
