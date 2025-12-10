@@ -20,9 +20,17 @@ using Application.Features.Messages.GetListingChats;
 using Application.Features.Messages.GetUserChats;
 using Application.Features.Messages.SendMessage;
 using Application.Features.Messages.UpdateMessage;
+using Application.Features.Payments.GetPaymentsByStatus;
+using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Notifications.GetPaginatedUserNotifications;
 using Application.Features.Reports.CreateReport;
 using Application.Features.Reports.GetPaginatedReports;
+using Application.Features.Payments.ConfirmDelivery;
+using Application.Features.Payments.DisputePurchase;
+using Application.Features.Payments.GetLatestPayments;
+using Application.Features.Payments.GetUserPurchases;
+using Application.Features.Payments.GetUserSales;
+using Application.Features.Payments.ResolveDispute;
 using Application.Features.Users.ChangeEmail;
 using Application.Features.Users.ChangeLocation;
 using Application.Features.Users.ChangePassword;
@@ -71,5 +79,13 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetPaginatedUsersQuery>, GetPaginatedUsersValidator>();
         services.AddScoped<IValidator<GetUserChatsQuery>, GetUserChatsValidator>();
         services.AddScoped<IValidator<UpdateAuctionListingCommand>, UpdateAuctionListingValidator>();
+        services.AddScoped<IValidator<PurchaseProductCommand>, PurchaseProductValidator>();
+        services.AddScoped<IValidator<GetLatestPaymentsQuery>, GetLatestPaymentsValidator>();
+        services.AddScoped<IValidator<GetPaymentsByStatusQuery>, GetPaymentsByStatusValidator>();
+        services.AddScoped<IValidator<DisputePurchaseCommand>, DisputePurchaseValidator>();
+        services.AddScoped<IValidator<ConfirmDeliveryCommand>, ConfirmDeliveryValidator>();
+        services.AddScoped<IValidator<ResolveDisputeCommand>, ResolveDisputeValidator>();
+        services.AddScoped<IValidator<GetUserSalesQuery>, GetUserSalesValidator>();
+        services.AddScoped<IValidator<GetUserPurchasesQuery>, GetUserPurchasesValidator>();
     }
 }

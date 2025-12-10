@@ -18,7 +18,7 @@ public class LoginHandler(
     UserManager<User> userManager,
     IOptions<AuthSettings> authSettings,
     IEmailService emailService,
-    IHttpContextAccessor contextAccessor, // TODO: change this shi 🗣️🔥
+    IHttpContextAccessor contextAccessor,
     IMapper mapper,
     ILogger<LoginHandler> logger
     ) : IRequestHandler<LoginCommand, UserBasicResponse>
@@ -76,8 +76,6 @@ public class LoginHandler(
             request.DeviceId,
             request.UserAgent
         );
-        
-        // var authResponse = new AuthResponse(user, tokens);
         
         tokenService.SetTokensInsideCookie(tokens, contextAccessor.HttpContext!);
 

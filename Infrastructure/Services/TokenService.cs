@@ -17,16 +17,16 @@ using Microsoft.IdentityModel.Tokens;
 namespace Infrastructure.Services;
 
 public class TokenService(
-        IRefreshTokenRepository refreshTokenRepository,
-        UserManager<User> userManager,
-        IUnitOfWork unitOfWork,
-        IOptions<JwtSettings> jwtSettings
-    ) : ITokenService
+    IRefreshTokenRepository refreshTokenRepository,
+    UserManager<User> userManager,
+    IUnitOfWork unitOfWork,
+    IOptions<JwtSettings> jwtSettings
+) : ITokenService
 {
     public async Task<TokenPair> GenerateTokenPairAsync(User user, string ipAddress, string? deviceId,
         string? userAgent)
     {
-        var accessToken = GenerateJwtToken(user);
+        var accessToken = await GenerateJwtToken(user);
         var jwtId = new JwtSecurityTokenHandler().ReadJwtToken(accessToken.Token).Id;
 
         var refreshToken = await CreateRefreshTokenAsync(user, jwtId, ipAddress, deviceId, userAgent);
@@ -92,7 +92,7 @@ public class TokenService(
             throw new UnauthorizedException("Account is locked");
         }
 
-        var newAccessToken = GenerateJwtToken(user);
+        var newAccessToken = await GenerateJwtToken(user);
         var newJwtId = new JwtSecurityTokenHandler().ReadJwtToken(newAccessToken.Token).Id;
 
         var newRefreshToken = await CreateRefreshTokenAsync(user, newJwtId, ipAddress, deviceId, userAgent);
@@ -177,7 +177,7 @@ public class TokenService(
     {
         var accessToken = tokenPair.AccessToken;
         var refreshToken = tokenPair.RefreshToken;
-        
+
         httpContext.Response.Cookies.Append("accessToken", accessToken.Token, new CookieOptions
         {
             Path = "/",
@@ -187,7 +187,7 @@ public class TokenService(
             Secure = false, // true if prod env
             SameSite = SameSiteMode.Lax
         });
-        
+
         httpContext.Response.Cookies.Append("refreshToken", refreshToken.Token, new CookieOptions
         {
             Path = "/",
@@ -241,12 +241,12 @@ public class TokenService(
         return refreshToken;
     }
 
-    private AccessTokenDTO GenerateJwtToken(User user)
+    private async Task<AccessTokenDTO> GenerateJwtToken(User user)
     {
         var tokenExpirationInMinutes = jwtSettings.Value.AccessTokenExpirationInMinutes;
 
         var signingCredentials = GetSigningCredentials();
-        var claims = GenerateClaims(user);
+        var claims = await GenerateClaims(user);
         var tokenOptions = CreateTokenOptions(signingCredentials, claims, tokenExpirationInMinutes);
 
         var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
@@ -278,8 +278,9 @@ public class TokenService(
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var tokenKey = jwtSettings.Value.Key ?? throw new ConfigException("Cannot access token key from appsettings.json");
-        
+        var tokenKey = jwtSettings.Value.Key ??
+                       throw new ConfigException("Cannot access token key from appsettings.json");
+
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -302,8 +303,9 @@ public class TokenService(
 
     private SigningCredentials GetSigningCredentials()
     {
-        var tokenKey = jwtSettings.Value.Key ?? throw new ConfigException("Cannot access token key from appsettings.json");
-        
+        var tokenKey = jwtSettings.Value.Key ??
+                       throw new ConfigException("Cannot access token key from appsettings.json");
+
         if (tokenKey.Length < 64)
             throw new ConfigException("Token key needs to be at least 64 characters long");
 
@@ -312,7 +314,7 @@ public class TokenService(
         return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
     }
 
-    private List<Claim> GenerateClaims(User user)
+    private async Task<List<Claim>> GenerateClaims(User user)
     {
         var claims = new List<Claim>
         {
@@ -321,15 +323,24 @@ public class TokenService(
             new Claim(ClaimTypes.Email, user.Email!),
             new Claim(ClaimTypes.Name, user.UserName!)
         };
+        
+        var roles = await userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
         return claims;
     }
 
     private JwtSecurityToken CreateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims,
         int minutesToExpiry)
     {
-        var issuer = jwtSettings.Value.Issuer ?? throw new ConfigException("Cannot access issuer from appsettings.json");
-        var audience = jwtSettings.Value.Audience ?? throw new ConfigException("Cannot access audience from appsettings.json");
-        
+        var issuer = jwtSettings.Value.Issuer ??
+                     throw new ConfigException("Cannot access issuer from appsettings.json");
+        var audience = jwtSettings.Value.Audience ??
+                       throw new ConfigException("Cannot access audience from appsettings.json");
+
         var tokenOptions = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,

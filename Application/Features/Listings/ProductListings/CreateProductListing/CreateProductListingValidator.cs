@@ -11,11 +11,11 @@ public class CreateProductListingValidator : AbstractValidator<CreateProductList
         RuleFor(x => x.ProductListingDto.Name)
             .NotEmpty().WithMessage("Product name is empty")
             .NotNull().WithMessage("Product name is null")
-            .Length(2, 30).WithMessage("Product name must be between 2 and 30 characters");
+            .Length(2, 50).WithMessage("Product name must be between 2 and 50 characters");
         RuleFor(x => x.ProductListingDto.Description)
             .NotEmpty().WithMessage("Product description is empty")
             .NotNull().WithMessage("Product description is null")
-            .Length(2, 500).WithMessage("Product description must be between 2 and 500 characters");
+            .Length(2, 2500).WithMessage("Product description must be between 2 and 2500 characters");
         RuleFor(x => x.ProductListingDto.CategoryId)
             .NotEmpty().WithMessage("Category id is empty")
             .NotNull().WithMessage("Category id is null")

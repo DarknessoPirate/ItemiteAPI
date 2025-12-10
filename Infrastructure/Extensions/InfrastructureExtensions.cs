@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Database;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
 using Infrastructure.Repositories;
@@ -8,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using Stripe;
+using TokenService = Infrastructure.Services.TokenService;
 
 namespace Infrastructure.Extensions;
 
@@ -43,7 +46,8 @@ public static class InfrastructureExtensions
                                    ?? throw new InvalidOperationException("Connection 'Redis' not found.");
             return ConnectionMultiplexer.Connect(connectionString);
         });
-        
+        StripeConfiguration.ApiKey = configuration["StripeSettings:SecretKey"] ??
+                                     throw new ConfigException("Stripe SecretKey missing");
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>(); 
@@ -58,8 +62,13 @@ public static class InfrastructureExtensions
         services.AddScoped<ILIstingViewRepository, ListingViewRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<IStripeConnectService, StripeConnectService>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
         services.AddHostedService<ArchiveExpiredListingsService>();
         services.AddHostedService<OldListingViewsCleanupService>();
+        services.AddHostedService<PaymentTransferBackgroundService>();
     }
 }
+

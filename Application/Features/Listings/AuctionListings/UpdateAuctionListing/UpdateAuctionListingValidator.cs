@@ -15,17 +15,20 @@ public class UpdateAuctionListingValidator : AbstractValidator<UpdateAuctionList
         RuleFor(x => x.UpdateDto.Name)
             .NotEmpty().WithMessage("Auction name is empty")
             .NotNull().WithMessage("Auction name is null")
-            .Length(2, 30).WithMessage("Auction name must be between 2 and 30 characters");
+            .Length(2, 50).WithMessage("Auction name must be between 2 and 50 characters");
         RuleFor(x => x.UpdateDto.Description)
             .NotEmpty().WithMessage("Auction description is empty")
             .NotNull().WithMessage("Auction description is null")
-            .Length(2, 500).WithMessage("Auction description must be between 2 and 500 characters");
+            .Length(2, 2500).WithMessage("Auction description must be between 2 and 2500 characters");
         RuleFor(x => x.UpdateDto.CategoryId)
             .NotEmpty().WithMessage("Category id is empty")
             .NotNull().WithMessage("Category id is null")
             .GreaterThan(0).WithMessage("Category id must be greater than 0");
         RuleFor(x => x.UpdateDto.StartingBid)
             .GreaterThan(0).WithMessage("Starting bid must be greater than 0");
+        RuleFor(x => x.UpdateDto.DateEnds)
+            .GreaterThan(DateTime.UtcNow.AddHours(1)).WithMessage("Auction must last at least one hour")
+            .LessThan(DateTime.UtcNow.AddDays(30)).WithMessage("Auction can't be longer than 30 days");
         
         RuleFor(x => x.UpdateDto.ExistingPhotoIds)
             .NotNull().WithMessage("ExistingPhotoIds cannot be null");
