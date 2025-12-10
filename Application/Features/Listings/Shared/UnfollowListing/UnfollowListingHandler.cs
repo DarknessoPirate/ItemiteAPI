@@ -1,3 +1,4 @@
+using Domain.Configs;
 using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Domain.Enums;
@@ -13,6 +14,7 @@ public class UnfollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
+    ICacheService cacheService,
     INotificationService notificationService
     ) : IRequestHandler<UnfollowListingCommand>
 {
@@ -54,5 +56,7 @@ public class UnfollowListingHandler(
         await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);
 
         await unitOfWork.SaveChangesAsync();
+
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}{request.UserId}_followed*");
     }
 }

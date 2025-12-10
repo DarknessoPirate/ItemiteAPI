@@ -1,3 +1,4 @@
+using Domain.Configs;
 using Domain.DTOs.Notifications;
 using Domain.Entities;
 using Domain.Enums;
@@ -13,6 +14,7 @@ public class FollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
+    ICacheService cacheService,
     INotificationService notificationService
     ) : IRequestHandler<FollowListingCommand, int>
 {
@@ -64,6 +66,8 @@ public class FollowListingHandler(
         };
             
         await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);
+        
+        await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}{request.UserId}_followed*");
         
         return followedListing.Id;
     }
