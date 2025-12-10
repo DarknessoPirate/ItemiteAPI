@@ -23,6 +23,8 @@ using Application.Features.Messages.UpdateMessage;
 using Application.Features.Payments.GetPaymentsByStatus;
 using Application.Features.Payments.PurchaseProduct;
 using Application.Features.Notifications.GetPaginatedUserNotifications;
+using Application.Features.Reports.CreateReport;
+using Application.Features.Reports.GetPaginatedReports;
 using Application.Features.Payments.ConfirmDelivery;
 using Application.Features.Payments.DisputePurchase;
 using Application.Features.Payments.GetLatestPayments;
@@ -35,6 +37,7 @@ using Application.Features.Users.ChangePassword;
 using Application.Features.Users.ChangePhoneNumber;
 using Application.Features.Users.ChangeUsername;
 using Application.Features.Users.ConfirmEmailChange;
+using Application.Features.Users.GetPaginatedUsers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -71,6 +74,9 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ChangeUsernameCommand>, ChangeUsernameValidator>();
         services.AddScoped<IValidator<GetPaginatedFollowedListingsQuery>, GetPaginatedFollowListingsValidator>();
         services.AddScoped<IValidator<GetPaginatedUserNotificationsQuery>, GetPaginatedUserNotificationsValidator>();
+        services.AddScoped<IValidator<CreateReportCommand>, CreateReportValidator>();
+        services.AddScoped<IValidator<GetPaginatedReportsQuery>, GetPaginatedReportsValidator>();
+        services.AddScoped<IValidator<GetPaginatedUsersQuery>, GetPaginatedUsersValidator>();
         services.AddScoped<IValidator<GetUserChatsQuery>, GetUserChatsValidator>();
         services.AddScoped<IValidator<UpdateAuctionListingCommand>, UpdateAuctionListingValidator>();
         services.AddScoped<IValidator<PurchaseProductCommand>, PurchaseProductValidator>();

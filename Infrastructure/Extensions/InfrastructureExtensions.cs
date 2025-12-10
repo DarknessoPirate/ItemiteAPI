@@ -61,6 +61,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IBroadcastService, BroadcastService>();
         services.AddScoped<ILIstingViewRepository, ListingViewRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();

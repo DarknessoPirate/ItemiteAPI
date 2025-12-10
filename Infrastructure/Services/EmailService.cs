@@ -114,7 +114,7 @@ public class EmailService(
     public async Task SendGlobalNotificationAsync(List<User> recipients, string emailSubject, string title, string message)
     {
         // TODO: Prepare email template
-        var template = "Helpers/EmailTemplates/GlobalNotification.cshtml";
+        var template = "Helpers/EmailTemplates/Notification.cshtml";
 
         foreach (var recipient in recipients)
         {
@@ -123,7 +123,7 @@ public class EmailService(
             var sendResponse = await email
                 .To(recipient.Email)
                 .Subject(emailSubject)
-                .UsingTemplateFromFile(template, new EmailGlobalNotificationModel
+                .UsingTemplateFromFile(template, new EmailNotificationModel
                 {
                     Title = title,
                     Message = message,
@@ -133,8 +133,31 @@ public class EmailService(
 
             if (!sendResponse.Successful)
             {
-                throw new EmailException("Error while sending email change confirmation", sendResponse.ErrorMessages.ToList());
+                throw new EmailException("Error while sending global notification email", sendResponse.ErrorMessages.ToList());
             }
         }
+    }
+
+    public async Task SendNotificationAsync(User recipient, string emailSubject, string title, string message)
+    {
+        // TODO: Prepare email template
+        var template = "Helpers/EmailTemplates/Notification.cshtml";
+        
+        var email = fluentEmailFactory.Create();
+        
+        var sendResponse = await email
+            .To(recipient.Email)
+            .Subject(emailSubject)
+            .UsingTemplateFromFile(template, new EmailNotificationModel
+            {
+                Title = title, Message = message, RecipientUsername = recipient.UserName!
+            })
+            .SendAsync();
+
+        if (!sendResponse.Successful)
+        {
+            throw new EmailException("Error while sending notification email", sendResponse.ErrorMessages.ToList());
+        }
+        
     }
 }

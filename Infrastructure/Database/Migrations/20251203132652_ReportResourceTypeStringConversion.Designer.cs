@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251203132652_ReportResourceTypeStringConversion")]
+    partial class ReportResourceTypeStringConversion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,93 +100,6 @@ namespace Infrastructure.Database.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Dispute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<int>("InitiatedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("RefundAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Resolution")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("ResolvedById")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InitiatedByUserId");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique();
-
-                    b.HasIndex("ResolvedById");
-
-                    b.ToTable("Disputes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DisputeEvidence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<int>("DisputeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PhotoId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DisputeId");
-
-                    b.HasIndex("PhotoId");
-
-                    b.ToTable("DisputeEvidences");
                 });
 
             modelBuilder.Entity("Domain.Entities.FollowedListing", b =>
@@ -454,110 +370,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("NotificationUsers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActualTransferMethod")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ApprovedById")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ApprovedByUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("BuyerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ChargeDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)");
-
-                    b.Property<int>("ListingId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<decimal>("PlatformFeeAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("PlatformFeePercentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("RefundAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("RefundAttempts")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("RefundDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ScheduledRefundDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ScheduledTransferDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("SellerAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("SellerId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("StripeChargeId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("StripeRefundId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StripeTransferId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("TransferAttempts")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("TransferDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("TransferTrigger")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovedById");
-
-                    b.HasIndex("BuyerId");
-
-                    b.HasIndex("ListingId");
-
-                    b.HasIndex("SellerId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("Domain.Entities.Photo", b =>
                 {
                     b.Property<int>("Id")
@@ -761,9 +573,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<string>("StripeConnectAccountId")
-                        .HasColumnType("text");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -944,17 +753,8 @@ namespace Infrastructure.Database.Migrations
                     b.Property<bool>("IsNegotiable")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsSold")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("Product");
                 });
@@ -1001,51 +801,6 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("ParentCategory");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Dispute", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "InitiatedBy")
-                        .WithMany()
-                        .HasForeignKey("InitiatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Payment", "Payment")
-                        .WithOne("Dispute")
-                        .HasForeignKey("Domain.Entities.Dispute", "PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "ResolvedBy")
-                        .WithMany()
-                        .HasForeignKey("ResolvedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("InitiatedBy");
-
-                    b.Navigation("Payment");
-
-                    b.Navigation("ResolvedBy");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DisputeEvidence", b =>
-                {
-                    b.HasOne("Domain.Entities.Dispute", "Dispute")
-                        .WithMany("Evidence")
-                        .HasForeignKey("DisputeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Photo", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dispute");
-
-                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("Domain.Entities.FollowedListing", b =>
@@ -1220,39 +975,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedById");
-
-                    b.HasOne("Domain.Entities.User", "Buyer")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithMany()
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "Seller")
-                        .WithMany()
-                        .HasForeignKey("SellerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApprovedBy");
-
-                    b.Navigation("Buyer");
-
-                    b.Navigation("Listing");
-
-                    b.Navigation("Seller");
-                });
-
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("Domain.Entities.RefreshToken", "ReplacedByToken")
@@ -1399,24 +1121,9 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductListing", b =>
-                {
-                    b.HasOne("Domain.Entities.Payment", "Payment")
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.ProductListing", "PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Navigation("SubCategories");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Dispute", b =>
-                {
-                    b.Navigation("Evidence");
                 });
 
             modelBuilder.Entity("Domain.Entities.ListingBase", b =>
@@ -1436,11 +1143,6 @@ namespace Infrastructure.Database.Migrations
             modelBuilder.Entity("Domain.Entities.Notification", b =>
                 {
                     b.Navigation("NotificationUsers");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Payment", b =>
-                {
-                    b.Navigation("Dispute");
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>

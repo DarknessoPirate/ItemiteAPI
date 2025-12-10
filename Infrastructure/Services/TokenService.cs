@@ -86,6 +86,11 @@ public class TokenService(
         {
             throw new NotFoundException("User not found");
         }
+        
+        if (await userManager.IsLockedOutAsync(user))
+        {
+            throw new UnauthorizedException("Account is locked");
+        }
 
         var newAccessToken = await GenerateJwtToken(user);
         var newJwtId = new JwtSecurityTokenHandler().ReadJwtToken(newAccessToken.Token).Id;

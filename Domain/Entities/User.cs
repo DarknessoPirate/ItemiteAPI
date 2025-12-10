@@ -28,4 +28,5 @@ public class User : IdentityUser<int>
     public ICollection<FollowedListing> FollowedListings { get; set; } = [];
     public ICollection<ListingView> ViewedListings { get; set; } = [];
     public ICollection<NotificationUser> Notifications { get; set; } = [];
+    public ICollection<Report> Reports { get; set; } = [];
 }

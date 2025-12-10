@@ -64,6 +64,11 @@ public class LoginHandler(
             throw new UnauthorizedException("Email is not confirmed. Check your email for the confirmation link");
             
         }
+        
+        if (await userManager.IsLockedOutAsync(user))
+        {
+            throw new UnauthorizedException("Your account has been locked");
+        }
 
         var tokens = await tokenService.GenerateTokenPairAsync(
             user,

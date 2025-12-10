@@ -11,6 +11,7 @@ public class PaginateListingQuery
     public SortDirection? SortDirection { get; set; } = Domain.Enums.SortDirection.Ascending;
     public decimal? PriceFrom { get; set; } 
     public decimal? PriceTo { get; set; }
+    public string Search { get; set; } = string.Empty;
     public List<int>? CategoryIds { get; set; }
     public double? Longitude { get; set; }
     public double? Latitude { get; set; }
@@ -22,6 +23,8 @@ public class PaginateListingQuery
             ? string.Join("-", CategoryIds) 
             : "null";
     
+        var searchString = string.IsNullOrEmpty(Search) ? "null" : Search;
+        
         return $"{PageSize.ToString()}_" +
                $"{PageNumber.ToString()}_" +
                $"{ListingType?.ToString() ?? "null"}_" +
@@ -29,6 +32,7 @@ public class PaginateListingQuery
                $"{SortDirection?.ToString() ?? "null"}_" +
                $"{PriceFrom?.ToString() ?? "null"}_" +
                $"{PriceTo?.ToString() ?? "null"}_" +
+               $"{searchString}_" +
                $"{Longitude?.ToString() ?? "null"}_" +
                $"{Latitude?.ToString() ?? "null"}_" +
                $"{Distance?.ToString() ?? "null"}_" +

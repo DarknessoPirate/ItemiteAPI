@@ -1,4 +1,3 @@
-
 using System.Globalization;
 using System.Text.Json.Serialization;
 using Api.Extensions;
@@ -51,6 +50,7 @@ public class Program
                     .ToList()
             });
         });
+        builder.Services.AddRateLimiting();
         builder.Services.AddConfig(builder.Configuration);
         builder.Services.AddInfrastructureServices(builder.Configuration);
         builder.Services.ConfigureIdentity(builder.Configuration);
@@ -93,6 +93,7 @@ public class Program
         app.ConfigureSerilogHttpLogging();
         app.UseHttpsRedirection();
         app.UseHttpsRedirection();
+        app.UseRateLimiter();
         app.UseCors("FrontendClient");
         app.UseAuthentication();
         app.UseAuthorization();
