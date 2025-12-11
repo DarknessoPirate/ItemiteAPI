@@ -1,5 +1,7 @@
 using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.DeleteUserPrice;
 using Application.Features.Listings.ProductListings.GetProductListing;
+using Application.Features.Listings.ProductListings.SetUserPrice;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Domain.DTOs.File;
 using Domain.DTOs.ProductListing;
@@ -77,4 +79,35 @@ public class ProductListingController(IMediator mediator, IRequestContextService
         var updatedProductListing = await mediator.Send(command);
         return Ok(updatedProductListing);
     }
+
+    [Authorize]
+    [HttpPost("{listingId}/user-price/{userId}")]
+    public async Task<IActionResult> SetUserPrice([FromBody] SetUserPriceRequest request, [FromRoute] int listingId, [FromRoute] int userId)
+    {
+        var command = new SetUserPriceCommand
+        {
+            OwnerId = requestContextService.GetUserId(),
+            UserId = userId,
+            ListingId = listingId,
+            Dto = request,
+        };
+        
+        await mediator.Send(command);
+        return Created();
+    }
+
+    [Authorize]
+    [HttpDelete("{listingId}/user-price/{userId}")]
+    public async Task<IActionResult> DeleteUserPrice([FromRoute] int listingId, [FromRoute] int userId)
+    {
+        var command = new DeleteUserPriceCommand
+        {
+            OwnerId = requestContextService.GetUserId(),
+            UserId = userId,
+            ListingId = listingId
+        };
+        await mediator.Send(command);
+        return NoContent();
+    }
+    
 }
