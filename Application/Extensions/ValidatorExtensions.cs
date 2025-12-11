@@ -11,6 +11,7 @@ using Application.Features.Listings.AuctionListings.GetBidHistory;
 using Application.Features.Listings.AuctionListings.PlaceBid;
 using Application.Features.Listings.AuctionListings.UpdateAuctionListing;
 using Application.Features.Listings.ProductListings.CreateProductListing;
+using Application.Features.Listings.ProductListings.SetUserPrice;
 using Application.Features.Listings.ProductListings.UpdateProductListing;
 using Application.Features.Listings.Shared.GetPaginatedFollowedListings;
 using Application.Features.Listings.Shared.GetPaginatedListings;
@@ -87,5 +88,6 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<ResolveDisputeCommand>, ResolveDisputeValidator>();
         services.AddScoped<IValidator<GetUserSalesQuery>, GetUserSalesValidator>();
         services.AddScoped<IValidator<GetUserPurchasesQuery>, GetUserPurchasesValidator>();
+        services.AddScoped<IValidator<SetUserPriceCommand>, SetUserPriceValidator>();
     }
 }
