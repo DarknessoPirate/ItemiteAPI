@@ -11,6 +11,7 @@ public class ProductListingResponse
     public string? Name { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
+    public decimal? YourPrice { get; set; }
     public int Views { get; set; }
     public int Followers { get; set; }
     public DateTime DateCreated { get; set; }
