@@ -37,6 +37,23 @@ public class ListingAutoMapper : Profile
             .ForMember(dest => dest.CurrentBid, opt => opt.MapFrom(src => src.CurrentBid))
             .ForMember(dest => dest.Price, opt => opt.Ignore())
             .ForMember(dest => dest.IsNegotiable, opt => opt.Ignore());
+        
+        CreateMap<ListingBase, ListingBasicInfo>()
+            .ForMember(p => p.MainImageUrl, o =>
+                o.MapFrom(p => p.ListingPhotos.FirstOrDefault(p => p.Order == 1).Photo.Url))
+            .ForMember(dest => dest.ListingType, opt => opt.MapFrom(src => "Unknown"))
+            .ForMember(dest => dest.Price, opt => opt.Ignore())
+            .Include<ProductListing, ListingBasicInfo>()
+            .Include<AuctionListing, ListingBasicInfo>();
+        
+        CreateMap<ProductListing, ListingBasicInfo>()
+            .ForMember(dest => dest.ListingType, opt => opt.MapFrom(src => "Product"))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.ToString("F2")));
+        
+        CreateMap<AuctionListing, ListingBasicInfo>()
+            .ForMember(dest => dest.ListingType, opt => opt.MapFrom(src => "Auction"))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => 
+                src.CurrentBid.HasValue ? src.CurrentBid.Value.ToString("F2") : src.StartingBid.ToString("F2")));
     }
     
     private bool IsLocationComplete(Location? location)
