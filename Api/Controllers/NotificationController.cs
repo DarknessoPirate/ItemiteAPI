@@ -1,3 +1,4 @@
+using Application.Features.Notifications.DeleteAllUserNotifications;
 using Application.Features.Notifications.DeleteUserNotification;
 using Application.Features.Notifications.GetPaginatedUserNotifications;
 using Application.Features.Notifications.GetUserUnreadNotificationsCount;
@@ -45,6 +46,18 @@ public class NotificationController(IMediator mediator, IRequestContextService r
         var command = new DeleteUserNotificationCommand
         {
             NotificationId = notificationId,
+            UserId = requestContextService.GetUserId()
+        };
+        
+        await mediator.Send(command);
+        return NoContent();
+    }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAllUserNotification()
+    {
+        var command = new DeleteAllUserNotificationsCommand
+        {
             UserId = requestContextService.GetUserId()
         };
         
