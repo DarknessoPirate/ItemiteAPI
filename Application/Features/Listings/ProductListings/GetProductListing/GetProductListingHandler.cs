@@ -33,6 +33,9 @@ public class GetProductListingHandler(
             {
                 var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
                 cachedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+                
+                var yourPrice = await listingRepository.GetUserListingPriceAsync(request.ListingId, request.UserId.Value);
+                cachedListing.YourPrice = yourPrice?.Price;
             }
             return cachedListing;
         }
@@ -87,6 +90,9 @@ public class GetProductListingHandler(
         {
             var followedListings = await listingRepository.GetUserFollowedListingsAsync(request.UserId.Value);
             mappedListing.IsFollowed = followedListings.Select(f => f.ListingId).Contains(request.ListingId);
+            
+            var yourPrice = await listingRepository.GetUserListingPriceAsync(request.ListingId, request.UserId.Value);
+            mappedListing.YourPrice = yourPrice?.Price;
         }
         
         return mappedListing;

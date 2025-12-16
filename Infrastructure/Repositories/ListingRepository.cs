@@ -1,6 +1,5 @@
 using Domain.Entities;
 using Infrastructure.Database;
-using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -124,5 +123,25 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
         return await dbContext.Set<T>()
             .Where(l => l.DateEnds <= currentDate && !l.IsArchived)
             .ToListAsync();
+    }
+
+    public async Task<UserListingPrice?> GetUserListingPriceAsync(int listingId, int userId)
+    {
+        return await dbContext.UserListingPrices.FirstOrDefaultAsync(p => p.ListingId == listingId && p.UserId == userId);
+    }
+
+    public async Task AddUserListingPriceAsync(UserListingPrice userListingPrice)
+    {
+        await dbContext.UserListingPrices.AddAsync(userListingPrice);
+    }
+
+    public void UpdateUserListingPrice(UserListingPrice userListingPrice)
+    {
+        dbContext.UserListingPrices.Update(userListingPrice);
+    }
+
+    public void DeleteUserListingPrice(UserListingPrice userListingPrice)
+    {
+        dbContext.UserListingPrices.Remove(userListingPrice);
     }
 }
