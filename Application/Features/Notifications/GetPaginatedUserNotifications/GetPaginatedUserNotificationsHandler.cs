@@ -28,6 +28,11 @@ public class GetPaginatedUserNotificationsHandler(
 
         var notifications = await queryable.ToListAsync(cancellationToken);
         
+        var mappedNotifications = mapper.Map<List<NotificationInfo>>(notifications, opt =>
+        {
+            opt.Items["UserId"] = request.UserId;
+        });
+        
         var readDate = DateTime.UtcNow;
         
         bool anyUpdated = false;
@@ -49,11 +54,6 @@ public class GetPaginatedUserNotificationsHandler(
         {
             await unitOfWork.SaveChangesAsync();
         }
-        
-        var mappedNotifications = mapper.Map<List<NotificationInfo>>(notifications, opt =>
-        {
-            opt.Items["UserId"] = request.UserId;
-        });
         
         return new PageResponse<NotificationInfo>(mappedNotifications, totalItems, request.Query.PageSize, request.Query.PageNumber);
     }
