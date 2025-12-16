@@ -8,5 +8,5 @@ public class ListingBasicInfo
     public bool IsArchived { get; set; }
     public int OwnerId { get; set; }
     public string ListingType { get; set; }
-    public string Price { get; set; }
+    public decimal? Price { get; set; }
 }
