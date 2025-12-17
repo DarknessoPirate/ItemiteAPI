@@ -44,8 +44,7 @@ public class DeleteUserPriceHandler(
         {
             Message = $"Your specific price of the product listing {productListing.Name} has been deleted.",
             ResourceType = ResourceType.Product,
-            ResourceId = productListing.Id,
-            NotificationImageUrl = productListing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url
+            ListingId = productListing.Id,
         });
     }
 }
