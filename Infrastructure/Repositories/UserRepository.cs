@@ -56,4 +56,13 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
             .Include(u => u.ProfilePhoto)
             .Include(u => u.BackgroundPhoto);
     }
+
+    public async Task<Dictionary<int, string?>> GetUserProfilePhotoUrlsAsync(List<int> userIds)
+    {
+        return await context.Users
+            .Include(u => u.ProfilePhoto)
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new { u.Id, Url = u.ProfilePhoto != null ? u.ProfilePhoto.Url : null })
+            .ToDictionaryAsync(x => x.Id, x => x.Url);
+    }
 }

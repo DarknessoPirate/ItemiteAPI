@@ -60,9 +60,8 @@ public class FollowListingHandler(
         var notificationInfo = new NotificationInfo
         {
             Message = $"User {user.UserName} has followed your listing {listingToFollow.Name}.",
-            ResourceId = listingToFollow.Id,
-            ResourceType = listingToFollow is ProductListing ? ResourceType.Product : ResourceType.Auction,
-            NotificationImageUrl = listingToFollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
+            UserId = user.Id,
+            ResourceType = ResourceType.User
         };
             
         await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);

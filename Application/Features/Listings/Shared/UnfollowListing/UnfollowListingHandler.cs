@@ -48,9 +48,8 @@ public class UnfollowListingHandler(
         var notificationInfo = new NotificationInfo
         {
             Message = $"User {user.UserName} has unfollowed your listing {listingToUnfollow.Name}.",
-            ResourceId = listingToUnfollow.Id,
-            ResourceType = listingToUnfollow is ProductListing ? ResourceType.Product : ResourceType.Auction,
-            NotificationImageUrl = listingToUnfollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
+            UserId = user.Id,
+            ResourceType = ResourceType.User
         };
             
         await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);

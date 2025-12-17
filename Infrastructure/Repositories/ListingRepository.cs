@@ -125,4 +125,13 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Where(l => l.DateEnds <= currentDate && !l.IsArchived)
             .ToListAsync();
     }
+
+    public async Task<Dictionary<int, string>> GetListingImageUrlsAsync(List<int> listingIds)
+    {
+        return await dbContext.ListingPhotos
+            .Include(lp => lp.Photo)
+            .Where(lp => listingIds.Contains(lp.ListingId) && lp.Order == 1)
+            .Select(lp => new { lp.ListingId, lp.Photo.Url })
+            .ToDictionaryAsync(x => x.ListingId, x => x.Url);
+    }
 }

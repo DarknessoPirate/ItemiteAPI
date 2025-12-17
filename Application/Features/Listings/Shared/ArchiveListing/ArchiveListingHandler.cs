@@ -49,9 +49,8 @@ public class ArchiveListingHandler(
             var notificationInfo = new NotificationInfo
             {
                 Message = $"Listing {listingToArchive.Name} has been archived.",
-                ResourceId = listingToArchive.Id,
-                ResourceType = listingType,
-                NotificationImageUrl = listingToArchive.ListingPhotos.First(p => p.Order == 1).Photo.Url
+                ListingId = listingToArchive.Id,
+                ResourceType = listingType
             };
             
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");

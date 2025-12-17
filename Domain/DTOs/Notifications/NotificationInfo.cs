@@ -8,7 +8,8 @@ public class NotificationInfo
     public string Message { get; set; }
     public string? NotificationImageUrl { get; set; }
     
-    public int? ResourceId { get; set; }
+    public int? UserId { get; set; }
+    public int? ListingId { get; set; }
     public ResourceType? ResourceType { get; set; }
     
     public DateTime NotificationSent { get; set; }

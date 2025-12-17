@@ -74,8 +74,7 @@ public class ArchiveExpiredListingsService(
                 userNotifications[listing.OwnerId] = new NotificationInfo
                 {
                     Message = $"Your listing {listing.Name} has been archived",
-                    NotificationImageUrl = listing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url,
-                    ResourceId = listing.Id,
+                    ListingId = listing.Id,
                     ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
                 };
             }

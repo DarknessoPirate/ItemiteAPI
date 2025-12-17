@@ -73,7 +73,7 @@ public class ExpiredFeaturedListingsCleanupService(
             {
                 Message = $"Your listing {listing.Name} is no longer featured",
                 NotificationImageUrl = listing.ListingPhotos.First(lp => lp.Order == 1).Photo.Url,
-                ResourceId = listing.Id,
+                ListingId = listing.Id,
                 ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
             };
         }

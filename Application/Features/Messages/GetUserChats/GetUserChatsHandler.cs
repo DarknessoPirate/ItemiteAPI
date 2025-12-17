@@ -44,7 +44,7 @@ public class GetUserChatsHandler(
             var otherUser = message.SenderId == user.Id ? message.Recipient : message.Sender;
 
             var unreadCount = unreadCounts
-                .FirstOrDefault(uc => uc.OtherUserId == otherUser.Id)
+                .FirstOrDefault(uc => uc.OtherUserId == otherUser.Id && uc.ListingId == message.ListingId)
                 ?.Count ?? 0;
 
             return new ChatInfoResponse

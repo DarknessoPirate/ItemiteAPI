@@ -181,9 +181,8 @@ public class UpdateAuctionListingHandler(
             var notificationInfo = new NotificationInfo
             {
                 Message = $"Auction {auctionListingToUpdate.Name} has been updated.",
-                ResourceId = auctionListingToUpdate.Id,
-                ResourceType = ResourceType.Auction,
-                NotificationImageUrl = auctionListingResponse.MainImageUrl,
+                ListingId = auctionListingToUpdate.Id,
+                ResourceType = ResourceType.Auction
             };
             
             await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);

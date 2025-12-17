@@ -183,8 +183,8 @@ public class SendMessageHandler(
                 await notificationService.SendNotification([request.SendMessageDto.RecipientId], request.SenderId, new NotificationInfo
                 {
                     Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
-                    NotificationImageUrl = sender.ProfilePhoto?.Url,
-                    ResourceId = request.SendMessageDto.ListingId,
+                    ListingId = request.SendMessageDto.ListingId,
+                    UserId = sender.Id,
                     ResourceType = ResourceType.ChatPage
                 });
             }
