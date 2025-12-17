@@ -1,3 +1,4 @@
+using Domain.DTOs.User;
 using Domain.Enums;
 
 namespace Domain.DTOs.Notifications;
@@ -9,6 +10,7 @@ public class NotificationInfo
     public string? NotificationImageUrl { get; set; }
     
     public int? UserId { get; set; }
+    public ChatMemberInfo? UserInfo { get; set; }
     public int? ListingId { get; set; }
     public ResourceType? ResourceType { get; set; }
     

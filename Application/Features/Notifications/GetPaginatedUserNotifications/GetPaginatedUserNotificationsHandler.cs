@@ -1,12 +1,10 @@
 using AutoMapper;
-using Domain.Configs;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.Pagination;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
-using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
-using Infrastructure.Interfaces.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,20 +51,26 @@ public class GetPaginatedUserNotificationsHandler(
             ? await listingRepository.GetListingImageUrlsAsync(listingIds) 
             : new Dictionary<int, string>();
 
-        var userUrls = userIds.Any() 
-            ? await userRepository.GetUserProfilePhotoUrlsAsync(userIds) 
-            : new Dictionary<int, string?>();
+        var userInfos = userIds.Any() 
+            ? await userRepository.GetUsersInfoAsync(userIds) 
+            : new Dictionary<int, ChatMemberInfo>();
         
         foreach (var notification in mappedNotifications)
         {
-            notification.NotificationImageUrl = notification.ResourceType switch
+            switch (notification.ResourceType)
             {
-                ResourceType.Auction or ResourceType.Product when notification.ListingId.HasValue 
-                    => listingUrls.GetValueOrDefault(notification.ListingId.Value),
-                ResourceType.ChatPage or ResourceType.User when notification.UserId.HasValue 
-                    => userUrls.GetValueOrDefault(notification.UserId.Value),
-                _ => null
-            };
+                case ResourceType.Auction or ResourceType.Product when notification.ListingId.HasValue:
+                    notification.NotificationImageUrl = listingUrls.GetValueOrDefault(notification.ListingId.Value);
+                    break;
+                case ResourceType.ChatPage or ResourceType.User when notification.UserId.HasValue:
+                    var userInfo = userInfos.GetValueOrDefault(notification.UserId.Value);
+                    if (userInfo != null)
+                    {
+                        notification.NotificationImageUrl = userInfo.PhotoUrl;
+                        notification.UserInfo = userInfo;
+                    }
+                    break;
+            }
         }
         
         var readDate = DateTime.UtcNow;
