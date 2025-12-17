@@ -2,6 +2,9 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
+using Dispute = Domain.Entities.Dispute;
+using DisputeEvidence = Domain.Entities.DisputeEvidence;
 
 namespace Infrastructure.Database;
 
@@ -27,6 +30,8 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReportPhoto> ReportPhotos { get; set; }
+    
+    public DbSet<UserListingPrice> UserListingPrices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

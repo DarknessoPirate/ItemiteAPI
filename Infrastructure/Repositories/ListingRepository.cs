@@ -126,6 +126,26 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .ToListAsync();
     }
 
+    public async Task<UserListingPrice?> GetUserListingPriceAsync(int listingId, int userId)
+    {
+        return await dbContext.UserListingPrices.FirstOrDefaultAsync(p => p.ListingId == listingId && p.UserId == userId);
+    }
+
+    public async Task AddUserListingPriceAsync(UserListingPrice userListingPrice)
+    {
+        await dbContext.UserListingPrices.AddAsync(userListingPrice);
+    }
+
+    public void UpdateUserListingPrice(UserListingPrice userListingPrice)
+    {
+        dbContext.UserListingPrices.Update(userListingPrice);
+    }
+
+    public void DeleteUserListingPrice(UserListingPrice userListingPrice)
+    {
+        dbContext.UserListingPrices.Remove(userListingPrice);
+    }
+
     public async Task<Dictionary<int, string>> GetListingImageUrlsAsync(List<int> listingIds)
     {
         return await dbContext.ListingPhotos
