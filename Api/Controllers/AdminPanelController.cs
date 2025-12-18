@@ -1,4 +1,6 @@
 using Application.Features.Banners.AddBanner;
+using Application.Features.Banners.DeleteBanner;
+using Application.Features.Banners.GetAllBanners;
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Notifications.SendGlobalNotification;
 using Application.Features.Notifications.SendNotification;
@@ -201,6 +203,35 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         return Ok(response);
     }
 
+
+    [HttpDelete("banners/{bannerId}")]
+    public async Task<IActionResult> DeleteBanner([FromRoute] int bannerId)
+    {
+        var command = new DeleteBannerCommand
+        {
+            UserId = requestContextService.GetUserId(),
+            BannerId = bannerId
+        };
+
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+
+    [HttpGet("banners/all")]
+    public async Task<ActionResult<List<BannerResponse>>> GetAllBanners()
+    {
+        var command = new GetAllBannersQuery
+        {
+            UserId = requestContextService.GetUserId()
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+
     /*
 
     [HttpPut("banners/{bannerId}")]
@@ -212,11 +243,7 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
 
 
 
-    [HttpDelete("banners/{bannerId}")]
-    public async Task<ActionResult<>> DeleteBanner([FromRoute] int bannerId         )
-    {
 
-    }
 
 
 
@@ -230,13 +257,6 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
 
     [HttpGet("banners/active")]
     public async Task<ActionResult<>> GetActiveBanners(                )
-    {
-
-    }
-
-
-    [HttpGet("banners/all")]
-    public async Task<ActionResult<>> GetAllBanners(                )
     {
 
     }
