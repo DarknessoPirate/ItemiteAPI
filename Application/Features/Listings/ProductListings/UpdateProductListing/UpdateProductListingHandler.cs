@@ -171,7 +171,8 @@ public class UpdateProductListingHandler(
             {
                 Message = $"Product listing {productListingToUpdate.Name} has been updated.",
                 ListingId = productListingToUpdate.Id,
-                ResourceType = ResourceType.Product
+                ResourceType = ResourceType.Product,
+                NotificationImageUrl = productListingToUpdate.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             };
             
             await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);

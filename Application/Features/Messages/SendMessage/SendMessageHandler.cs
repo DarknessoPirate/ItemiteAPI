@@ -185,7 +185,8 @@ public class SendMessageHandler(
                     Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
                     ListingId = request.SendMessageDto.ListingId,
                     UserId = sender.Id,
-                    ResourceType = ResourceType.ChatPage
+                    ResourceType = ResourceType.ChatPage,
+                    NotificationImageUrl = sender.ProfilePhoto?.Url
                 });
             }
             

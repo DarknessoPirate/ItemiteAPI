@@ -12,7 +12,7 @@ namespace Application.Features.Listings.Shared.UnfollowListing;
 
 public class UnfollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
-    UserManager<User> userManager,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
     INotificationService notificationService
@@ -20,7 +20,7 @@ public class UnfollowListingHandler(
 {
     public async Task Handle(UnfollowListingCommand request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await userRepository.GetUserWithProfilePhotoAsync(request.UserId);
         if (user == null)
         {
             throw new NotFoundException("User not found");
@@ -49,7 +49,8 @@ public class UnfollowListingHandler(
         {
             Message = $"User {user.UserName} has unfollowed your listing {listingToUnfollow.Name}.",
             UserId = user.Id,
-            ResourceType = ResourceType.User
+            ResourceType = ResourceType.User,
+            NotificationImageUrl = user.ProfilePhoto?.Url
         };
             
         await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);

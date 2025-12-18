@@ -14,6 +14,6 @@ public class NotificationInfo
     public int? ListingId { get; set; }
     public ResourceType? ResourceType { get; set; }
     
-    public DateTime NotificationSent { get; set; }
+    public DateTime NotificationSent { get; set; } = DateTime.UtcNow;
     public DateTime? ReadAt { get; set; }
 }

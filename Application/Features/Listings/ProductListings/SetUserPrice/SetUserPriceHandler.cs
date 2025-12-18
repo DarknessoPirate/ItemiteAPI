@@ -78,7 +78,8 @@ public class SetUserPriceHandler(
         {
             Message = $"The price of the product listing {productListing.Name} has changed for you from {productListing.Price} to {request.Dto.Price}!",
             ResourceType = ResourceType.Product,
-            ListingId = productListing.Id
+            ListingId = productListing.Id,
+            NotificationImageUrl = productListing.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
         });
     }
 }

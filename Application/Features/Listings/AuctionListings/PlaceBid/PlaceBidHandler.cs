@@ -93,7 +93,8 @@ public class PlaceBidHandler(
         {
             Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in your auction {auction.Name}",
             ListingId = request.AuctionId,
-            ResourceType = ResourceType.Auction
+            ResourceType = ResourceType.Auction,
+            NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
         });
 
         if (formerHighestBid != null)
@@ -102,7 +103,8 @@ public class PlaceBidHandler(
             {
                 Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in auction {auction.Name}. You are no longer the highest bidder.",
                 ListingId = request.AuctionId,
-                ResourceType = ResourceType.Auction
+                ResourceType = ResourceType.Auction,
+                NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             });
         }
         
