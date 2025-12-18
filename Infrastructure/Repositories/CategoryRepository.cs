@@ -56,7 +56,7 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
     public async Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId)
     {
-        var categories = await dbContext.Categories.Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
+        var categories = await dbContext.Categories.Include(c => c.Photo).Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
 
         return categories;
     }
