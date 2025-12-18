@@ -6,6 +6,7 @@ using Application.Features.Categories.GetMainCategories;
 using Application.Features.Categories.GetSubCategories;
 using Application.Features.Categories.UpdateCategory;
 using Domain.DTOs.Category;
+using Domain.DTOs.File;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,19 +17,7 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController(ISender mediator) : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> CreateCategory(CreateCategoryRequest request)
-    {
-        var command = new CreateCategoryCommand
-        {
-            CreateCategoryDto = request
-        };
-
-        int categoryId = await mediator.Send(command);
-
-        return Created($"api/category/{categoryId}", new { categoryId });
-    }
-
+    
     // TODO : PROBABL REMOVE OR PRIVATE LATER WHEN NOT NEEDED
     [HttpGet("all")]
     public async Task<ActionResult<List<CategoryResponse>>> GetAllCategories()
@@ -73,33 +62,5 @@ public class CategoriesController(ISender mediator) : ControllerBase
         
         return Ok(result);
     }
-
-    [HttpPut("{categoryId:int}")]
-    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromBody] UpdateCategoryRequest updateCategoryRequest)
-    {
-        var command = new UpdateCategoryCommand
-        {
-            CategoryId = categoryId,
-            Dto = updateCategoryRequest
-        };
-
-        var result = await mediator.Send(command);
-        
-        return Ok(result);
-    }
     
-    
-    [HttpDelete("{categoryId:int}")]
-    public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)
-    {
-        var command = new DeleteCategoryCommand
-        {
-            CategoryId = categoryId,
-            DeleteFullTree = deleteFullTree
-        };
-        
-        await mediator.Send(command);
-
-        return NoContent();
-    }
 }

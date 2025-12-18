@@ -1,0 +1,481 @@
+{
+  "Categories": [
+    {
+      "Name": "Agriculture",
+      "Description": "Agricultural products and equipment",
+      "ImageName": "Agriculture.png",
+      "SubCategories": [
+        {
+          "Name": "Farm Equipment",
+          "Description": "Tractors, harvesters and farm machinery",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Seeds & Plants",
+          "Description": "Agricultural seeds and plants",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Fertilizers",
+          "Description": "Fertilizers and soil amendments",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Livestock",
+          "Description": "Farm animals and livestock",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Electronics",
+      "Description": "Electronic devices and gadgets",
+      "ImageName": "Electronics.png",
+      "SubCategories": [
+        {
+          "Name": "Computers",
+          "Description": "Desktop and laptop computers",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "Laptops",
+              "Description": "Portable computers",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Desktops",
+              "Description": "Stationary computers",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Phones",
+          "Description": "Mobile phones and smartphones",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "Smartphones",
+              "Description": null,
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Feature Phones",
+              "Description": null,
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Audio",
+          "Description": "Audio equipment",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "TV & Video",
+          "Description": "Televisions and video equipment",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Gaming",
+          "Description": "Gaming consoles and accessories",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Fashion",
+      "Description": "Apparel and fashion items",
+      "ImageName": "Fashion.png",
+      "SubCategories": [
+        {
+          "Name": "Men's Clothing",
+          "Description": "Clothing for men",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "Shirts",
+              "Description": null,
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "Pants",
+              "Description": null,
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "Women's Clothing",
+          "Description": "Clothing for women",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Shoes",
+          "Description": "Footwear for all",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Accessories",
+          "Description": "Fashion accessories",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Jewelry",
+          "Description": "Jewelry and watches",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Health & Beauty",
+      "Description": "Health and beauty products",
+      "ImageName": "Health_and_Beauty_icon.png",
+      "SubCategories": [
+        {
+          "Name": "Skincare",
+          "Description": "Skincare products and treatments",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Makeup",
+          "Description": "Cosmetics and makeup",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Hair Care",
+          "Description": "Hair care products",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Vitamins & Supplements",
+          "Description": "Health supplements",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Medical Equipment",
+          "Description": "Medical devices and equipment",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Home & Garden",
+      "Description": "Home improvement and garden supplies",
+      "ImageName": "Home_and_Garden.png",
+      "SubCategories": [
+        {
+          "Name": "Furniture",
+          "Description": "Home furniture",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Home Decor",
+          "Description": "Decorative items for home",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Kitchen & Dining",
+          "Description": "Kitchen appliances and dining",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Garden Tools",
+          "Description": "Gardening tools and equipment",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Lighting",
+          "Description": "Indoor and outdoor lighting",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Industry",
+      "Description": "Industrial equipment and supplies",
+      "ImageName": "Industry_icon.png",
+      "SubCategories": [
+        {
+          "Name": "Construction Equipment",
+          "Description": "Heavy machinery for construction",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Manufacturing Tools",
+          "Description": "Tools for manufacturing",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Safety Equipment",
+          "Description": "Industrial safety gear",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Warehouse Equipment",
+          "Description": "Storage and logistics equipment",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Kids & Baby",
+      "Description": "Products for children and babies",
+      "ImageName": "Kids_and_Baby.png",
+      "SubCategories": [
+        {
+          "Name": "Baby Clothing",
+          "Description": "Clothes for babies and toddlers",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Toys",
+          "Description": "Toys and games for children",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Strollers & Car Seats",
+          "Description": "Baby transport equipment",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Nursery Furniture",
+          "Description": "Furniture for baby rooms",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Baby Care",
+          "Description": "Baby care products",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Motorization",
+      "Description": "Vehicles and automotive parts",
+      "ImageName": "Motorization.png",
+      "SubCategories": [
+        {
+          "Name": "Cars",
+          "Description": "Passenger vehicles",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Motorcycles",
+          "Description": "Motorcycles and scooters",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Auto Parts",
+          "Description": "Spare parts for vehicles",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Tires & Wheels",
+          "Description": "Tires and wheel accessories",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Car Accessories",
+          "Description": "Interior and exterior accessories",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Pets",
+      "Description": "Pet supplies and accessories",
+      "ImageName": "Pets.png",
+      "SubCategories": [
+        {
+          "Name": "Pet Food",
+          "Description": "Food for all types of pets",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Pet Toys",
+          "Description": "Toys and entertainment for pets",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Pet Care",
+          "Description": "Grooming and health products",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Cages & Habitats",
+          "Description": "Housing for pets",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Pet Accessories",
+          "Description": "Collars, leashes and accessories",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Real Estate",
+      "Description": "Property and real estate",
+      "ImageName": "Real_Estate.png",
+      "SubCategories": [
+        {
+          "Name": "Houses",
+          "Description": "Residential houses for sale",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Apartments",
+          "Description": "Apartments and condos",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Land",
+          "Description": "Land plots and lots",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Commercial Property",
+          "Description": "Commercial real estate",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Rentals",
+          "Description": "Properties for rent",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Services & Education",
+      "Description": "Professional services and education",
+      "ImageName": "Services_and_Education.png",
+      "SubCategories": [
+        {
+          "Name": "Tutoring",
+          "Description": "Private tutoring services",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Courses & Training",
+          "Description": "Educational courses",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Consulting",
+          "Description": "Professional consulting services",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Repair Services",
+          "Description": "Repair and maintenance services",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Event Services",
+          "Description": "Event planning and services",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    },
+    {
+      "Name": "Sports & Hobbies",
+      "Description": "Sports equipment and hobby supplies",
+      "ImageName": "Sports_and_Hobbies.png",
+      "SubCategories": [
+        {
+          "Name": "Fitness Equipment",
+          "Description": "Exercise and fitness gear",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Outdoor Sports",
+          "Description": "Equipment for outdoor activities",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Team Sports",
+          "Description": "Equipment for team sports",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Arts & Crafts",
+          "Description": "Supplies for creative hobbies",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Musical Instruments",
+          "Description": "Instruments and music equipment",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "Collectibles",
+          "Description": "Collectible items and memorabilia",
+          "ImageName": null,
+          "SubCategories": []
+        }
+      ]
+    }
+  ]
+}
