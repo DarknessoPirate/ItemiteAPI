@@ -1,5 +1,6 @@
 using Domain.Configs;
 using Domain.DTOs.Notifications;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -63,7 +64,13 @@ public class FollowListingHandler(
             Message = $"User {user.UserName} has followed your listing {listingToFollow.Name}.",
             UserId = user.Id,
             ResourceType = ResourceType.User,
-            NotificationImageUrl = user.ProfilePhoto?.Url
+            NotificationImageUrl = user.ProfilePhoto?.Url,
+            UserInfo = new ChatMemberInfo
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                PhotoUrl = user.ProfilePhoto?.Url
+            }
         };
             
         await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);

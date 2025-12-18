@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.DTOs.Messages;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.Photo;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -186,7 +187,13 @@ public class SendMessageHandler(
                     ListingId = request.SendMessageDto.ListingId,
                     UserId = sender.Id,
                     ResourceType = ResourceType.ChatPage,
-                    NotificationImageUrl = sender.ProfilePhoto?.Url
+                    NotificationImageUrl = sender.ProfilePhoto?.Url,
+                    UserInfo = new ChatMemberInfo
+                    {
+                        Id = sender.Id,
+                        UserName = sender.UserName!,
+                        PhotoUrl = sender.ProfilePhoto?.Url
+                    }
                 });
             }
             
