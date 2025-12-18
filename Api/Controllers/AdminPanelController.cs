@@ -1,3 +1,6 @@
+using Application.Features.Categories.CreateCategory;
+using Application.Features.Categories.DeleteCategory;
+using Application.Features.Categories.UpdateCategory;
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Notifications.SendGlobalNotification;
 using Application.Features.Notifications.SendNotification;
@@ -5,6 +8,8 @@ using Application.Features.Reports.GetPaginatedReports;
 using Application.Features.Users.GetPaginatedUsers;
 using Application.Features.Users.LockUser;
 using Application.Features.Users.UnlockUser;
+using Domain.DTOs.Category;
+using Domain.DTOs.File;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.Reports;
 using Domain.DTOs.User;
@@ -20,6 +25,56 @@ namespace Api.Controllers;
 [Authorize(Roles = "Admin,Moderator")]
 public class AdminPanelController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
+    public sealed class FullCategoryRequest
+    {
+        public CreateCategoryRequest Dto { get; set; }
+        public IFormFile? Image { get; set; }
+    }
+    
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateCategory([FromForm] FullCategoryRequest request)
+    {
+        var command = new CreateCategoryCommand
+        {
+            CreateCategoryDto = request.Dto,
+            Image = request.Image != null ? new FileWrapper(request.Image.FileName, request.Image.Length, request.Image.ContentType, request.Image.OpenReadStream()) : null
+        };
+
+        int categoryId = await mediator.Send(command);
+
+        return Created($"api/category/{categoryId}", new { categoryId });
+    }
+    
+    [HttpPut("{categoryId:int}")]
+    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromBody] UpdateCategoryRequest updateCategoryRequest)
+    {
+        var command = new UpdateCategoryCommand
+        {
+            CategoryId = categoryId,
+            Dto = updateCategoryRequest
+        };
+
+        var result = await mediator.Send(command);
+        
+        return Ok(result);
+    }
+    
+    
+    [HttpDelete("{categoryId:int}")]
+    public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)
+    {
+        var command = new DeleteCategoryCommand
+        {
+            CategoryId = categoryId,
+            DeleteFullTree = deleteFullTree
+        };
+        
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+    
     [HttpPost("global-notification")]
     public async Task<IActionResult> SendGlobalNotification(SendNotificationRequest request)
     {

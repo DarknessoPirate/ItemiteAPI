@@ -48,8 +48,9 @@ public class DeleteListingHandler(
                     throw new CloudinaryException($"An error occured while deleting the photo: {deletionResult.Error.Message}");
                 }
                 await photoRepository.DeletePhotoAsync(listingPhoto.Id);
-                listingRepository.DeleteListing(listingToDelete);
             }
+            
+            listingRepository.DeleteListing(listingToDelete);
             
             var notificationInfo = new NotificationInfo
             {

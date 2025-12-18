@@ -497,7 +497,6 @@ public class DatabaseSeeder(
         {
             Name = categoryData.Name,
             Description = categoryData.Description,
-            ImageUrl = categoryData.ImageUrl,
             ParentCategoryId = parentId,
             RootCategoryId = rootId
         };

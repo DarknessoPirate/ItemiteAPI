@@ -71,7 +71,6 @@ public class UpdateCategoryHandler(
 
         categoryToUpdate.Name = request.Dto.Name;
         categoryToUpdate.Description = request.Dto.Description;
-        categoryToUpdate.ImageUrl = request.Dto.ImageUrl;
         categoryToUpdate.ParentCategoryId = request.Dto.ParentCategoryId;
 
 

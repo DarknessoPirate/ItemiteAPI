@@ -6,12 +6,8 @@ namespace Application.Features.Categories.CreateCategory;
 
 public class CreateCategoryValidator : AbstractValidator<CreateCategoryCommand>
 {
-    private readonly ICategoryRepository _categoryRepository;
-    
     public CreateCategoryValidator(ICategoryRepository categoryRepository)
     {   
-        _categoryRepository = categoryRepository;
-
         RuleFor(x => x.CreateCategoryDto.Name)
             .NotEmpty().WithMessage("Name cannot be empty")
             .Length(2, 50).WithMessage("Name must be between 2 and 50 characters");
@@ -21,8 +17,6 @@ public class CreateCategoryValidator : AbstractValidator<CreateCategoryCommand>
         
         RuleFor(x => x.CreateCategoryDto.ParentCategoryId)
             .GreaterThan(0).WithMessage("Parent category id must be greater than 0");
-
-
     }
     
 }

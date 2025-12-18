@@ -35,7 +35,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -55,7 +54,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -72,7 +70,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = InitialCategories.First(c => c.RootCategoryId == null).Name,
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = null
             }
         };
@@ -92,7 +89,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -366,8 +362,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CreateCategoryDto = new CreateCategoryRequest()
             {
                 Name = "test4",
-                Description = "test",
-                ImageUrl = "test.jpg",
+                Description = "test"
             }
         };
         
@@ -400,7 +395,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test5",
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = getSubCommand.ParentCategoryId
             }
         };
@@ -522,14 +516,12 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             Name = "test1",
             Description = "test1",
-            ImageUrl = "test1.jpg",
         };
         
         var createCategoryDto2 = new CreateCategoryRequest()
         {
             Name = "test2",
             Description = "test2",
-            ImageUrl = "test2.jpg",
         };
         
         
@@ -543,7 +535,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             Name = "test3",
             Description = "test3",
-            ImageUrl = "test3.jpg",
             ParentCategoryId = categoryId1
         };
         
