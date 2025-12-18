@@ -12,7 +12,7 @@ namespace Application.Features.Listings.Shared.FollowListing;
 
 public class FollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
-    UserManager<User> userManager,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
     INotificationService notificationService
@@ -20,7 +20,8 @@ public class FollowListingHandler(
 {
     public async Task<int> Handle(FollowListingCommand request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        
+        var user = await userRepository.GetUserWithProfilePhotoAsync(request.UserId);
         if (user == null)
         {
             throw new NotFoundException("User not found");
@@ -61,7 +62,8 @@ public class FollowListingHandler(
         {
             Message = $"User {user.UserName} has followed your listing {listingToFollow.Name}.",
             UserId = user.Id,
-            ResourceType = ResourceType.User
+            ResourceType = ResourceType.User,
+            NotificationImageUrl = user.ProfilePhoto?.Url
         };
             
         await notificationService.SendNotification([listingToFollow.OwnerId], request.UserId, notificationInfo);
