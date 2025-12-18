@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -16,23 +17,37 @@ public class BannerRepository(ItemiteDbContext context) : IBannerRepository
         throw new NotImplementedException();
     }
 
-    public void Delete(int bannerId)
+    public async Task RemoveAsync(int bannerId)
+    {
+        var banner = await context.Banners.FindAsync(bannerId);
+
+        if (banner != null)
+            context.Banners.Remove(banner);
+    }
+    public void Remove(Banner banner)
+    {
+        context.Banners.Remove(banner);
+    }
+
+    public async Task<Banner?> FindByIdAsync(int bannerId)
+    {
+        return await context.Banners.FindAsync(bannerId);
+    }
+
+    public Task ToggleActive(Banner banner)
     {
         throw new NotImplementedException();
     }
 
-    public Task ToggleActive(int bannerId)
+    public async Task<List<Banner>> FindAllActiveAsync()
     {
-        throw new NotImplementedException();
+        return await context.Banners
+        .Where(b => b.IsActive)
+        .ToListAsync();
     }
 
-    public Task<List<Banner>> GetActiveBanners()
+    public async Task<List<Banner>> FindAllAsync()
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Banner>> GetAllBanners()
-    {
-        throw new NotImplementedException();
+        return await context.Banners.ToListAsync();
     }
 }
