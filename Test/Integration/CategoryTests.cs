@@ -151,7 +151,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test",
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = null
             }
         };
@@ -171,7 +170,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -190,7 +188,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
                 // same name as parent
                 Name = "test1",
                 Description = "test",
-                ImageUrl = "image.jpg",
                 ParentCategoryId = savedCategoriesIds[0]
             }
         };
@@ -203,7 +200,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test1",
                 Description = "test",
-                ImageUrl = "image.jpg",
                 // categoryId = ParentCategoryId 
                 ParentCategoryId = savedCategoriesIds[0]
             }
@@ -222,7 +218,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test_modified",
                 Description = "test_desc_modified",
-                ImageUrl = "image_modified.jpg",
                 ParentCategoryId = savedCategoriesIds[1]
             }
         };
