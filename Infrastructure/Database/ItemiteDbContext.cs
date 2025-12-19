@@ -212,6 +212,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status)
             .HasConversion<string>();
+        
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.PaymentIntentStatus)
+            .HasConversion<string>();
 
         modelBuilder.Entity<Payment>()
             .Property(p => p.TransferTrigger)
