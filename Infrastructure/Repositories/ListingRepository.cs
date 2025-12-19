@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Database;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<T?> GetListingByIdAsync(int listingId)
     {
-        var listing = await dbContext.Set<T>().Include(p => p.Categories)
+        var listing = await dbContext.Set<T>().Include(p => p.Categories).ThenInclude(c => c.Photo)
             .Include(p => p.Owner).ThenInclude(u => u.ProfilePhoto)
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         return listing;
@@ -73,12 +74,19 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Select(f => f.Listing);
     }
     
-    public IQueryable<ListingBase> GetUserListingsQueryable(int userId)
+    public IQueryable<ListingBase> GetUserListingsQueryable(int userId, bool? areArchived)
     {
-        return dbContext.Set<T>().Include(p => p.Categories)
-            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
-            .Where(l => l.OwnerId == userId && !l.IsArchived)
+        var listingsQuery = dbContext.Set<T>().Include(p => p.Categories)
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
+
+        if (areArchived != null)
+        {
+            return listingsQuery.Where(l => l.OwnerId == userId && areArchived == false ? !l.IsArchived : l.IsArchived)
+                .OrderByDescending(l => l.DateCreated);
+        }
+        return listingsQuery.Where(l => l.OwnerId == userId)
             .OrderByDescending(l => l.DateCreated);
+            
     }
 
 
@@ -143,5 +151,14 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
     public void DeleteUserListingPrice(UserListingPrice userListingPrice)
     {
         dbContext.UserListingPrices.Remove(userListingPrice);
+    }
+
+    public async Task<Dictionary<int, string>> GetListingImageUrlsAsync(List<int> listingIds)
+    {
+        return await dbContext.ListingPhotos
+            .Include(lp => lp.Photo)
+            .Where(lp => listingIds.Contains(lp.ListingId) && lp.Order == 1)
+            .Select(lp => new { lp.ListingId, lp.Photo.Url })
+            .ToDictionaryAsync(x => x.ListingId, x => x.Url);
     }
 }

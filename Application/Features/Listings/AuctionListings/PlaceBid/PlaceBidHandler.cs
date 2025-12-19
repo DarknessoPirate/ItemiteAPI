@@ -92,9 +92,9 @@ public class PlaceBidHandler(
         await notificationService.SendNotification([auction.OwnerId], request.UserId, new NotificationInfo
         {
             Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in your auction {auction.Name}",
-            ResourceId = request.AuctionId,
+            ListingId = request.AuctionId,
             ResourceType = ResourceType.Auction,
-            NotificationImageUrl = auction.ListingPhotos.First(p => p.Order == 1).Photo.Url,
+            NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
         });
 
         if (formerHighestBid != null)
@@ -102,9 +102,9 @@ public class PlaceBidHandler(
             await notificationService.SendNotification([formerHighestBid.BidderId], request.UserId, new NotificationInfo
             {
                 Message = $"User {bidder.UserName} placed a new bid with value: {bidToAdd.BidPrice} in auction {auction.Name}. You are no longer the highest bidder.",
-                ResourceId = request.AuctionId,
+                ListingId = request.AuctionId,
                 ResourceType = ResourceType.Auction,
-                NotificationImageUrl = auction.ListingPhotos.First(p => p.Order == 1).Photo.Url,
+                NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             });
         }
         

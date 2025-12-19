@@ -35,7 +35,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -55,7 +54,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -72,7 +70,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = InitialCategories.First(c => c.RootCategoryId == null).Name,
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = null
             }
         };
@@ -92,7 +89,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -155,7 +151,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test",
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = null
             }
         };
@@ -175,7 +170,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = name,
                 Description = description,
-                ImageUrl = imageUrl,
                 ParentCategoryId = parentCategoryId
             }
         };
@@ -194,7 +188,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
                 // same name as parent
                 Name = "test1",
                 Description = "test",
-                ImageUrl = "image.jpg",
                 ParentCategoryId = savedCategoriesIds[0]
             }
         };
@@ -207,7 +200,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test1",
                 Description = "test",
-                ImageUrl = "image.jpg",
                 // categoryId = ParentCategoryId 
                 ParentCategoryId = savedCategoriesIds[0]
             }
@@ -226,7 +218,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test_modified",
                 Description = "test_desc_modified",
-                ImageUrl = "image_modified.jpg",
                 ParentCategoryId = savedCategoriesIds[1]
             }
         };
@@ -366,8 +357,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CreateCategoryDto = new CreateCategoryRequest()
             {
                 Name = "test4",
-                Description = "test",
-                ImageUrl = "test.jpg",
+                Description = "test"
             }
         };
         
@@ -400,7 +390,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             {
                 Name = "test5",
                 Description = "test",
-                ImageUrl = "test.jpg",
                 ParentCategoryId = getSubCommand.ParentCategoryId
             }
         };
@@ -522,14 +511,12 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             Name = "test1",
             Description = "test1",
-            ImageUrl = "test1.jpg",
         };
         
         var createCategoryDto2 = new CreateCategoryRequest()
         {
             Name = "test2",
             Description = "test2",
-            ImageUrl = "test2.jpg",
         };
         
         
@@ -543,7 +530,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             Name = "test3",
             Description = "test3",
-            ImageUrl = "test3.jpg",
             ParentCategoryId = categoryId1
         };
         

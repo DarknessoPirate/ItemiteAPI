@@ -1,3 +1,4 @@
+using Domain.DTOs.User;
 using Domain.Entities;
 using Infrastructure.Database;
 using Infrastructure.Interfaces.Repositories;
@@ -55,5 +56,19 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
         return context.Users
             .Include(u => u.ProfilePhoto)
             .Include(u => u.BackgroundPhoto);
+    }
+
+    public async Task<Dictionary<int, ChatMemberInfo>> GetUsersInfoAsync(List<int> userIds)
+    {
+        return await context.Users
+            .Include(u => u.ProfilePhoto)
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new ChatMemberInfo
+            {
+                Id = u.Id,
+                UserName = u.UserName!,
+                PhotoUrl = u.ProfilePhoto != null ? u.ProfilePhoto.Url : null
+            })
+            .ToDictionaryAsync(x => x.Id, x => x);
     }
 }

@@ -48,8 +48,15 @@ public class DeleteListingHandler(
                     throw new CloudinaryException($"An error occured while deleting the photo: {deletionResult.Error.Message}");
                 }
                 await photoRepository.DeletePhotoAsync(listingPhoto.Id);
-                listingRepository.DeleteListing(listingToDelete);
             }
+            
+            listingRepository.DeleteListing(listingToDelete);
+            
+            var notificationInfo = new NotificationInfo
+            {
+                Message = $"Listing {listingName} has been deleted.",
+                ResourceType = listingToDelete is ProductListing ? ResourceType.Product : ResourceType.Auction,
+            };
 
             await unitOfWork.CommitTransactionAsync();
             
@@ -58,11 +65,6 @@ public class DeleteListingHandler(
                 await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
             else
                 await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
-            
-            var notificationInfo = new NotificationInfo
-            {
-                Message = $"Listing {listingName} has been deleted.",
-            };
             
             await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
         }

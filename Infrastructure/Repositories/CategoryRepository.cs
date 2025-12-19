@@ -25,7 +25,7 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
     public async Task<List<Category>> GetAllCategories()
     {
-        var categories = await dbContext.Categories.ToListAsync();
+        var categories = await dbContext.Categories.Include(c => c.Photo).ToListAsync();
 
         return categories;
     }
@@ -35,6 +35,7 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
         var mainCategories =
             await dbContext.Categories
                 .Where(c => c.ParentCategoryId == null)
+                .Include(c => c.Photo)
                 .ToListAsync();
 
         return mainCategories;
@@ -55,7 +56,7 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
     public async Task<List<Category>> GetCategoriesByRootIdAsync(int rootCategoryId)
     {
-        var categories = await dbContext.Categories.Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
+        var categories = await dbContext.Categories.Include(c => c.Photo).Where(c => c.RootCategoryId == rootCategoryId).ToListAsync();
 
         return categories;
     }
@@ -106,7 +107,7 @@ public class CategoryRepository(ItemiteDbContext dbContext) : ICategoryRepositor
 
     public async Task<Category> GetByIdAsync(int categoryId)
     {
-        var category = await dbContext.Categories.FirstOrDefaultAsync(x => x.Id == categoryId);
+        var category = await dbContext.Categories.Include(c => c.Photo).FirstOrDefaultAsync(x => x.Id == categoryId);
 
         if (category == null)
             throw new NotFoundException($"Category with id: {categoryId} not found");

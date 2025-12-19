@@ -29,7 +29,7 @@ public class GetPaginatedUserListingsHandler(
             return cachedListings;
         }
 
-        var queryable = listingRepository.GetUserListingsQueryable(request.UserId);
+        var queryable = listingRepository.GetUserListingsQueryable(request.UserId, request.Query.AreArchived);
         
         int totalItems = await queryable.CountAsync(cancellationToken);
         

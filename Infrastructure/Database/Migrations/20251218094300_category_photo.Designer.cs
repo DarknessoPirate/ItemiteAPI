@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251218094300_category_photo")]
+    partial class category_photo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,47 +69,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("AuctionBids");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Banner", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateUploaded")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Banners");
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -127,7 +89,7 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int?>("ParentCategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PhotoId")
+                    b.Property<int>("PhotoId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("RootCategoryId")
@@ -529,7 +491,8 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<decimal>("PlatformFeeAmount")
                         .HasColumnType("numeric");
@@ -1061,53 +1024,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Bidder");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Banner", b =>
-                {
-                    b.OwnsOne("Domain.ValueObjects.Dimensions", "Dimensions", b1 =>
-                        {
-                            b1.Property<int>("BannerId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Height")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Width")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("BannerId");
-
-                            b1.ToTable("Banners");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BannerId");
-                        });
-
-                    b.OwnsOne("Domain.ValueObjects.Offset", "Offset", b1 =>
-                        {
-                            b1.Property<int>("BannerId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("X")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Y")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("BannerId");
-
-                            b1.ToTable("Banners");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BannerId");
-                        });
-
-                    b.Navigation("Dimensions")
-                        .IsRequired();
-
-                    b.Navigation("Offset")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.HasOne("Domain.Entities.Category", "ParentCategory")
@@ -1117,7 +1033,9 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasOne("Domain.Entities.Photo", "Photo")
                         .WithMany()
-                        .HasForeignKey("PhotoId");
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ParentCategory");
 

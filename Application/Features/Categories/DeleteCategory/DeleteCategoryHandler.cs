@@ -10,8 +10,10 @@ namespace Application.Features.Categories.DeleteCategory;
 
 public class DeleteCategoryHandler(
     ICategoryRepository categoryRepository,
+    IPhotoRepository photoRepository,
     ICacheService cache,
     IUnitOfWork unitOfWork,
+    IMediaService mediaService,
     ILogger<DeleteCategoryHandler> logger
 ) : IRequestHandler<DeleteCategoryCommand>
 {
@@ -25,13 +27,25 @@ public class DeleteCategoryHandler(
             throw new BadRequestException(
                 "You can't remove a category that is a parent. If you truly need to delete the whole tree, set the ForceDelete flag");
 
+        await unitOfWork.BeginTransactionAsync();
         try
         {
+            if (categoryToDelete.RootCategoryId == null)
+            {
+                var deletionResult = await mediaService.DeleteImageAsync(categoryToDelete.Photo!.PublicId);
+                if (deletionResult.Error != null)
+                {
+                    throw new CloudinaryException($"An error occured while deleting the photo: {deletionResult.Error.Message}");
+                }
+                await photoRepository.DeletePhotoAsync(categoryToDelete.Photo!.Id);
+            }
+            
             categoryRepository.DeleteCategory(categoryToDelete);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception e)
         {
+            await unitOfWork.RollbackTransactionAsync(cancellationToken);
             logger.LogError(e, "Failed to delete category with id: {CategoryId}", request.CategoryId);
             throw;
         }

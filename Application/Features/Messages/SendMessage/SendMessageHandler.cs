@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.DTOs.Messages;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.Photo;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -183,9 +184,16 @@ public class SendMessageHandler(
                 await notificationService.SendNotification([request.SendMessageDto.RecipientId], request.SenderId, new NotificationInfo
                 {
                     Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
+                    ListingId = request.SendMessageDto.ListingId,
+                    UserId = sender.Id,
+                    ResourceType = ResourceType.ChatPage,
                     NotificationImageUrl = sender.ProfilePhoto?.Url,
-                    ResourceId = request.SendMessageDto.ListingId,
-                    ResourceType = ResourceType.ChatPage
+                    UserInfo = new ChatMemberInfo
+                    {
+                        Id = sender.Id,
+                        UserName = sender.UserName!,
+                        PhotoUrl = sender.ProfilePhoto?.Url
+                    }
                 });
             }
             

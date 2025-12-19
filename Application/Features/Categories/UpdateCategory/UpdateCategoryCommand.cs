@@ -1,4 +1,5 @@
 using Domain.DTOs.Category;
+using Domain.DTOs.File;
 using MediatR;
 
 namespace Application.Features.Categories.UpdateCategory;

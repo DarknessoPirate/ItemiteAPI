@@ -1,5 +1,6 @@
 using Domain.Configs;
 using Domain.DTOs.Notifications;
+using Domain.DTOs.User;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Exceptions;
@@ -12,7 +13,7 @@ namespace Application.Features.Listings.Shared.UnfollowListing;
 
 public class UnfollowListingHandler(
     IListingRepository<ListingBase> listingRepository,
-    UserManager<User> userManager,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
     INotificationService notificationService
@@ -20,7 +21,7 @@ public class UnfollowListingHandler(
 {
     public async Task Handle(UnfollowListingCommand request, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await userRepository.GetUserWithProfilePhotoAsync(request.UserId);
         if (user == null)
         {
             throw new NotFoundException("User not found");
@@ -48,9 +49,15 @@ public class UnfollowListingHandler(
         var notificationInfo = new NotificationInfo
         {
             Message = $"User {user.UserName} has unfollowed your listing {listingToUnfollow.Name}.",
-            ResourceId = listingToUnfollow.Id,
-            ResourceType = listingToUnfollow is ProductListing ? ResourceType.Product : ResourceType.Auction,
-            NotificationImageUrl = listingToUnfollow.ListingPhotos.First(p => p.Order == 1).Photo.Url
+            UserId = user.Id,
+            ResourceType = ResourceType.User,
+            NotificationImageUrl = user.ProfilePhoto?.Url,
+            UserInfo = new ChatMemberInfo
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                PhotoUrl = user.ProfilePhoto?.Url
+            }
         };
             
         await notificationService.SendNotification([listingToUnfollow.OwnerId], request.UserId, notificationInfo);

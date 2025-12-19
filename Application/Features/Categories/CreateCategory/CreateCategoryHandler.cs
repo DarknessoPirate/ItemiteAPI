@@ -14,7 +14,9 @@ public class CreateCategoryHandler(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    ICacheService cache
+    ICacheService cache,
+    IMediaService mediaService,
+    IPhotoRepository photoRepository
 ) : IRequestHandler<CreateCategoryCommand, int>
 {
     public async Task<int> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
@@ -29,9 +31,17 @@ public class CreateCategoryHandler(
             var rootExists = await categoryRepository.RootCategoryExistsByName(dto.Name);
             if (rootExists)
                 throw new BadRequestException("A root category with that name already exists");
+            if (command.Image == null)
+            {
+                throw new BadRequestException("Root category must have an image");
+            }
         }
         else
         {
+            if (command.Image != null)
+            {
+                throw new BadRequestException("Non root category cannot have an image");
+            }
             var parentCategory = await categoryRepository.GetByIdAsync(dto.ParentCategoryId.Value);
             if (parentCategory == null)
                 throw new NotFoundException("Parent category not found");
@@ -48,9 +58,44 @@ public class CreateCategoryHandler(
             category.RootCategoryId = rootCategoryId;
         }
 
+        string savedPhotoPublicId = string.Empty;
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            if (command.Image != null)
+            {
+                var uploadResult = await mediaService.UploadPhotoAsync(command.Image);
+                if (uploadResult.Error != null)
+                {
+                    await mediaService.DeleteImageAsync(uploadResult.PublicId);
+                    throw new CloudinaryException(uploadResult.Error.Message);
+                }
+            
+                savedPhotoPublicId = uploadResult.PublicId;
+            
+                var photo = new Photo
+                {
+                    Url = uploadResult.SecureUrl.AbsoluteUri,
+                    PublicId = uploadResult.PublicId,
+                    FileName = command.Image.FileName
+                };
+                await photoRepository.AddPhotoAsync(photo);
 
-        await categoryRepository.CreateCategory(category);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+                category.Photo = photo;   
+            }
+            await categoryRepository.CreateCategory(category);
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            if (savedPhotoPublicId != string.Empty)
+            {
+                await mediaService.DeleteImageAsync(savedPhotoPublicId);
+            }
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+       
 
         // remove cache after adding new entity for getting fresh data 
         if (category.ParentCategoryId != null && category.RootCategoryId != null)
