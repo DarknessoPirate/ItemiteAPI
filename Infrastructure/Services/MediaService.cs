@@ -1,13 +1,16 @@
+using System.Net.Mime;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Configs;
 using Domain.DTOs.File;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
 using ResourceType = CloudinaryDotNet.Actions.ResourceType;
 
 namespace Infrastructure.Services;
@@ -92,5 +95,19 @@ public class MediaService : IMediaService
             _logger.LogError($"Error while deleting image: {ex.Message}");
             throw new MediaServiceException($"Failed to delete image");
         }
+    }
+
+    public async Task<Dimensions> GetImageDimensions(FileWrapper file)
+    {
+        var imageInfo = await Image.IdentifyAsync(file.FileStream);
+        var dimensions = new Dimensions
+        {
+            Width = imageInfo.Width,
+            Height = imageInfo.Height
+        };
+
+        file.FileStream.Position = 0;
+
+        return dimensions;
     }
 }

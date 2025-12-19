@@ -65,6 +65,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
+        services.AddScoped<IBannerRepository, BannerRepository>();
         services.AddHostedService<ExpiredFeaturedListingsCleanupService>();
         services.AddHostedService<ArchiveExpiredListingsService>();
         services.AddHostedService<OldListingViewsCleanupService>();
