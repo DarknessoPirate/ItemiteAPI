@@ -14,7 +14,7 @@ public class BannerRepository(ItemiteDbContext context) : IBannerRepository
 
     public void Update(Banner banner)
     {
-        throw new NotImplementedException();
+        context.Banners.Update(banner);
     }
 
     public async Task RemoveAsync(int bannerId)
@@ -32,11 +32,6 @@ public class BannerRepository(ItemiteDbContext context) : IBannerRepository
     public async Task<Banner?> FindByIdAsync(int bannerId)
     {
         return await context.Banners.FindAsync(bannerId);
-    }
-
-    public Task ToggleActive(Banner banner)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<List<Banner>> FindAllActiveAsync()

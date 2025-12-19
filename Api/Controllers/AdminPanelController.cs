@@ -1,6 +1,8 @@
 using Application.Features.Banners.AddBanner;
 using Application.Features.Banners.DeleteBanner;
 using Application.Features.Banners.GetAllBanners;
+using Application.Features.Banners.ToggleActiveBanner;
+using Application.Features.Banners.UpdateBanner;
 using Application.Features.Listings.Shared.DeleteListing;
 using Application.Features.Notifications.SendGlobalNotification;
 using Application.Features.Notifications.SendNotification;
@@ -204,6 +206,38 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     }
 
 
+    [HttpPut("banners/{bannerId}")]
+    public async Task<ActionResult<BannerResponse>> UpdateBanner([FromRoute] int bannerId,
+        [FromForm] UpdateBannerRequest request, IFormFile? photo)
+    {
+        var command = new UpdateBannerCommand
+        {
+            BannerId = bannerId,
+            Dto = request,
+            UserId = requestContextService.GetUserId(),
+            BannerPhoto = photo != null
+                ? new FileWrapper(photo.FileName, photo.Length, photo.ContentType, photo.OpenReadStream())
+                : null
+        };
+
+        var response = await mediator.Send(command);
+        return Ok(response);
+    }
+
+    [HttpPost("banners/active/{bannerId}")]
+    public async Task<ActionResult<BannerResponse>> ToggleActiveBanner([FromRoute] int bannerId)
+    {
+        var command = new ToggleActiveBannerCommand
+        {
+            BannerId = bannerId,
+            UserId = requestContextService.GetUserId()
+        };
+
+        var response = await mediator.Send(command);
+
+        return Ok(response);
+    }
+
     [HttpDelete("banners/{bannerId}")]
     public async Task<IActionResult> DeleteBanner([FromRoute] int bannerId)
     {
@@ -218,7 +252,6 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         return NoContent();
     }
 
-
     [HttpGet("banners/all")]
     public async Task<ActionResult<List<BannerResponse>>> GetAllBanners()
     {
@@ -231,35 +264,4 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
 
         return Ok(response);
     }
-
-    /*
-
-    [HttpPut("banners/{bannerId}")]
-    public async Task<ActionResult<>> UpdateBanner([FromRoute] int bannerId        )
-
-    {
-
-    }
-
-
-
-
-
-
-
-    [HttpPost("banners/active/{bannerId}")]
-    public async Task<ActionResult<>> ToggleActiveBanner([FromRoute] int bannerId         )
-    {
-
-    }
-
-
-
-    [HttpGet("banners/active")]
-    public async Task<ActionResult<>> GetActiveBanners(                )
-    {
-
-    }
-
-    */
 }

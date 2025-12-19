@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using AutoMapper;
 using Domain.DTOs.Banners;
 using Domain.Entities;
@@ -18,7 +19,7 @@ public class GetAllBannersHandler(
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
-            throw new BadRequestException("Invalid user id");
+            throw new ForbiddenException("Invalid user id");
 
         var banners = await bannerRepository.FindAllAsync();
 

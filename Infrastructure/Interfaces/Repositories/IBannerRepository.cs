@@ -9,7 +9,6 @@ public interface IBannerRepository
     void Remove(Banner banner);
     public Task RemoveAsync(int bannerId);
     Task<Banner?> FindByIdAsync(int bannerId);
-    public Task ToggleActive(Banner banner);
     public Task<List<Banner>> FindAllActiveAsync();
     public Task<List<Banner>> FindAllAsync();
 }

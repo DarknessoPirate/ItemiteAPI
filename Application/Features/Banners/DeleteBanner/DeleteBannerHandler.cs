@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Domain.DTOs.Banners;
 using Domain.Entities;
 using Infrastructure.Exceptions;
@@ -22,7 +23,7 @@ public class DeleteBannerHandler(
     {
         var user = await userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
-            throw new BadRequestException("Invalid user id");
+            throw new ForbiddenException("Invalid user id");
 
         var banner = await bannerRepository.FindByIdAsync(request.BannerId);
         if (banner == null)
