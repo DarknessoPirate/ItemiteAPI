@@ -53,7 +53,6 @@ public class Payment
     public DateTime? RefundDate { get; set; } 
     public DateTime? ScheduledRefundDate { get; set; }
     public int RefundAttempts { get; set; } = 0;
-
-    // 
-    [MaxLength(500)] public string? Notes { get; set; } // Admin notes, dispute info, etc.
+    
+    public string? Notes { get; set; } // Admin notes, dispute info, etc.
 }

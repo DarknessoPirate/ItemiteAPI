@@ -24,13 +24,14 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Dispute> Disputes { get; set; }
     public DbSet<DisputeEvidence> DisputeEvidences { get; set; }
-    
+    public DbSet<Banner> Banners { get; set; }
+
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<NotificationUser> NotificationUsers { get; set; }
-    
+
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReportPhoto> ReportPhotos { get; set; }
-    
+
     public DbSet<UserListingPrice> UserListingPrices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -161,21 +162,21 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .WithOne(rt => rt.ReplacedThisToken)
             .HasForeignKey<RefreshToken>(rt => rt.ReplacedByTokenId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         modelBuilder.Entity<Notification>()
             .Property(n => n.ResourceType)
             .HasConversion<string>();
-        
+
         modelBuilder.Entity<Report>()
             .Property(r => r.ResourceType)
             .HasConversion<string>();
-        
+
         modelBuilder.Entity<ReportPhoto>()
             .HasOne(rp => rp.Report)
             .WithMany(r => r.ReportPhotos)
             .HasForeignKey(rp => rp.ReportId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<ReportPhoto>()
             .HasOne(rp => rp.Photo)
             .WithMany()
@@ -261,7 +262,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
             .HasForeignKey(de => de.PhotoId)
             .OnDelete(DeleteBehavior.Cascade);
 
-
+        modelBuilder.Entity<Banner>()
+            .Property(b => b.Position)
+            .HasConversion<string>();
+        
         base.OnModelCreating(modelBuilder);
     }
 }
