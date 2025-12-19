@@ -2,6 +2,8 @@ using Application.Features.Auth.EmailConfirmation;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.ResetPassword;
+using Application.Features.Banners.AddBanner;
+using Application.Features.Banners.UpdateBanner;
 using Application.Features.Categories.CreateCategory;
 using Application.Features.Categories.DeleteCategory;
 using Application.Features.Categories.GetCategoryTree;
@@ -89,5 +91,7 @@ public static class ValidatorExtensions
         services.AddScoped<IValidator<GetUserSalesQuery>, GetUserSalesValidator>();
         services.AddScoped<IValidator<GetUserPurchasesQuery>, GetUserPurchasesValidator>();
         services.AddScoped<IValidator<SetUserPriceCommand>, SetUserPriceValidator>();
+        services.AddScoped<IValidator<AddBannerCommand>, AddBannerValidator>();
+        services.AddScoped<IValidator<UpdateBannerCommand>, UpdateBannerValidator>();
     }
 }
