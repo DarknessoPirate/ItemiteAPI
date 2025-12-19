@@ -47,7 +47,13 @@ public class Payment
     public DateTime ChargeDate { get; set; } = DateTime.UtcNow;
     public DateTime? TransferDate { get; set; } // When money was transferred to seller
     public DateTime? ScheduledTransferDate { get; set; } // when it's scheduled for transfer
-
+    
+    // bid payment data
+    public string? StripePaymentIntentId { get; set; }  // The PaymentIntent ID
+    public string? PaymentIntentClientSecret { get; set; }  // Frontend needs this for 3D Secure
+    public PaymentIntentStatus? PaymentIntentStatus { get; set; } = Enums.PaymentIntentStatus.RequiresAction; // Stripe-specific status
+    
+    // refund optional data
     public string? StripeRefundId { get; set; } 
     public decimal? RefundAmount { get; set; } 
     public DateTime? RefundDate { get; set; } 

@@ -16,6 +16,21 @@ public interface IStripeConnectService
         string description,
         Dictionary<string, string>? metadata = null);
 
+    Task<PaymentIntent> CreatePaymentIntentAsync(
+        decimal amount,
+        string currency,
+        string paymentMethodId,
+        string description,
+        Dictionary<string, string>? metadata = null);
+
+    Task<PaymentIntent> CapturePaymentIntentAsync(
+        string paymentIntentId,
+        decimal? amountToCapture = null);
+
+    Task<PaymentIntent> CancelPaymentIntentAsync(string paymentIntentId);
+
+    Task<PaymentIntent> GetPaymentIntentAsync(string paymentIntentId);
+
     Task<Transfer> CreateTransferAsync(
         decimal amount,
         string currency,

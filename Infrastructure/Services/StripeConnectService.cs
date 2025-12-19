@@ -59,6 +59,129 @@ public class StripeConnectService(
         }
     }
 
+    /// <summary>
+    /// Creates a PaymentIntent to authorize (hold) funds for an auction bid
+    /// </summary>
+    /// <param name="amount">Amount to authorize</param>
+    /// <param name="currency">Currency code</param>
+    /// <param name="paymentMethodId">Payment method ID from frontend</param>
+    /// <param name="description">Description</param>
+    /// <param name="metadata">Metadata</param>
+    /// <returns>Created PaymentIntent</returns>
+    public async Task<PaymentIntent> CreatePaymentIntentAsync(
+        decimal amount,
+        string currency,
+        string paymentMethodId,
+        string description,
+        Dictionary<string, string>? metadata = null)
+    {
+        var paymentIntentService = new PaymentIntentService();
+        var amountInSmallestUnit = (long)(amount * 100);
+
+        var options = new PaymentIntentCreateOptions
+        {
+            Amount = amountInSmallestUnit,
+            Currency = currency.ToLower(),
+            PaymentMethod = paymentMethodId,
+            Description = description,
+            Metadata = metadata ?? new Dictionary<string, string>(),
+            CaptureMethod = "manual", // Don't charge immediately - only authorize
+            Confirm = true, // Confirm immediately to check if card is valid
+            ReturnUrl = "https://your-frontend-url.com/auction-bid-complete", // For 3D Secure redirects
+        };
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CreateAsync(options);
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent creation failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent creation failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Captures an authorized PaymentIntent (actually charges the card)
+    /// </summary>
+    /// <param name="paymentIntentId">The PaymentIntent ID to capture</param>
+    /// <param name="amountToCapture">Optional: capture partial amount (null for full)</param>
+    /// <returns>Updated PaymentIntent</returns>
+    public async Task<PaymentIntent> CapturePaymentIntentAsync(
+        string paymentIntentId,
+        decimal? amountToCapture = null)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        var options = new PaymentIntentCaptureOptions();
+
+        if (amountToCapture.HasValue)
+        {
+            options.AmountToCapture = (long)(amountToCapture.Value * 100);
+        }
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CaptureAsync(paymentIntentId, options);
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent capture failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent capture failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Cancels a PaymentIntent (releases the hold) - used when user is outbid
+    /// </summary>
+    /// <param name="paymentIntentId">The PaymentIntent ID to cancel</param>
+    /// <returns>Canceled PaymentIntent</returns>
+    public async Task<PaymentIntent> CancelPaymentIntentAsync(string paymentIntentId)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CancelAsync(paymentIntentId);
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent cancellation failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent cancellation failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Gets a PaymentIntent by ID to check its status
+    /// </summary>
+    public async Task<PaymentIntent> GetPaymentIntentAsync(string paymentIntentId)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        try
+        {
+            return await paymentIntentService.GetAsync(paymentIntentId);
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Failed to retrieve PaymentIntent. Error: {ErrorMessage}",
+                ex.StripeError?.Message);
+            throw new StripeErrorException($"Failed to retrieve PaymentIntent: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
 
     /// <summary>
     /// Transfers money from the platform account to seller's Stripe Connect account.

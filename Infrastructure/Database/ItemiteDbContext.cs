@@ -192,9 +192,10 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         // payments 
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.Listing)
-            .WithMany()
-            .HasForeignKey(p => p.ListingId)
+            .WithOne(l => l.Payment)
+            .HasForeignKey<Payment>(p => p.ListingId)
             .OnDelete(DeleteBehavior.Restrict);
+
 
         modelBuilder.Entity<Payment>()
             .HasOne(p => p.Buyer)
@@ -265,7 +266,7 @@ public class ItemiteDbContext(DbContextOptions<ItemiteDbContext> options)
         modelBuilder.Entity<Banner>()
             .Property(b => b.Position)
             .HasConversion<string>();
-        
+
         base.OnModelCreating(modelBuilder);
     }
 }
