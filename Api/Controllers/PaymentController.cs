@@ -3,6 +3,7 @@ using Application.Features.Payments.DisputePurchase;
 using Application.Features.Payments.GetLatestPayments;
 using Application.Features.Payments.GetPaymentCountsByStatus;
 using Application.Features.Payments.GetPaymentsByStatus;
+using Application.Features.Payments.GetStripeOnboardingStatus;
 using Application.Features.Payments.GetUserPurchases;
 using Application.Features.Payments.GetUserSales;
 using Application.Features.Payments.PurchaseProduct;
@@ -51,6 +52,20 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
         var onboardingUrl = await mediator.Send(command);
 
         return Redirect(onboardingUrl);
+    }
+
+    [Authorize]
+    [HttpGet("stripe/onboarding-status")]
+    public async Task<IActionResult> GetStripeOnboardingStatus()
+    {
+        var query = new GetStripeOnboardingStatusQuery
+        {
+            UserId = requestContextService.GetUserId()
+        };
+
+        var isOnboarded = await mediator.Send(query);
+
+        return Ok(new { isOnboarded });
     }
 
     [Authorize]
@@ -145,6 +160,4 @@ public class PaymentController(IMediator mediator, IRequestContextService reques
 
         return Ok(response);
     }
-
-   
 }

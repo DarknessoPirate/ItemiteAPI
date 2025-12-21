@@ -18,6 +18,7 @@ public class ListingBase
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     public DateTime DateEnds { get; set; }
     
+    public int? PaymentId { get; set; }
     public Payment? Payment { get; set; }
 
     public bool IsArchived { get; set; } = false;

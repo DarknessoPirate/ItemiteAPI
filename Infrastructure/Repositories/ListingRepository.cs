@@ -175,10 +175,10 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Include(a => a.ListingPhotos)
             .ThenInclude(lp => lp.Photo)
             .Where(a =>
-                a.DateEnds <= currentDate &&
-                !a.IsArchived &&
-                a.HighestBidId != null && // Has at least one bid
-                a.Payment == null) // Payment hasn't been captured yet
+                    a.DateEnds <= currentDate &&
+                    !a.IsArchived &&
+                    a.HighestBidId != null// Has at least one bid
+            )
             .ToListAsync();
     }
 }

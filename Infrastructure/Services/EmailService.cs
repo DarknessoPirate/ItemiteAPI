@@ -16,6 +16,7 @@ public class EmailService(
 {
     public async Task SendConfirmationAsync(User user, string emailToken)
     {
+        
         var queryParam = new Dictionary<string, string>
         {
             { "token", emailToken },

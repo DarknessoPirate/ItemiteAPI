@@ -103,6 +103,8 @@ public class PlaceBidHandler(
                 currency: "pln",
                 paymentMethodId: request.BidDto.PaymentMethodId, // Frontend provides this
                 description: $"Bid authorization for auction: {auction.Name}",
+                returnUrl: paymentSettings.Value.BidCompleteUrl,
+                captureMethod: CaptureMethods.MANUAL,
                 metadata: paymentIntentMetadata
             );
 

@@ -138,7 +138,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
 
             if (captureResult.Success)
             {
-                // Successfully captured payment - finalize auction
+                await CancelBidsAsync(bids, excludeBidId: bid.Id, stripeConnectService, paymentRepository, unitOfWork);
                 await FinalizeAuctionAsync(
                     auction,
                     bid,
@@ -147,15 +147,16 @@ public class AuctionCompletionBackgroundService : BackgroundService
                     notificationService,
                     cacheService,
                     unitOfWork);
+
                 return; // Auction successfully completed
             }
 
-            await CancelLosingBidsAsync(bids, bid.Id, stripeConnectService, paymentRepository, unitOfWork);
 
             // Capture failed - continue to next bidder
             _logger.LogWarning($"Failed to capture payment for bid {bid.Id} after retries - trying next bidder");
         }
 
+        await CancelBidsAsync(bids, excludeBidId: null, stripeConnectService, paymentRepository, unitOfWork);
         _logger.LogError($"All bids failed for auction {auction.Id} - no successful payment capture");
         auction.IsArchived = true;
         auctionListingRepository.UpdateListing(auction);
@@ -199,6 +200,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
                     payment.StripePaymentIntentId!);
 
                 // Update payment status
+                payment.StripeChargeId = capturedIntent.LatestChargeId;
                 payment.Status = PaymentStatus.Pending; // Now waiting for transfer to seller
                 payment.PaymentIntentStatus = PaymentIntentStatusExtensions.FromStripeStatus(capturedIntent.Status);
                 payment.TransferTrigger = TransferTrigger.TimeBased;
@@ -222,7 +224,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
                 if (attemptCount < MaxCaptureAttempts)
                 {
                     // Not the last attempt - wait and retry
-                    var delaySeconds = 5 * attemptCount; // Exponential backoff: 5s, 10s, 15s
+                    var delaySeconds = 10 * attemptCount; 
                     _logger.LogInformation($"Waiting {delaySeconds} seconds before retry...");
                     await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
                 }
@@ -301,18 +303,21 @@ public class AuctionCompletionBackgroundService : BackgroundService
         _logger.LogInformation($"Auction {auction.Id} finalized successfully");
     }
 
-    private async Task CancelLosingBidsAsync(
+    private async Task CancelBidsAsync(
         List<AuctionBid> allBids,
-        int winningBidId,
+        int? excludeBidId, // null = cancel all, value = cancel all except this one
         IStripeConnectService stripeConnectService,
         IPaymentRepository paymentRepository,
         IUnitOfWork unitOfWork)
     {
         foreach (var bid in allBids)
         {
-            if (bid.Id == winningBidId || bid.Payment == null)
+            if (excludeBidId.HasValue && bid.Id == excludeBidId.Value)
                 continue;
-            
+
+            if (bid.Payment == null)
+                continue;
+
             if (!string.IsNullOrEmpty(bid.Payment.StripePaymentIntentId) &&
                 bid.Payment.PaymentIntentStatus != PaymentIntentStatus.Canceled)
             {
@@ -321,14 +326,17 @@ public class AuctionCompletionBackgroundService : BackgroundService
                     await stripeConnectService.CancelPaymentIntentAsync(bid.Payment.StripePaymentIntentId);
 
                     bid.Payment.PaymentIntentStatus = PaymentIntentStatus.Canceled;
-                    bid.Payment.Notes = $"PaymentIntent canceled - auction won by bid {winningBidId}";
+                    bid.Payment.Status = excludeBidId.HasValue ? PaymentStatus.Outbid : PaymentStatus.Failed;
+                    bid.Payment.Notes = excludeBidId.HasValue
+                        ? $"PaymentIntent canceled - auction won by bid {excludeBidId.Value}"
+                        : "Auction ended - all payment captures failed";
                     paymentRepository.Update(bid.Payment);
 
-                    _logger.LogInformation($"Canceled PaymentIntent for losing bid {bid.Id}");
+                    _logger.LogInformation($"Canceled PaymentIntent for bid {bid.Id}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, $"Failed to cancel PaymentIntent for bid {bid.Id} - non-critical");
+                    _logger.LogWarning(ex, $"Failed to cancel PaymentIntent for bid {bid.Id}");
                 }
             }
         }

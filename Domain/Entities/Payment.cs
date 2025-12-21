@@ -8,7 +8,7 @@ public class Payment
     public int Id { get; set; }
 
     // === Stripe Information ===
-    [Required] [MaxLength(255)] public string StripeChargeId { get; set; } = string.Empty; // e.g., "ch_xxxxx"
+    [MaxLength(255)] public string? StripeChargeId { get; set; } = string.Empty; // e.g., "ch_xxxxx"
 
     [MaxLength(255)] public string? StripeTransferId { get; set; } // e.g., "tr_xxxxx" (null until transferred)
 

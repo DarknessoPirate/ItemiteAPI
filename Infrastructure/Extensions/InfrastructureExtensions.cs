@@ -70,6 +70,7 @@ public static class InfrastructureExtensions
         services.AddHostedService<ArchiveExpiredListingsService>();
         services.AddHostedService<OldListingViewsCleanupService>();
         services.AddHostedService<PaymentTransferBackgroundService>();
+        services.AddHostedService<AuctionCompletionBackgroundService>();
     }
 }
 
