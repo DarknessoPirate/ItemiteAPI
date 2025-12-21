@@ -19,7 +19,7 @@ public class ListingBase
     public bool IsArchived { get; set; } = false;
     public bool IsFeatured { get; set; } = false;
     public DateTime? FeaturedAt { get; set; } = null;
-    [MaxLength(500)]
+    [MaxLength(2500)]
     public string? Description { get; set; } = null;
     public int OwnerId { get; set; }
     public required User Owner { get; set; } = null!;
