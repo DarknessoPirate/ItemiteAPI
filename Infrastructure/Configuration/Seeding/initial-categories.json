@@ -3,7 +3,7 @@
     {
       "Name": "agriculture",
       "Description": "Products, equipment and supplies used in agriculture and farming.",
-      "ImageName": "Agriculture.png",
+      "ImageName": "Agriculture.svg",
       "SubCategories": [
         {
           "Name": "farm_equipment",
@@ -91,7 +91,7 @@
     {
       "Name": "electronics",
       "Description": "Electronic devices, gadgets and accessories.",
-      "ImageName": "Electronics.png",
+      "ImageName": "Electronics.svg",
       "SubCategories": [
         {
           "Name": "computers",
@@ -223,7 +223,7 @@
     {
       "Name": "fashion",
       "Description": "Clothing, footwear and fashion accessories.",
-      "ImageName": "Fashion.png",
+      "ImageName": "Fashion.svg",
       "SubCategories": [
         {
           "Name": "men_clothing",
@@ -383,7 +383,7 @@
     {
       "Name": "health_beauty",
       "Description": "Products related to personal health, wellness and beauty care.",
-      "ImageName": "Health_and_Beauty_icon.png",
+      "ImageName": "Health_and_Beauty_icon.svg",
       "SubCategories": [
         {
           "Name": "skincare",
@@ -497,7 +497,7 @@
     {
       "Name": "home_garden",
       "Description": "Products for home improvement, interior design and garden care.",
-      "ImageName": "Home_and_Garden.png",
+      "ImageName": "Home_and_Garden.svg",
       "SubCategories": [
         {
           "Name": "furniture",
@@ -604,7 +604,7 @@
     {
       "Name": "industry",
       "Description": "Equipment, tools and supplies used in industrial and professional environments.",
-      "ImageName": "Industry_icon.png",
+      "ImageName": "Industry_icon.svg",
       "SubCategories": [
         {
           "Name": "construction_equipment",
@@ -635,7 +635,7 @@
     {
       "Name": "kids_baby",
       "Description": "Products designed for babies, toddlers and young children.",
-      "ImageName": "Kids_and_Baby.png",
+      "ImageName": "Kids_and_Baby.svg",
       "SubCategories": [
         {
           "Name": "baby_clothing",
@@ -755,7 +755,7 @@
     {
       "Name": "motorization",
       "Description": "Vehicles, spare parts and accessories for cars and motorcycles.",
-      "ImageName": "Motorization.png",
+      "ImageName": "Motorization.svg",
       "SubCategories": [
         {
           "Name": "cars",
@@ -843,7 +843,7 @@
     {
       "Name": "pets",
       "Description": "Supplies, accessories and care products for pets of all types.",
-      "ImageName": "Pets.png",
+      "ImageName": "Pets.svg",
       "SubCategories": [
         {
           "Name": "pet_food",
@@ -951,7 +951,7 @@
     {
       "Name": "real_estate",
       "Description": "Properties, land and real estate for sale or rent.",
-      "ImageName": "Real_Estate.png",
+      "ImageName": "Real_Estate.svg",
       "SubCategories": [
         {
           "Name": "residential",
@@ -1015,7 +1015,7 @@
     {
       "Name": "services_education",
       "Description": "Professional services and educational offerings for individuals and businesses.",
-      "ImageName": "Services_and_Education.png",
+      "ImageName": "Services_and_Education.svg",
       "SubCategories": [
         {
           "Name": "services",
@@ -1072,7 +1072,7 @@
     {
       "Name": "sports_hobbies",
       "Description": "Equipment, games and collectibles for sports, hobbies and leisure activities.",
-      "ImageName": "Sports_and_Hobbies.png",
+      "ImageName": "Sports_and_Hobbies.svg",
       "SubCategories": [
         {
           "Name": "fitness_equipment",

@@ -40,7 +40,7 @@
         <None Update="Configuration\Seeding\initial-categories.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Configuration\Seeding\CategoryImages\*.png">
+        <None Update="Configuration\Seeding\CategoryImages\*.svg">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

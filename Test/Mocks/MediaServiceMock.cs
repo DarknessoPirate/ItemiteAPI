@@ -1,5 +1,6 @@
 using CloudinaryDotNet.Actions;
 using Domain.DTOs.File;
+using Domain.ValueObjects;
 using Infrastructure.Interfaces.Services;
 
 namespace Test.Mocks;
@@ -26,5 +27,10 @@ public class MediaServiceMock : IMediaService
         };
 
         return Task.FromResult(deletionResult);
+    }
+
+    public Task<Dimensions> GetImageDimensions(FileWrapper file)
+    {
+        throw new NotImplementedException();
     }
 }

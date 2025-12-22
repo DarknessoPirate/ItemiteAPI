@@ -14,9 +14,7 @@ public class CreateCategoryHandler(
     ICategoryRepository categoryRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper,
-    ICacheService cache,
-    IMediaService mediaService,
-    IPhotoRepository photoRepository
+    ICacheService cache
 ) : IRequestHandler<CreateCategoryCommand, int>
 {
     public async Task<int> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
@@ -35,6 +33,27 @@ public class CreateCategoryHandler(
             {
                 throw new BadRequestException("Root category must have an image");
             }
+            
+            if (command.Image.ContentType != "image/svg+xml")
+            {
+                throw new BadRequestException("Image must be an SVG file");
+            }
+
+            var fileExtension = Path.GetExtension(command.Image.FileName).ToLowerInvariant();
+            if (fileExtension != ".svg")
+            {
+                throw new BadRequestException("File must have .svg extension");
+            }
+            
+            using var reader = new StreamReader(command.Image.FileStream);
+            var svgContent = await reader.ReadToEndAsync(cancellationToken);
+            
+            if (string.IsNullOrWhiteSpace(svgContent))
+            {
+                throw new BadRequestException("SVG file cannot be empty");
+            }
+
+            category.SvgImage = svgContent;
         }
         else
         {
@@ -57,46 +76,10 @@ public class CreateCategoryHandler(
             // Set the root category ID for the new category
             category.RootCategoryId = rootCategoryId;
         }
-
-        string savedPhotoPublicId = string.Empty;
-        await unitOfWork.BeginTransactionAsync();
-        try
-        {
-            if (command.Image != null)
-            {
-                var uploadResult = await mediaService.UploadPhotoAsync(command.Image);
-                if (uploadResult.Error != null)
-                {
-                    await mediaService.DeleteImageAsync(uploadResult.PublicId);
-                    throw new CloudinaryException(uploadResult.Error.Message);
-                }
-            
-                savedPhotoPublicId = uploadResult.PublicId;
-            
-                var photo = new Photo
-                {
-                    Url = uploadResult.SecureUrl.AbsoluteUri,
-                    PublicId = uploadResult.PublicId,
-                    FileName = command.Image.FileName
-                };
-                await photoRepository.AddPhotoAsync(photo);
-
-                category.Photo = photo;   
-            }
-            await categoryRepository.CreateCategory(category);
-            await unitOfWork.CommitTransactionAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            if (savedPhotoPublicId != string.Empty)
-            {
-                await mediaService.DeleteImageAsync(savedPhotoPublicId);
-            }
-            await unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
-       
-
+        
+        await categoryRepository.CreateCategory(category);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         // remove cache after adding new entity for getting fresh data 
         if (category.ParentCategoryId != null && category.RootCategoryId != null)
         {

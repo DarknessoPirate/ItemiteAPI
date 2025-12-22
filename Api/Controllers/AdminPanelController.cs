@@ -45,7 +45,7 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         public IFormFile? Image { get; set; }
     }
     
-    [HttpPost]
+    [HttpPost("category")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> CreateCategory([FromForm] FullCategoryRequest request)
     {
@@ -60,7 +60,7 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
         return Created($"api/category/{categoryId}", new { categoryId });
     }
     
-    [HttpPut("{categoryId:int}")]
+    [HttpPut("category/{categoryId:int}")]
     public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromBody] UpdateCategoryRequest updateCategoryRequest)
     {
         var command = new UpdateCategoryCommand
@@ -75,7 +75,7 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     }
     
     
-    [HttpDelete("{categoryId:int}")]
+    [HttpDelete("category/{categoryId:int}")]
     public async Task<IActionResult> DeleteCategory(int categoryId, [FromQuery] bool deleteFullTree = false)
     {
         var command = new DeleteCategoryCommand

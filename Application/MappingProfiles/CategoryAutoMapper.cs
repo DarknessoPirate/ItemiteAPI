@@ -9,13 +9,9 @@ public class CategoryAutoMapper : Profile
     public CategoryAutoMapper()
     {
         CreateMap<CreateCategoryRequest, Category>();
-        CreateMap<Category, CategoryResponse>()
-            .ForMember(c => c.ImageUrl, opt =>
-                opt.MapFrom(cr => cr.Photo.Url));
+        CreateMap<Category, CategoryResponse>();
         CreateMap<Category, CategoryTreeResponse>()
-            .ForMember(c => c.SubCategories, opt => opt.Ignore())
-            .ForMember(c => c.ImageUrl, opt =>
-            opt.MapFrom(cr => cr.Photo.Url));
+            .ForMember(c => c.SubCategories, opt => opt.Ignore());
         CreateMap<Category, CategoryBasicResponse>();
     }
 }
