@@ -12,6 +12,8 @@ public class PaymentRepository(ItemiteDbContext context) : IPaymentRepository
     {
         return context.Payments
             .Include(p => p.Listing)
+            .ThenInclude(l => l.Categories)
+            .Include(p => p.Listing)
             .ThenInclude(l => l.ListingPhotos)
             .ThenInclude(lp => lp.Photo)
             .Include(p => p.Buyer)
