@@ -19,23 +19,34 @@ public class CreateAuctionListingHandler(
     ICacheService cacheService,
     IMediaService mediaService,
     IPhotoRepository photoRepository,
+    IStripeConnectService stripeConnectService,
     UserManager<User> userManager,
     ILogger<CreateAuctionListingHandler> logger
-    ) : IRequestHandler<CreateAuctionListingCommand, int>
+) : IRequestHandler<CreateAuctionListingCommand, int>
 {
     public async Task<int> Handle(CreateAuctionListingCommand request, CancellationToken cancellationToken)
     {
         var auctionListing = mapper.Map<AuctionListing>(request.AuctionListingDto);
         auctionListing.OwnerId = request.UserId;
         
+        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        if (user == null)
+            throw new UnauthorizedException("Invalid user id");
+
+        if (user.StripeConnectAccountId == null)
+            throw new BadRequestException("Create a stripe account first");
+
+        if (!await stripeConnectService.IsAccountFullyOnboardedAsync(user.StripeConnectAccountId))
+            throw new BadRequestException("Finish the stripe account configuration");
+        
         if (request.AuctionListingDto.Location == null || !IsLocationComplete(request.AuctionListingDto.Location))
         {
-            var user = await userManager.FindByIdAsync(request.UserId.ToString());
             if (user?.Location == null || !IsLocationComplete(user.Location))
             {
-                throw new BadRequestException("Location is required. Please provide location or set your profile location.");
+                throw new BadRequestException(
+                    "Location is required. Please provide location or set your profile location.");
             }
-            
+
             auctionListing.Location = new Location
             {
                 Longitude = user.Location.Longitude,
@@ -45,7 +56,7 @@ public class CreateAuctionListingHandler(
                 State = user.Location.State
             };
         }
-        
+
         var category = await categoryRepository.GetByIdAsync(request.AuctionListingDto.CategoryId);
         if (category == null)
         {
@@ -59,9 +70,9 @@ public class CreateAuctionListingHandler(
 
         var directParents = await categoryRepository.GetAllParentsRelatedToCategory(category);
         directParents.Add(category);
-        
+
         auctionListing.Categories = directParents;
-        
+
         var savedPhotosPublicIds = new List<string>();
         var listingPhotos = new List<ListingPhoto>();
         await unitOfWork.BeginTransactionAsync();
@@ -77,8 +88,10 @@ public class CreateAuctionListingHandler(
                     {
                         await mediaService.DeleteImageAsync(savedPhoto);
                     }
+
                     throw new CloudinaryException(uploadResult.Error.Message);
                 }
+
                 savedPhotosPublicIds.Add(uploadResult.PublicId);
                 var photo = new Photo
                 {
@@ -86,8 +99,8 @@ public class CreateAuctionListingHandler(
                     PublicId = uploadResult.PublicId,
                     FileName = image.FileName
                 };
-                await photoRepository.AddPhotoAsync(photo); 
-                
+                await photoRepository.AddPhotoAsync(photo);
+
                 var listingPhoto = new ListingPhoto
                 {
                     Photo = photo,
@@ -114,19 +127,19 @@ public class CreateAuctionListingHandler(
             logger.LogError(ex, $"Error when creating new product listing: {ex.Message}");
             throw;
         }
-        
-        
+
+
         return auctionListing.Id;
     }
-    
+
     private bool IsLocationComplete(Location? location)
     {
         if (location == null) return false;
-    
-        return location.Longitude.HasValue 
-               && location.Latitude.HasValue 
-               && !string.IsNullOrWhiteSpace(location.Country) 
-               && !string.IsNullOrWhiteSpace(location.City) 
+
+        return location.Longitude.HasValue
+               && location.Latitude.HasValue
+               && !string.IsNullOrWhiteSpace(location.Country)
+               && !string.IsNullOrWhiteSpace(location.City)
                && !string.IsNullOrWhiteSpace(location.State);
     }
 }
