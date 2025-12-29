@@ -11,4 +11,5 @@ public class UserResponse
     public string? PhoneNumber { get; set; }
     public string? PhotoUrl { get; set; }
     public string? BackgroundUrl { get; set; }
+    public List<string> Roles { get; set; } = [];
 }

@@ -13,4 +13,5 @@ public interface IUserRepository
     Task<List<User>> GetAllUsers();
     IQueryable<User> GetUsersQueryable();
     Task<Dictionary<int, ChatMemberInfo>> GetUsersInfoAsync(List<int> userIds);
+    Task<Dictionary<int, List<string?>>> GetUserRolesAsync(List<int> userIds);
 }

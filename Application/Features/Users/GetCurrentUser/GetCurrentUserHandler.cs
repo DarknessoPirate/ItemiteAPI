@@ -18,6 +18,12 @@ public class GetCurrentUserHandler(
         {
             throw new UnauthorizedException("User not found");
         }
-        return mapper.Map<UserResponse>(user);
+        
+        var userRoleDict = await userRepository.GetUserRolesAsync([user.Id]);
+        var mappedUser = mapper.Map<UserResponse>(user);
+        
+        mappedUser.Roles = userRoleDict.TryGetValue(mappedUser.Id, out var roles) ?  roles : new List<string>();
+        
+        return mappedUser;
     }
 }

@@ -44,6 +44,7 @@ public class LoginGoogleCallbackHandler(
             {
                 return (int) GoogleLoginResult.UsernameUniqueFailure;
             }
+            await userManager.AddToRolesAsync(user, [Roles.User.ToString()]);
         }
         else if (user.AuthProvider == AuthProvider.Email)
         {

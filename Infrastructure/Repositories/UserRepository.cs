@@ -71,4 +71,19 @@ public class UserRepository(ItemiteDbContext context) : IUserRepository
             })
             .ToDictionaryAsync(x => x.Id, x => x);
     }
+
+    public async Task<Dictionary<int, List<string?>>> GetUserRolesAsync(List<int> userIds)
+    {
+        return await context.UserRoles
+            .Where(ur => userIds.Contains(ur.UserId))
+            .Join(context.Roles, 
+                ur => ur.RoleId, 
+                r => r.Id, 
+                (ur, r) => new { ur.UserId, r.Name })
+            .GroupBy(x => x.UserId)
+            .ToDictionaryAsync(
+                g => g.Key, 
+                g => g.Select(x => x.Name).ToList()
+            );
+    }
 }
