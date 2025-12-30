@@ -2,6 +2,7 @@ using Domain.Configs;
 using Domain.DTOs.Payments;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Extensions;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -64,34 +65,49 @@ public class PurchaseProductHandler(
             throw new BadRequestException("Seller's payment account is not fully set up yet");
         }
 
-        var platformFeePercentage = paymentSettings.Value.PlatformFeePercentage;
-        var platformFeeAmount = product.Price * (platformFeePercentage / 100);
-        var sellerAmount = product.Price - platformFeeAmount;
+        var userSpecificPrice = await productListingRepository.GetUserListingPriceAsync(
+            product.Id,
+            request.BuyerId);
 
-        var chargeMetadata = new Dictionary<string, string>
+        var finalPrice = userSpecificPrice?.Price ?? product.Price;
+
+        var platformFeePercentage = paymentSettings.Value.PlatformFeePercentage;
+        var platformFeeAmount = finalPrice * (platformFeePercentage / 100);
+        var sellerAmount = finalPrice - platformFeeAmount;
+
+        var paymentMetadata = new Dictionary<string, string>
         {
             { "product_id", product.Id.ToString() },
             { "product_name", product.Name },
             { "seller_id", product.OwnerId.ToString() },
             { "buyer_id", request.BuyerId.ToString() },
-            { "platform_fee", platformFeeAmount.ToString("F2") }
+            { "platform_fee", platformFeeAmount.ToString("F2") },
+            { "payment_type", "product_purchase" }
         };
+
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
-            var charge = await stripeConnectService.CreateChargeAsync(
-                amount: product.Price,
+            var paymentIntent = await stripeConnectService.CreatePaymentIntentAsync(
+                amount: finalPrice,
                 currency: "pln",
                 paymentMethodId: request.PaymentMethodId,
                 description: $"Purchase: {product.Name}",
-                metadata: chargeMetadata
+                returnUrl: paymentSettings.Value.PurchaseCompleteUrl,
+                metadata: paymentMetadata,
+                captureMethod: CaptureMethods.AUTOMATIC
             );
+
+            var paymentIntentStatus = PaymentIntentStatusExtensions.FromStripeStatus(paymentIntent.Status);
 
             var payment = new Payment
             {
-                StripeChargeId = charge.Id,
-                TotalAmount = product.Price,
+                StripePaymentIntentId = paymentIntent.Id,
+                PaymentIntentClientSecret = paymentIntent.ClientSecret,
+                PaymentIntentStatus = paymentIntentStatus,
+                StripeChargeId = paymentIntent.LatestChargeId,
+                TotalAmount = finalPrice,
                 PlatformFeePercentage = platformFeePercentage,
                 PlatformFeeAmount = platformFeeAmount,
                 SellerAmount = sellerAmount,
@@ -99,18 +115,20 @@ public class PurchaseProductHandler(
                 ListingId = product.Id,
                 BuyerId = request.BuyerId,
                 SellerId = product.OwnerId,
-                Status = PaymentStatus.Pending,
+                Status = PaymentStatus.Pending, // Charged, waiting for transfer to seller
                 TransferTrigger = TransferTrigger.TimeBased,
                 ScheduledTransferDate = DateTime.UtcNow.AddDays(paymentSettings.Value.TransferDelayDays),
-                ChargeDate = DateTime.UtcNow
+                ChargeDate = DateTime.UtcNow,
+                Notes = "Product purchase - automatic capture"
             };
 
             await paymentRepository.AddAsync(payment);
-            await unitOfWork.SaveChangesAsync(cancellationToken); // save here because it needs to generate id
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             product.IsSold = true;
             product.PaymentId = payment.Id;
             productListingRepository.UpdateListing(product);
+
             await unitOfWork.SaveChangesAsync(cancellationToken);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
 
@@ -118,7 +136,9 @@ public class PurchaseProductHandler(
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
 
             logger.LogInformation(
-                $"Payment successful - Product: {product.Id}, Buyer: {request.BuyerId}, Amount: {product.Price} PLN");
+                "Product purchase successful - Product: {ProductId}, Buyer: {BuyerId}, " +
+                "Amount: {Amount} PLN, PaymentIntent: {PaymentIntentId}",
+                product.Id, request.BuyerId, finalPrice, paymentIntent.Id);
 
             return new PurchaseProductResponse
             {
@@ -130,7 +150,9 @@ public class PurchaseProductHandler(
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
-            logger.LogError(ex, $"Error processing purchase for product {request.ProductListingId}: {ex.Message}");
+            logger.LogError(ex,
+                "Error processing purchase for product {ProductId}: {Message}",
+                request.ProductListingId, ex.Message);
             throw;
         }
     }

@@ -7,4 +7,6 @@ public interface IBidRepository
     Task CreateBid(AuctionBid bid);
     Task<List<AuctionBid>> GetAuctionBids(int auctionId);
     Task<AuctionBid?> GetCurrentHighestBid(int auctionId);
+    Task<List<AuctionBid>> GetAuctionBidsSortedByPrice(int auctionId);
+    Task<AuctionBid?> GetBidByIdAsync(int bidId);
 }

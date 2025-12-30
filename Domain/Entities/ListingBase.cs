@@ -15,7 +15,11 @@ public class ListingBase
     public int ViewsCount { get; set; } = 0;
     public int Followers { get; set; } = 0;
     public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-    public DateTime DateEnds { get; set; } 
+    public DateTime DateEnds { get; set; }
+    
+    public int? PaymentId { get; set; }
+    public Payment? Payment { get; set; }
+
     public bool IsArchived { get; set; } = false;
     public bool IsFeatured { get; set; } = false;
     public DateTime? FeaturedAt { get; set; } = null;
@@ -24,7 +28,7 @@ public class ListingBase
     public int OwnerId { get; set; }
     public required User Owner { get; set; } = null!;
     public ICollection<Category> Categories { get; set; } = new List<Category>();
-    
+
     public ICollection<ListingPhoto> ListingPhotos { get; set; } = new List<ListingPhoto>();
     public ICollection<Message> ListingMessages { get; set; } = new List<Message>();
     public ICollection<ListingView> ListingViews { get; set; } = [];

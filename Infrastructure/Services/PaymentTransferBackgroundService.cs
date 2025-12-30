@@ -189,6 +189,7 @@ public class PaymentTransferBackgroundService : BackgroundService
                 $"Buyer: {payment.BuyerId}, Attempt: {payment.RefundAttempts}");
 
             var refund = await stripeConnectService.CreateRefundAsync(
+                paymentIntentId: payment.StripePaymentIntentId,
                 chargeId: payment.StripeChargeId,
                 amount: payment.RefundAmount,
                 reason: "requested_by_customer",
@@ -267,6 +268,7 @@ public class PaymentTransferBackgroundService : BackgroundService
             if (needsRefund)
             {
                 var refund = await stripeConnectService.CreateRefundAsync(
+                    paymentIntentId: payment.StripePaymentIntentId,
                     chargeId: payment.StripeChargeId,
                     amount: payment.RefundAmount,
                     reason: "requested_by_customer",

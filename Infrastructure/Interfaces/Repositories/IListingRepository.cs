@@ -26,4 +26,5 @@ public interface IListingRepository<T> where T : ListingBase
     void UpdateUserListingPrice(UserListingPrice userListingPrice);
     void DeleteUserListingPrice(UserListingPrice userListingPrice);
     Task<Dictionary<int, string>> GetListingImageUrlsAsync(List<int> listingIds);
+    Task<List<AuctionListing>> GetEndedAuctionsNotProcessedAsync(DateTime currentDate);
 }

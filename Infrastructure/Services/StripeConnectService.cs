@@ -1,5 +1,7 @@
 using System.Linq.Expressions;
+using Domain.Configs;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -59,6 +61,143 @@ public class StripeConnectService(
         }
     }
 
+    /// <summary>
+    /// Creates a PaymentIntent to authorize (hold) funds for an auction bid
+    /// </summary>
+    /// <param name="amount">Amount to authorize</param>
+    /// <param name="currency">Currency code</param>
+    /// <param name="paymentMethodId">Payment method ID from frontend</param>
+    /// <param name="description">Description</param>
+    /// <param name="returnUrl"></param>
+    /// <param name="captureMethod">"automatic" for immediate charge, "manual" for authorization only</param>
+    /// <param name="metadata">Metadata</param>
+    /// <returns>Created PaymentIntent</returns>
+    public async Task<PaymentIntent> CreatePaymentIntentAsync(
+        decimal amount,
+        string currency,
+        string paymentMethodId,
+        string description,
+        string returnUrl,
+        string captureMethod = CaptureMethods.MANUAL,
+        Dictionary<string, string>? metadata = null
+    )
+    {
+        var paymentIntentService = new PaymentIntentService();
+        var amountInSmallestUnit = (long)(amount * 100);
+
+        var options = new PaymentIntentCreateOptions
+        {
+            Amount = amountInSmallestUnit,
+            Currency = currency.ToLower(),
+            PaymentMethod = paymentMethodId,
+            Description = description,
+            Metadata = metadata ?? new Dictionary<string, string>(),
+            CaptureMethod = captureMethod,
+            Confirm = true,
+            OffSession = false,
+            ReturnUrl = returnUrl
+        };
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CreateAsync(options);
+            logger.LogInformation(
+                "PaymentIntent created: {PaymentIntentId}, Status: {Status}, Capture: {CaptureMethod}",
+                paymentIntent.Id, paymentIntent.Status, captureMethod);
+
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent creation failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent creation failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Captures an authorized PaymentIntent (actually charges the card)
+    /// </summary>
+    /// <param name="paymentIntentId">The PaymentIntent ID to capture</param>
+    /// <param name="amountToCapture">Optional: capture partial amount (null for full)</param>
+    /// <returns>Updated PaymentIntent</returns>
+    public async Task<PaymentIntent> CapturePaymentIntentAsync(
+        string paymentIntentId,
+        decimal? amountToCapture = null)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        var options = new PaymentIntentCaptureOptions();
+
+        if (amountToCapture.HasValue)
+        {
+            options.AmountToCapture = (long)(amountToCapture.Value * 100);
+        }
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CaptureAsync(paymentIntentId, options);
+            logger.LogInformation(
+                "PaymentIntent captured: {PaymentIntentId}, Status: {Status}, Charge: {ChargeId}",
+                paymentIntent.Id, paymentIntent.Status, paymentIntent.LatestChargeId);
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent capture failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent capture failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Cancels a PaymentIntent (releases the hold) - used when user is outbid
+    /// </summary>
+    /// <param name="paymentIntentId">The PaymentIntent ID to cancel</param>
+    /// <returns>Canceled PaymentIntent</returns>
+    public async Task<PaymentIntent> CancelPaymentIntentAsync(string paymentIntentId)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        try
+        {
+            var paymentIntent = await paymentIntentService.CancelAsync(paymentIntentId);
+            logger.LogInformation("PaymentIntent canceled: {PaymentIntentId}", paymentIntent.Id);
+            return paymentIntent;
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Stripe PaymentIntent cancellation failed. Error: {ErrorMessage}, Code: {ErrorCode}",
+                ex.StripeError?.Message,
+                ex.StripeError?.Code);
+            throw new StripeErrorException($"Stripe PaymentIntent cancellation failed: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
+
+    /// <summary>
+    /// Gets a PaymentIntent by ID to check its status
+    /// </summary>
+    public async Task<PaymentIntent> GetPaymentIntentAsync(string paymentIntentId)
+    {
+        var paymentIntentService = new PaymentIntentService();
+
+        try
+        {
+            return await paymentIntentService.GetAsync(paymentIntentId);
+        }
+        catch (StripeException ex)
+        {
+            logger.LogError(ex, "Failed to retrieve PaymentIntent. Error: {ErrorMessage}",
+                ex.StripeError?.Message);
+            throw new StripeErrorException($"Failed to retrieve PaymentIntent: {ex.StripeError?.Message}",
+                detailedMessage: ex.StripeError?.Message);
+        }
+    }
 
     /// <summary>
     /// Transfers money from the platform account to seller's Stripe Connect account.
@@ -90,6 +229,9 @@ public class StripeConnectService(
         try
         {
             var transfer = await transferService.CreateAsync(transferOptions);
+            logger.LogInformation(
+                "Transfer created: {TransferId}, Amount: {Amount} {Currency}, Destination: {Destination}",
+                transfer.Id, amount, currency.ToUpper(), destinationAccountId);
             return transfer;
         }
         catch (StripeException ex)
@@ -103,19 +245,30 @@ public class StripeConnectService(
     }
 
     /// <summary>
-    /// Creates a refund for a charge. It is marked as a refund in the system and transfer fees don't apply.
+    /// Creates a refund for a charge or PaymentIntent
     /// </summary>
-    /// <param name="chargeId">The Stripe charge ID to refund</param>
+    /// <param name="paymentIntentId">The Stripe PaymentIntent ID to refund (preferred)</param>
+    /// <param name="chargeId">Alternative: The Stripe charge ID to refund</param>
     /// <param name="amount">Amount to refund (null for full refund)</param>
     /// <param name="reason">Reason for refund</param>
     /// <param name="metadata">Additional metadata</param>
     /// <returns>The created Refund object</returns>
-    public async Task<Refund> CreateRefundAsync(string chargeId, decimal? amount = null, string? reason = null,
+    public async Task<Refund> CreateRefundAsync(
+        string? paymentIntentId = null,
+        string? chargeId = null,
+        decimal? amount = null,
+        string? reason = null,
         Dictionary<string, string>? metadata = null)
     {
+        if (string.IsNullOrEmpty(paymentIntentId) && string.IsNullOrEmpty(chargeId))
+        {
+            throw new ArgumentException("Either paymentIntentId or chargeId must be provided");
+        }
+
         var refundService = new RefundService();
         var refundOptions = new RefundCreateOptions
         {
+            PaymentIntent = paymentIntentId,
             Charge = chargeId,
             Reason = reason,
             Metadata = metadata ?? new Dictionary<string, string>()
@@ -129,6 +282,11 @@ public class StripeConnectService(
         try
         {
             var refund = await refundService.CreateAsync(refundOptions);
+
+            logger.LogInformation(
+                "Refund created: {RefundId}, Amount: {Amount}, PaymentIntent: {PaymentIntentId}",
+                refund.Id, refund.Amount / 100m, paymentIntentId ?? chargeId);
+
             return refund;
         }
         catch (StripeException ex)
@@ -199,5 +357,33 @@ public class StripeConnectService(
         var account = await accountService.GetAsync(stripeAccountId);
 
         return account.ChargesEnabled && account.DetailsSubmitted;
+    }
+
+
+    /// <summary>
+    /// Creates a test PaymentMethod for testing purposes - ONLY AVAILABLE IN DEBUG MODE
+    /// </summary>
+    public async Task<string> CreateTestPaymentMethodAsync(string cardNumber = "4242424242424242")
+    {
+        var paymentMethodService = new PaymentMethodService();
+
+        var options = new PaymentMethodCreateOptions
+        {
+            Type = "card",
+            Card = new PaymentMethodCardOptions
+            {
+                Number = cardNumber,
+                ExpMonth = 12,
+                ExpYear = 2025,
+                Cvc = "123"
+            }
+        };
+
+        var paymentMethod = await paymentMethodService.CreateAsync(options);
+
+        logger.LogWarning("TEST PAYMENT METHOD CREATED: {PaymentMethodId} - DO NOT USE IN PRODUCTION",
+            paymentMethod.Id);
+
+        return paymentMethod.Id;
     }
 }
