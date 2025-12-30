@@ -12,31 +12,41 @@ using Microsoft.Extensions.Logging;
 namespace Application.Features.Listings.ProductListings.CreateProductListing;
 
 public class CreateProductListingHandler(
-        IListingRepository<ProductListing> productListingRepository,
-        ICategoryRepository categoryRepository,
-        IMapper mapper,
-        IUnitOfWork unitOfWork,
-        ICacheService cacheService,
-        IMediaService mediaService,
-        IPhotoRepository photoRepository,
-        UserManager<User> userManager,
-        ILogger<CreateProductListingHandler> logger
-        ) : IRequestHandler<CreateProductListingCommand, int>
+    IListingRepository<ProductListing> productListingRepository,
+    ICategoryRepository categoryRepository,
+    IMapper mapper,
+    IUnitOfWork unitOfWork,
+    ICacheService cacheService,
+    IMediaService mediaService,
+    IPhotoRepository photoRepository,
+    IStripeConnectService stripeConnectService,
+    UserManager<User> userManager,
+    ILogger<CreateProductListingHandler> logger
+) : IRequestHandler<CreateProductListingCommand, int>
 {
-   
     public async Task<int> Handle(CreateProductListingCommand request, CancellationToken cancellationToken)
     {
         var productListing = mapper.Map<ProductListing>(request.ProductListingDto);
         productListing.OwnerId = request.UserId;
-        
+
+        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        if (user == null)
+            throw new UnauthorizedException("Invalid user id");
+
+        if (user.StripeConnectAccountId == null)
+            throw new BadRequestException("Create a stripe account first");
+
+        if (!await stripeConnectService.IsAccountFullyOnboardedAsync(user.StripeConnectAccountId))
+            throw new BadRequestException("Finish the stripe account configuration");
+
         if (request.ProductListingDto.Location == null || !IsLocationComplete(request.ProductListingDto.Location))
         {
-            var user = await userManager.FindByIdAsync(request.UserId.ToString());
-            if (user?.Location == null || !IsLocationComplete(user.Location))
+            if (user.Location == null || !IsLocationComplete(user.Location))
             {
-                throw new BadRequestException("Location is required. Please provide location or set your profile location.");
+                throw new BadRequestException(
+                    "Location is required. Please provide location or set your profile location.");
             }
-            
+
             productListing.Location = new Location
             {
                 Longitude = user.Location.Longitude,
@@ -46,7 +56,7 @@ public class CreateProductListingHandler(
                 State = user.Location.State
             };
         }
-        
+
         var category = await categoryRepository.GetByIdAsync(request.ProductListingDto.CategoryId);
         if (category == null)
         {
@@ -60,9 +70,9 @@ public class CreateProductListingHandler(
 
         var directParents = await categoryRepository.GetAllParentsRelatedToCategory(category);
         directParents.Add(category);
-        
+
         productListing.Categories = directParents;
-        
+
         var savedPhotosPublicIds = new List<string>();
         var listingPhotos = new List<ListingPhoto>();
         await unitOfWork.BeginTransactionAsync();
@@ -78,8 +88,10 @@ public class CreateProductListingHandler(
                     {
                         await mediaService.DeleteImageAsync(savedPhoto);
                     }
+
                     throw new CloudinaryException(uploadResult.Error.Message);
                 }
+
                 savedPhotosPublicIds.Add(uploadResult.PublicId);
                 var photo = new Photo
                 {
@@ -87,8 +99,8 @@ public class CreateProductListingHandler(
                     PublicId = uploadResult.PublicId,
                     FileName = image.FileName
                 };
-                await photoRepository.AddPhotoAsync(photo); 
-                
+                await photoRepository.AddPhotoAsync(photo);
+
                 var listingPhoto = new ListingPhoto
                 {
                     Photo = photo,
@@ -116,19 +128,19 @@ public class CreateProductListingHandler(
             logger.LogError(ex, $"Error when creating new product listing: {ex.Message}");
             throw;
         }
-        
-        
+
+
         return productListing.Id;
     }
-    
+
     private bool IsLocationComplete(Location? location)
     {
         if (location == null) return false;
-    
-        return location.Longitude.HasValue 
-               && location.Latitude.HasValue 
-               && !string.IsNullOrWhiteSpace(location.Country) 
-               && !string.IsNullOrWhiteSpace(location.City) 
+
+        return location.Longitude.HasValue
+               && location.Latitude.HasValue
+               && !string.IsNullOrWhiteSpace(location.Country)
+               && !string.IsNullOrWhiteSpace(location.City)
                && !string.IsNullOrWhiteSpace(location.State);
     }
 }

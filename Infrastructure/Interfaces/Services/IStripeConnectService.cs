@@ -16,6 +16,23 @@ public interface IStripeConnectService
         string description,
         Dictionary<string, string>? metadata = null);
 
+    Task<PaymentIntent> CreatePaymentIntentAsync(
+        decimal amount,
+        string currency,
+        string paymentMethodId,
+        string description,
+        string returnUrl,
+        string captureMethod,
+        Dictionary<string, string>? metadata = null);
+
+    Task<PaymentIntent> CapturePaymentIntentAsync(
+        string paymentIntentId,
+        decimal? amountToCapture = null);
+
+    Task<PaymentIntent> CancelPaymentIntentAsync(string paymentIntentId);
+
+    Task<PaymentIntent> GetPaymentIntentAsync(string paymentIntentId);
+
     Task<Transfer> CreateTransferAsync(
         decimal amount,
         string currency,
@@ -24,8 +41,11 @@ public interface IStripeConnectService
         Dictionary<string, string>? metadata = null);
 
     Task<Refund> CreateRefundAsync(
-        string chargeId,
+        string? paymentIntentId = null,
+        string? chargeId = null,
         decimal? amount = null,
         string? reason = null,
         Dictionary<string, string>? metadata = null);
+
+    Task<string> CreateTestPaymentMethodAsync(string cardNumber = "4242424242424242");
 }

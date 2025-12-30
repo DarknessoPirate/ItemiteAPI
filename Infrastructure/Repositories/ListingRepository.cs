@@ -24,10 +24,10 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public IQueryable<T> GetListingsQueryable()
     {
-       return dbContext.Set<T>()
-           .Where(l => !l.IsArchived)
-           .Include(p => p.Categories)
-           .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
+        return dbContext.Set<T>()
+            .Where(l => !l.IsArchived)
+            .Include(p => p.Categories)
+            .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
     }
 
     public async Task<T?> GetListingByIdAsync(int listingId)
@@ -37,10 +37,11 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         return listing;
     }
-    
+
     public async Task<T?> GetListingWithPhotosByIdAsync(int listingId)
     {
-        var listing = await dbContext.Set<T>().Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
+        var listing = await dbContext.Set<T>().Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
+            .FirstOrDefaultAsync(l => l.Id == listingId);
         return listing;
     }
 
@@ -73,7 +74,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .SelectMany(u => u.FollowedListings.OrderByDescending(f => f.FollowedAt))
             .Select(f => f.Listing);
     }
-    
+
     public IQueryable<ListingBase> GetUserListingsQueryable(int userId, bool? areArchived)
     {
         var listingsQuery = dbContext.Set<T>().Include(p => p.Categories)
@@ -84,9 +85,9 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             return listingsQuery.Where(l => l.OwnerId == userId && areArchived == false ? !l.IsArchived : l.IsArchived)
                 .OrderByDescending(l => l.DateCreated);
         }
+
         return listingsQuery.Where(l => l.OwnerId == userId)
             .OrderByDescending(l => l.DateCreated);
-            
     }
 
 
@@ -122,7 +123,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo)
             .Where(l => l.IsFeatured == true && l.FeaturedAt < expirationDate)
             .ToListAsync();
-    
+
         return expiredListings;
     }
 
@@ -135,7 +136,8 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<UserListingPrice?> GetUserListingPriceAsync(int listingId, int userId)
     {
-        return await dbContext.UserListingPrices.FirstOrDefaultAsync(p => p.ListingId == listingId && p.UserId == userId);
+        return await dbContext.UserListingPrices.FirstOrDefaultAsync(
+            p => p.ListingId == listingId && p.UserId == userId);
     }
 
     public async Task AddUserListingPriceAsync(UserListingPrice userListingPrice)
@@ -160,5 +162,23 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
             .Where(lp => listingIds.Contains(lp.ListingId) && lp.Order == 1)
             .Select(lp => new { lp.ListingId, lp.Photo.Url })
             .ToDictionaryAsync(x => x.ListingId, x => x.Url);
+    }
+
+    public async Task<List<AuctionListing>> GetEndedAuctionsNotProcessedAsync(DateTime currentDate)
+    {
+        return await dbContext.Set<AuctionListing>()
+            .Include(a => a.Owner)
+            .Include(a => a.Bids)
+            .ThenInclude(b => b.Payment)
+            .Include(a => a.Bids)
+            .ThenInclude(b => b.Bidder)
+            .Include(a => a.ListingPhotos)
+            .ThenInclude(lp => lp.Photo)
+            .Where(a =>
+                    a.DateEnds <= currentDate &&
+                    !a.IsArchived &&
+                    a.HighestBidId != null// Has at least one bid
+            )
+            .ToListAsync();
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251219192112_add enum conversion")]
+    partial class addenumconversion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,15 +135,17 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int?>("ParentCategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RootCategoryId")
+                    b.Property<int?>("PhotoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("SvgImage")
-                        .HasColumnType("text");
+                    b.Property<int?>("RootCategoryId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentCategoryId");
+
+                    b.HasIndex("PhotoId");
 
                     b.ToTable("Categories");
                 });
@@ -276,8 +281,8 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2500)
-                        .HasColumnType("character varying(2500)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("FeaturedAt")
                         .HasColumnType("timestamp with time zone");
@@ -302,9 +307,6 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PaymentId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ViewsCount")
@@ -575,6 +577,7 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("StripeChargeId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -1030,6 +1033,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<bool>("IsSold")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("PaymentId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -1130,7 +1136,13 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Domain.Entities.Photo", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId");
+
                     b.Navigation("ParentCategory");
+
+                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("Domain.Entities.Dispute", b =>
