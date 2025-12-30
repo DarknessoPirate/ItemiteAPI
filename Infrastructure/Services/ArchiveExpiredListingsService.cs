@@ -37,7 +37,7 @@ public class ArchiveExpiredListingsService(
         logger.LogInformation("Archiving expired listings...");
 
         using var scope = scopeFactory.CreateScope();
-        var listingRepository = scope.ServiceProvider.GetRequiredService<IListingRepository<ListingBase>>();
+        var listingRepository = scope.ServiceProvider.GetRequiredService<IListingRepository<ProductListing>>();
         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
