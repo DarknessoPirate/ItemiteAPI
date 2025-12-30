@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using ForgotPasswordRequest = Microsoft.AspNetCore.Identity.Data.ForgotPasswordRequest;
 
 namespace Api.Controllers;
@@ -33,6 +34,7 @@ public class AuthController(IMediator mediator, IRequestContextService requestCo
         return Created($"api/user/{userId}",new { UserId = userId });
     }
 
+    [EnableRateLimiting("LoginPolicy")]
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {

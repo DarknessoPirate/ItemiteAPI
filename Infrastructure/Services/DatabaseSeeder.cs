@@ -19,8 +19,6 @@ public class DatabaseSeeder(
     RoleManager<IdentityRole<int>> roleManager,
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
-    IMediaService mediaService,
-    IPhotoRepository photoRepository,
     IOptions<SeedSettings> seedSettings,
     IWebHostEnvironment environment, // for checking if we are in dev (if in prod, clearing is not allowed)
     ILogger<DatabaseSeeder> logger
@@ -192,11 +190,7 @@ public class DatabaseSeeder(
 
         logger.LogInformation("Found {Count} categories to clear", categories.Count);
 
-        var photosToDelete = categories
-            .Where(c => c.Photo != null)
-            .Select(c => c.Photo!)
-            .DistinctBy(p => p.Id)
-            .ToList();
+       
         
         foreach (var category in categories)
         {
@@ -205,33 +199,6 @@ public class DatabaseSeeder(
 
         await unitOfWork.SaveChangesAsync();
         logger.LogInformation("Categories clearing completed");
-        foreach (var photo in photosToDelete)
-        {
-            try
-            {
-                var deletionResult = await mediaService.DeleteImageAsync(photo.PublicId);
-            
-                if (deletionResult.Error == null)
-                {
-                    logger.LogInformation("Photo deleted from Cloudinary: {PublicId}", photo.PublicId);
-                }
-                else
-                {
-                    logger.LogWarning("Failed to delete photo from Cloudinary: {PublicId}, Result: {Result}", 
-                        photo.PublicId, deletionResult.Result);
-                }
-                
-                await photoRepository.DeletePhotoAsync(photo.Id);
-                logger.LogInformation("Photo with ID {PhotoId} deleted from database", photo.Id);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error deleting photo with ID {PhotoId}", photo.Id);
-            }
-        }
-
-        await unitOfWork.SaveChangesAsync();
-        logger.LogInformation("Categories and photos clearing completed");
     }
 
     public async Task CreateRolesAsync()
@@ -529,15 +496,15 @@ public class DatabaseSeeder(
             }
         }
         
-        Photo? uploadedPhoto = null;
+        string? svgContent = null;
         if (rootId == null && !string.IsNullOrWhiteSpace(categoryData.ImageName))
         {
-            logger.LogInformation("Uploading image for root category '{Name}'", categoryData.Name);
-            uploadedPhoto = await UploadCategoryImageAsync(categoryData.ImageName, categoryData.Name);
-        
-            if (uploadedPhoto == null)
+            logger.LogInformation("Loading SVG image for root category '{Name}'", categoryData.Name);
+            svgContent = await LoadCategorySvgAsync(categoryData.ImageName, categoryData.Name);
+
+            if (svgContent == null)
             {
-                logger.LogWarning("Failed to upload image for category '{Name}', continuing without image", categoryData.Name);
+                logger.LogWarning("Failed to load SVG for category '{Name}', continuing without image", categoryData.Name);
             }
         }
 
@@ -547,7 +514,7 @@ public class DatabaseSeeder(
             Description = categoryData.Description,
             ParentCategoryId = parentId,
             RootCategoryId = rootId,
-            PhotoId = uploadedPhoto?.Id
+            SvgImage = svgContent
         };
 
         await categoryRepository.CreateCategory(newCategory);
@@ -621,79 +588,36 @@ public class DatabaseSeeder(
         }
     }
     
-    private async Task<Photo?> UploadCategoryImageAsync(string imageName, string categoryName)
+    private async Task<string?> LoadCategorySvgAsync(string imageName, string categoryName)
     {
         try
         {
-            // Pełna ścieżka do pliku (Domain/Assets/...)
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "Configuration","Seeding", "CategoryImages", imageName);
-            fullPath = Path.GetFullPath(fullPath); // Normalizacja ścieżki
-    
+            var fullPath = Path.Combine(AppContext.BaseDirectory, "Configuration", "Seeding", "CategoryImages", imageName);
+            fullPath = Path.GetFullPath(fullPath);
+
             if (!File.Exists(fullPath))
             {
-                logger.LogError("Image file not found for category '{CategoryName}': {Path}", 
+                logger.LogError("SVG file not found for category '{CategoryName}': {Path}",
                     categoryName, fullPath);
                 return null;
             }
-    
-            var fileInfo = new FileInfo(fullPath);
-            var fileName = Path.GetFileName(fullPath);
-            var contentType = GetContentType(fileName);
-            
-            await using var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
-            var memoryStream = new MemoryStream();
-            await fileStream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
-    
-            var fileWrapper = new FileWrapper(
-                fileName: fileName,
-                fileLength: fileInfo.Length,
-                contentType: contentType,
-                fileStream: memoryStream
-            );
-            
-            var uploadResult = await mediaService.UploadPhotoAsync(fileWrapper);
-    
-            if (uploadResult.PublicId == null)
+
+            var svgContent = await File.ReadAllTextAsync(fullPath);
+
+            if (string.IsNullOrWhiteSpace(svgContent))
             {
-                logger.LogError("Failed to upload image to Cloudinary for category '{CategoryName}'", categoryName);
+                logger.LogError("SVG file is empty for category '{CategoryName}'", categoryName);
                 return null;
             }
-            
-            var photo = new Photo
-            {
-                FileName = fileName,
-                Url = uploadResult.SecureUrl?.ToString() ?? string.Empty,
-                PublicId = uploadResult.PublicId,
-                DateUploaded = DateTime.UtcNow
-            };
-    
-            await photoRepository.AddPhotoAsync(photo);
-            await unitOfWork.SaveChangesAsync();
-    
-            logger.LogInformation("Image uploaded successfully for category '{CategoryName}': {PublicId}", 
-                categoryName, photo.PublicId);
-    
-            return photo;
+
+            logger.LogInformation("SVG loaded successfully for category '{CategoryName}'", categoryName);
+            return svgContent;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error uploading image for category '{CategoryName}'", categoryName);
+            logger.LogError(ex, "Error loading SVG for category '{CategoryName}'", categoryName);
             return null;
         }
-    }
-
-    private string GetContentType(string fileName)
-    {
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        return extension switch
-        {
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            ".gif" => "image/gif",
-            ".webp" => "image/webp",
-            _ => "application/octet-stream"
-        };
     }
 
     private InitialUsersData LoadInitialUsersData()

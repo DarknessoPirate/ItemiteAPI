@@ -3,17 +3,20 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ItemiteDbContext))]
-    partial class ItemiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251222120223_svg_string_category")]
+    partial class svg_string_category
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,16 +60,11 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int>("BidderId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuctionId");
 
                     b.HasIndex("BidderId");
-
-                    b.HasIndex("PaymentId");
 
                     b.ToTable("AuctionBids");
                 });
@@ -304,9 +302,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PaymentId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("ViewsCount")
                         .HasColumnType("integer");
 
@@ -537,12 +532,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("PaymentIntentClientSecret")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PaymentIntentStatus")
-                        .HasColumnType("text");
-
                     b.Property<decimal>("PlatformFeeAmount")
                         .HasColumnType("numeric");
 
@@ -575,11 +564,9 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("StripeChargeId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<string>("StripePaymentIntentId")
-                        .HasColumnType("text");
 
                     b.Property<string>("StripeRefundId")
                         .HasColumnType("text");
@@ -607,8 +594,7 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasIndex("BuyerId");
 
-                    b.HasIndex("ListingId")
-                        .IsUnique();
+                    b.HasIndex("ListingId");
 
                     b.HasIndex("SellerId");
 
@@ -1030,8 +1016,14 @@ namespace Infrastructure.Database.Migrations
                     b.Property<bool>("IsSold")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("PaymentId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.HasIndex("PaymentId")
+                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("Product");
                 });
@@ -1065,15 +1057,9 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Payment", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId");
-
                     b.Navigation("Auction");
 
                     b.Navigation("Bidder");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Domain.Entities.Banner", b =>
@@ -1363,8 +1349,8 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.ListingBase", "Listing")
-                        .WithOne("Payment")
-                        .HasForeignKey("Domain.Entities.Payment", "ListingId")
+                        .WithMany()
+                        .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1548,6 +1534,16 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.ProductListing", b =>
+                {
+                    b.HasOne("Domain.Entities.Payment", "Payment")
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.ProductListing", "PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Navigation("SubCategories");
@@ -1565,8 +1561,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("ListingPhotos");
 
                     b.Navigation("ListingViews");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Domain.Entities.Message", b =>

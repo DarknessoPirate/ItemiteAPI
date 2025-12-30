@@ -11,8 +11,7 @@ public class Category
     public string Name { get; set; } = string.Empty;
     [MaxLength(100)]
     public string? Description { get; set; }
-    public int? PhotoId { get; set; }
-    public Photo? Photo { get; set; }
+    public string? SvgImage { get; set; }
     public int? ParentCategoryId { get; set; }
     public int? RootCategoryId { get; set; }
     public Category? ParentCategory { get; set; }

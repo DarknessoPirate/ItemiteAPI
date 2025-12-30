@@ -225,7 +225,6 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         var updatedCategory = await Sender.Send(command);
         updatedCategory.Name.Should().Be("test_modified");
         updatedCategory.Description.Should().Be("test_desc_modified");
-        updatedCategory.ImageUrl.Should().Be("image_modified.jpg");
 
         var getSubCategoriesCommand = new GetSubCategoriesCommand
         {

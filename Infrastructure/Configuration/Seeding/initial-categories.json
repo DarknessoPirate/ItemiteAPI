@@ -1,479 +1,1158 @@
 {
   "Categories": [
     {
-      "Name": "Agriculture",
-      "Description": "Agricultural products and equipment",
-      "ImageName": "Agriculture.png",
+      "Name": "agriculture",
+      "Description": "Products, equipment and supplies used in agriculture and farming.",
+      "ImageName": "Agriculture.svg",
       "SubCategories": [
         {
-          "Name": "Farm Equipment",
-          "Description": "Tractors, harvesters and farm machinery",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Seeds & Plants",
-          "Description": "Agricultural seeds and plants",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Fertilizers",
-          "Description": "Fertilizers and soil amendments",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Livestock",
-          "Description": "Farm animals and livestock",
-          "ImageName": null,
-          "SubCategories": []
-        }
-      ]
-    },
-    {
-      "Name": "Electronics",
-      "Description": "Electronic devices and gadgets",
-      "ImageName": "Electronics.png",
-      "SubCategories": [
-        {
-          "Name": "Computers",
-          "Description": "Desktop and laptop computers",
+          "Name": "farm_equipment",
+          "Description": "Machines and equipment used for agricultural work.",
           "ImageName": null,
           "SubCategories": [
             {
-              "Name": "Laptops",
-              "Description": "Portable computers",
+              "Name": "tractors",
+              "Description": "Agricultural vehicles used to pull or power farming equipment.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Desktops",
-              "Description": "Stationary computers",
+              "Name": "harvesters",
+              "Description": "Machines designed for efficient crop harvesting.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "seeders",
+              "Description": "Equipment used to plant seeds into soil.",
               "ImageName": null,
               "SubCategories": []
             }
           ]
         },
         {
-          "Name": "Phones",
-          "Description": "Mobile phones and smartphones",
+          "Name": "seeds_plants",
+          "Description": "Seeds, plants and seedlings for agricultural use.",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "fertilizers",
+          "Description": "Products used to enrich soil and improve crop growth.",
+          "ImageName": null,
+          "SubCategories": []
+        },
+        {
+          "Name": "farm_tools",
+          "Description": "Manual tools used for daily farming activities.",
           "ImageName": null,
           "SubCategories": [
             {
-              "Name": "Smartphones",
-              "Description": null,
+              "Name": "hand_tools",
+              "Description": "Handheld tools for basic agricultural tasks.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Feature Phones",
-              "Description": null,
+              "Name": "power_tools",
+              "Description": "Powered tools used to perform farming and agricultural tasks more efficiently.",
               "ImageName": null,
               "SubCategories": []
             }
           ]
         },
         {
-          "Name": "Audio",
-          "Description": "Audio equipment",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "TV & Video",
-          "Description": "Televisions and video equipment",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Gaming",
-          "Description": "Gaming consoles and accessories",
-          "ImageName": null,
-          "SubCategories": []
-        }
-      ]
-    },
-    {
-      "Name": "Fashion",
-      "Description": "Apparel and fashion items",
-      "ImageName": "Fashion.png",
-      "SubCategories": [
-        {
-          "Name": "Men's Clothing",
-          "Description": "Clothing for men",
+          "Name": "livestock",
+          "Description": "Animals raised for food production or farming purposes.",
           "ImageName": null,
           "SubCategories": [
             {
-              "Name": "Shirts",
-              "Description": null,
+              "Name": "cattle",
+              "Description": "Cows and bulls raised for meat or dairy production.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Pants",
-              "Description": null,
+              "Name": "poultry",
+              "Description": "Birds such as chickens and turkeys raised on farms.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "pigs",
+              "Description": "Farm animals raised mainly for meat production.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "electronics",
+      "Description": "Electronic devices, gadgets and accessories.",
+      "ImageName": "Electronics.svg",
+      "SubCategories": [
+        {
+          "Name": "computers",
+          "Description": "Personal computers for work and entertainment.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "laptops",
+              "Description": "Portable computers designed for mobile use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "desktops",
+              "Description": "Stationary computers for home or office use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "all_in_one",
+              "Description": "Computers with integrated monitor and hardware.",
               "ImageName": null,
               "SubCategories": []
             }
           ]
         },
         {
-          "Name": "Women's Clothing",
-          "Description": "Clothing for women",
+          "Name": "computer_accessories",
+          "Description": "Accessories that enhance computer functionality.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "mice",
+              "Description": "Pointing devices used to control computers.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "keyboards",
+              "Description": "Input devices used for typing and commands.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "monitors",
+              "Description": "Display screens used with computers.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "headsets",
+              "Description": "Audio devices with headphones and microphones.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "phones",
+          "Description": "Mobile phones and communication devices.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "smartphones",
+              "Description": "Advanced mobile phones with smart features.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "feature_phones",
+              "Description": "Basic mobile phones with limited functions.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "phone_accessories",
+              "Description": "Accessories for mobile phones such as chargers and cases.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "audio",
+          "Description": "Audio playback and sound equipment.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "speakers",
+              "Description": "Devices used to output sound.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "headphones",
+              "Description": "Personal audio devices worn on the head.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "tv_video",
+          "Description": "Television and video display equipment.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Shoes",
-          "Description": "Footwear for all",
+          "Name": "gaming",
+          "Description": "Gaming consoles, games and accessories.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "console_games",
+              "Description": "Games designed for gaming consoles.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "computer_games",
+              "Description": "Games designed for computers and laptops.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "fashion",
+      "Description": "Clothing, footwear and fashion accessories.",
+      "ImageName": "Fashion.svg",
+      "SubCategories": [
+        {
+          "Name": "men_clothing",
+          "Description": "Clothing items designed for men.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "men_tops",
+              "Description": "Tops and upper body clothing for men.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_shirts",
+              "Description": "Shirts designed for everyday and formal wear.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_pants",
+              "Description": "Pants and trousers designed for men.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_shorts",
+              "Description": "Shorts designed for casual and summer wear.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_jackets",
+              "Description": "Jackets and outerwear designed for men.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_shoes",
+              "Description": "Footwear designed specifically for men.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_activewear",
+              "Description": "Sports and active clothing for men.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "men_underwear",
+              "Description": "Underwear and base layers designed for men.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Accessories",
-          "Description": "Fashion accessories",
+          "Name": "women_clothing",
+          "Description": "Clothing items designed for women.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "women_tops",
+              "Description": "Tops and upper body clothing for women.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_dresses",
+              "Description": "Dresses designed for various occasions.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_pants",
+              "Description": "Pants and trousers designed for women.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_skirts",
+              "Description": "Skirts in different styles and lengths.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_jackets",
+              "Description": "Jackets and outerwear for women.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_shoes",
+              "Description": "Footwear designed for women.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_activewear",
+              "Description": "Sports and active clothing for women.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "women_underwear",
+              "Description": "Underwear and lingerie for women.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Jewelry",
-          "Description": "Jewelry and watches",
+          "Name": "fashion_accessories",
+          "Description": "Accessories that complement clothing styles.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "jewelry",
+              "Description": "Decorative items such as rings and necklaces.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "watches",
+              "Description": "Timepieces worn on the wrist.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "belts",
+              "Description": "Accessories used to secure clothing.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "hats",
+              "Description": "Headwear designed for fashion and protection.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "bags",
+              "Description": "Bags and purses to complement outfits.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "scarves",
+              "Description": "Scarves and shawls for style and warmth.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "health_beauty",
+      "Description": "Products related to personal health, wellness and beauty care.",
+      "ImageName": "Health_and_Beauty_icon.svg",
+      "SubCategories": [
+        {
+          "Name": "skincare",
+          "Description": "Products used for facial and body skin care.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "face_care",
+              "Description": "Skincare products designed for facial use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "body_care",
+              "Description": "Products used to care for the skin of the body.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "makeup",
+          "Description": "Cosmetic products used to enhance appearance.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "face_makeup",
+              "Description": "Makeup products designed for facial application.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "eye_makeup",
+              "Description": "Cosmetics used for eye makeup.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "lip_makeup",
+              "Description": "Products designed for lip makeup.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "hair_care",
+          "Description": "Products used to clean, protect and style hair.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "shampoos",
+              "Description": "Hair cleansing products for regular use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "conditioners",
+              "Description": "Products used to nourish and soften hair.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "hair_styling",
+              "Description": "Products used to style and shape hair.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "vitamins_supplements",
+          "Description": "Dietary supplements supporting health and wellness.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "vitamins",
+              "Description": "Vitamin products supporting daily nutrition.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "minerals",
+              "Description": "Mineral supplements supporting body functions.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "medical_equipment",
+          "Description": "Devices and tools used for medical and health monitoring.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "diagnostic_devices",
+              "Description": "Devices used to measure and monitor health conditions.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "mobility_aids",
+              "Description": "Equipment designed to assist movement and mobility.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "home_garden",
+      "Description": "Products for home improvement, interior design and garden care.",
+      "ImageName": "Home_and_Garden.svg",
+      "SubCategories": [
+        {
+          "Name": "furniture",
+          "Description": "Furniture for indoor and outdoor living spaces.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "living_room_furniture",
+              "Description": "Furniture designed for living room spaces.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "bedroom_furniture",
+              "Description": "Furniture designed for bedrooms.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "office_furniture",
+              "Description": "Furniture designed for home offices.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "outdoor_furniture",
+              "Description": "Furniture designed for gardens and outdoor areas.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "home_decor",
+          "Description": "Decorative items used to enhance home interiors.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "wall_decor",
+              "Description": "Decorations designed for walls and vertical surfaces.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "textiles",
+              "Description": "Decorative textiles such as rugs and curtains.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "kitchen_dining",
+          "Description": "Products used for cooking, food preparation and dining.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "kitchen_appliances",
+              "Description": "Appliances used for cooking and food preparation.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "cookware",
+              "Description": "Pots, pans and cookware for kitchen use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "tableware",
+              "Description": "Plates, glasses and dining accessories.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "garden_tools",
+          "Description": "Tools and equipment used for gardening and outdoor work.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "manual_garden_tools",
+              "Description": "Hand tools used for basic gardening tasks.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "power_garden_tools",
+              "Description": "Powered tools used for advanced garden maintenance.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "lighting",
+          "Description": "Lighting solutions for indoor and outdoor spaces.",
           "ImageName": null,
           "SubCategories": []
         }
       ]
     },
     {
-      "Name": "Health & Beauty",
-      "Description": "Health and beauty products",
-      "ImageName": "Health_and_Beauty_icon.png",
+      "Name": "industry",
+      "Description": "Equipment, tools and supplies used in industrial and professional environments.",
+      "ImageName": "Industry_icon.svg",
       "SubCategories": [
         {
-          "Name": "Skincare",
-          "Description": "Skincare products and treatments",
+          "Name": "construction_equipment",
+          "Description": "Heavy machinery and equipment used in construction projects.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Makeup",
-          "Description": "Cosmetics and makeup",
+          "Name": "manufacturing_tools",
+          "Description": "Tools and machines used in manufacturing processes.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Hair Care",
-          "Description": "Hair care products",
+          "Name": "safety_equipment",
+          "Description": "Protective gear and equipment used to ensure workplace safety.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Vitamins & Supplements",
-          "Description": "Health supplements",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Medical Equipment",
-          "Description": "Medical devices and equipment",
+          "Name": "warehouse_equipment",
+          "Description": "Equipment used for storage, handling and logistics operations.",
           "ImageName": null,
           "SubCategories": []
         }
       ]
     },
     {
-      "Name": "Home & Garden",
-      "Description": "Home improvement and garden supplies",
-      "ImageName": "Home_and_Garden.png",
+      "Name": "kids_baby",
+      "Description": "Products designed for babies, toddlers and young children.",
+      "ImageName": "Kids_and_Baby.svg",
       "SubCategories": [
         {
-          "Name": "Furniture",
-          "Description": "Home furniture",
+          "Name": "baby_clothing",
+          "Description": "Clothing designed for babies and toddlers.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "bodysuits",
+              "Description": "One-piece clothing items for babies.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "sleepwear",
+              "Description": "Clothing designed for sleeping and nightwear.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "outerwear",
+              "Description": "Jackets and warm clothing for babies.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "toys",
+          "Description": "Toys and games designed for children of different ages.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "educational_toys",
+              "Description": "Toys designed to support learning and development.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "outdoor_toys",
+              "Description": "Toys intended for outdoor play.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "plush_toys",
+              "Description": "Soft toys designed for children.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "strollers_car_seats",
+          "Description": "Equipment used for transporting babies and young children.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "strollers",
+              "Description": "Wheeled devices used to transport babies.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "car_seats",
+              "Description": "Safety seats designed for children in vehicles.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "nursery_furniture",
+          "Description": "Furniture designed for nurseries and children's rooms.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "cribs",
+              "Description": "Beds designed specifically for babies.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "changing_tables",
+              "Description": "Furniture used for changing baby diapers.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "baby_care",
+          "Description": "Products used for daily care and hygiene of babies.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "diapers",
+              "Description": "Disposable or reusable diapers for babies.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "feeding_accessories",
+              "Description": "Accessories used for feeding babies.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "bath_care",
+              "Description": "Products used for baby bathing and hygiene.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "motorization",
+      "Description": "Vehicles, spare parts and accessories for cars and motorcycles.",
+      "ImageName": "Motorization.svg",
+      "SubCategories": [
+        {
+          "Name": "cars",
+          "Description": "Passenger cars of various makes and models.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Home Decor",
-          "Description": "Decorative items for home",
+          "Name": "motorcycles",
+          "Description": "Motorcycles, scooters and other two-wheeled vehicles.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "scooters",
+              "Description": "Lightweight two-wheeled motor vehicles.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "sport_bikes",
+              "Description": "Motorcycles designed for speed and performance.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "cruisers",
+              "Description": "Motorcycles designed for comfortable long rides.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Kitchen & Dining",
-          "Description": "Kitchen appliances and dining",
+          "Name": "auto_parts",
+          "Description": "Replacement parts and components for vehicles.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "engine_parts",
+              "Description": "Components for vehicle engines.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "brakes",
+              "Description": "Brake system parts and accessories.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "suspension",
+              "Description": "Suspension and steering components.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Garden Tools",
-          "Description": "Gardening tools and equipment",
+          "Name": "tires_wheels",
+          "Description": "Tires and wheel accessories for vehicles.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "tires",
+              "Description": "Tires for cars and motorcycles.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "rims",
+              "Description": "Rims and wheel hubs for vehicles.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Lighting",
-          "Description": "Indoor and outdoor lighting",
+          "Name": "car_accessories",
+          "Description": "Accessories for vehicles.",
           "ImageName": null,
           "SubCategories": []
         }
       ]
     },
     {
-      "Name": "Industry",
-      "Description": "Industrial equipment and supplies",
-      "ImageName": "Industry_icon.png",
+      "Name": "pets",
+      "Description": "Supplies, accessories and care products for pets of all types.",
+      "ImageName": "Pets.svg",
       "SubCategories": [
         {
-          "Name": "Construction Equipment",
-          "Description": "Heavy machinery for construction",
+          "Name": "pet_food",
+          "Description": "Food and treats for dogs, cats, birds, and other pets.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "dog_food",
+              "Description": "Food and treats specifically for dogs.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "cat_food",
+              "Description": "Food and treats specifically for cats.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "small_pet_food",
+              "Description": "Food for rabbits, hamsters, guinea pigs, and other small pets.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Manufacturing Tools",
-          "Description": "Tools for manufacturing",
+          "Name": "pet_toys",
+          "Description": "Toys and entertainment items for pets.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "chew_toys",
+              "Description": "Toys designed for chewing and dental health.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "interactive_toys",
+              "Description": "Toys designed to stimulate pets mentally and physically.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Safety Equipment",
-          "Description": "Industrial safety gear",
+          "Name": "pet_care",
+          "Description": "Grooming, hygiene and health products for pets.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "grooming_products",
+              "Description": "Shampoos, brushes and grooming tools for pets.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "health_products",
+              "Description": "Vitamins, supplements, and medications for pets.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Warehouse Equipment",
-          "Description": "Storage and logistics equipment",
+          "Name": "cages_habitats",
+          "Description": "Housing and habitats for small pets and birds.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "bird_cages",
+              "Description": "Cages designed for pet birds.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "small_pet_habitats",
+              "Description": "Cages and enclosures for small animals like hamsters and rabbits.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
+        {
+          "Name": "pet_accessories",
+          "Description": "Collars, leashes, clothing and other pet accessories.",
+          "ImageName": null,
+          "SubCategories": [
+            {
+              "Name": "collars_leashes",
+              "Description": "Collars and leashes for pets.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "pet_clothing",
+              "Description": "Clothing and wearable accessories for pets.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         }
       ]
     },
     {
-      "Name": "Kids & Baby",
-      "Description": "Products for children and babies",
-      "ImageName": "Kids_and_Baby.png",
+      "Name": "real_estate",
+      "Description": "Properties, land and real estate for sale or rent.",
+      "ImageName": "Real_Estate.svg",
       "SubCategories": [
         {
-          "Name": "Baby Clothing",
-          "Description": "Clothes for babies and toddlers",
+          "Name": "residential",
+          "Description": "Residential properties for living purposes.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "apartments",
+              "Description": "Apartments and condominiums for sale or rent.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "houses",
+              "Description": "Detached or semi-detached houses for sale or rent.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Toys",
-          "Description": "Toys and games for children",
+          "Name": "commercial",
+          "Description": "Properties intended for business or commercial use.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "offices",
+              "Description": "Office spaces and buildings for business use.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "warehouses",
+              "Description": "Warehouses and storage facilities for commercial purposes.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Strollers & Car Seats",
-          "Description": "Baby transport equipment",
+          "Name": "land",
+          "Description": "Plots of land available for construction, investment, or farming.",
           "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Nursery Furniture",
-          "Description": "Furniture for baby rooms",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Baby Care",
-          "Description": "Baby care products",
-          "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "building_plots",
+              "Description": "Land plots designated for construction purposes.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "agricultural_land",
+              "Description": "Land designated for agricultural or farming use.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         }
       ]
     },
     {
-      "Name": "Motorization",
-      "Description": "Vehicles and automotive parts",
-      "ImageName": "Motorization.png",
+      "Name": "services_education",
+      "Description": "Professional services and educational offerings for individuals and businesses.",
+      "ImageName": "Services_and_Education.svg",
       "SubCategories": [
         {
-          "Name": "Cars",
-          "Description": "Passenger vehicles",
+          "Name": "services",
+          "Description": "Various professional services for individuals and businesses.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "construction_services",
+              "Description": "Services related to construction projects and building works.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "it_services",
+              "Description": "Information technology services and support.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "repairs",
+              "Description": "Repair and maintenance services for different products.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         },
         {
-          "Name": "Motorcycles",
-          "Description": "Motorcycles and scooters",
+          "Name": "education",
+          "Description": "Educational courses, training and learning opportunities.",
           "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Auto Parts",
-          "Description": "Spare parts for vehicles",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Tires & Wheels",
-          "Description": "Tires and wheel accessories",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Car Accessories",
-          "Description": "Interior and exterior accessories",
-          "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "courses",
+              "Description": "Structured educational courses for different topics.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "trainings",
+              "Description": "Professional training programs for skills development.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "online_learning",
+              "Description": "Learning programs delivered online.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         }
       ]
     },
     {
-      "Name": "Pets",
-      "Description": "Pet supplies and accessories",
-      "ImageName": "Pets.png",
+      "Name": "sports_hobbies",
+      "Description": "Equipment, games and collectibles for sports, hobbies and leisure activities.",
+      "ImageName": "Sports_and_Hobbies.svg",
       "SubCategories": [
         {
-          "Name": "Pet Food",
-          "Description": "Food for all types of pets",
+          "Name": "fitness_equipment",
+          "Description": "Exercise and fitness gear for home and gym.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Pet Toys",
-          "Description": "Toys and entertainment for pets",
+          "Name": "sports_equipment",
+          "Description": "Equipment for various sports and outdoor activities.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Pet Care",
-          "Description": "Grooming and health products",
+          "Name": "team_sports",
+          "Description": "Equipment and gear for team sports like football and basketball.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Cages & Habitats",
-          "Description": "Housing for pets",
+          "Name": "cycling",
+          "Description": "Bicycles and accessories for cycling enthusiasts.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Pet Accessories",
-          "Description": "Collars, leashes and accessories",
+          "Name": "video_games",
+          "Description": "Video games for consoles and computers.",
           "ImageName": null,
-          "SubCategories": []
-        }
-      ]
-    },
-    {
-      "Name": "Real Estate",
-      "Description": "Property and real estate",
-      "ImageName": "Real_Estate.png",
-      "SubCategories": [
+          "SubCategories": [
+            {
+              "Name": "console_games",
+              "Description": "Games designed for gaming consoles.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "computer_games",
+              "Description": "Games designed for computers and laptops.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
+        },
         {
-          "Name": "Houses",
-          "Description": "Residential houses for sale",
+          "Name": "arts_crafts",
+          "Description": "Supplies for creative hobbies like painting and crafting.",
           "ImageName": null,
           "SubCategories": []
         },
         {
-          "Name": "Apartments",
-          "Description": "Apartments and condos",
+          "Name": "collectibles",
+          "Description": "Collectible items such as coins, badges, figurines, and trading cards.",
           "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Land",
-          "Description": "Land plots and lots",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Commercial Property",
-          "Description": "Commercial real estate",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Rentals",
-          "Description": "Properties for rent",
-          "ImageName": null,
-          "SubCategories": []
-        }
-      ]
-    },
-    {
-      "Name": "Services & Education",
-      "Description": "Professional services and education",
-      "ImageName": "Services_and_Education.png",
-      "SubCategories": [
-        {
-          "Name": "Tutoring",
-          "Description": "Private tutoring services",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Courses & Training",
-          "Description": "Educational courses",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Consulting",
-          "Description": "Professional consulting services",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Repair Services",
-          "Description": "Repair and maintenance services",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Event Services",
-          "Description": "Event planning and services",
-          "ImageName": null,
-          "SubCategories": []
-        }
-      ]
-    },
-    {
-      "Name": "Sports & Hobbies",
-      "Description": "Sports equipment and hobby supplies",
-      "ImageName": "Sports_and_Hobbies.png",
-      "SubCategories": [
-        {
-          "Name": "Fitness Equipment",
-          "Description": "Exercise and fitness gear",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Outdoor Sports",
-          "Description": "Equipment for outdoor activities",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Team Sports",
-          "Description": "Equipment for team sports",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Arts & Crafts",
-          "Description": "Supplies for creative hobbies",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Musical Instruments",
-          "Description": "Instruments and music equipment",
-          "ImageName": null,
-          "SubCategories": []
-        },
-        {
-          "Name": "Collectibles",
-          "Description": "Collectible items and memorabilia",
-          "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [
+            {
+              "Name": "coins",
+              "Description": "Collectible coins from around the world.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "badges",
+              "Description": "Collectible badges and pins.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "figurines",
+              "Description": "Collectible figurines and statues.",
+              "ImageName": null,
+              "SubCategories": []
+            },
+            {
+              "Name": "trading_cards",
+              "Description": "Trading cards for games and collections.",
+              "ImageName": null,
+              "SubCategories": []
+            }
+          ]
         }
       ]
     }

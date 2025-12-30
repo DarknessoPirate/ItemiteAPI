@@ -32,7 +32,7 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public async Task<T?> GetListingByIdAsync(int listingId)
     {
-        var listing = await dbContext.Set<T>().Include(p => p.Categories).ThenInclude(c => c.Photo)
+        var listing = await dbContext.Set<T>().Include(p => p.Categories)
             .Include(p => p.Owner).ThenInclude(u => u.ProfilePhoto)
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo).FirstOrDefaultAsync(l => l.Id == listingId);
         return listing;

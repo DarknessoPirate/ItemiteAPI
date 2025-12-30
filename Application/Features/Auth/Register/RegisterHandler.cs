@@ -35,6 +35,8 @@ public class RegisterHandler(
         var tokenExpirationInMinutes = authSettings.Value.EmailTokenLifespanInMinutes;
         user.EmailConfirmationTokenExpirationDate = DateTime.UtcNow.AddMinutes(tokenExpirationInMinutes);
         user.AuthProvider = AuthProvider.Email;
+        
+        await userManager.AddToRolesAsync(user, [Roles.User.ToString()]);
 
         try
         {

@@ -1,13 +1,76 @@
 @model Domain.DTOs.Email.EmailNotificationModel
-<!DOCTYPE html>
 
-<html>
+<!DOCTYPE html>
+<html lang="pl">
 <head>
-    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification</title>
 </head>
-<body>
-<div>
-    
-</div>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #ffffff; padding: 40px 20px;">
+    <tr>
+        <td align="center">
+            <!-- Main Container -->
+            <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #fafcff; color: #575757; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px 0px #0000001a,
+                                0 8px 10px -1px #0000001a;">
+
+                <!-- Header with Gradient -->
+                <tr>
+                    <td style="background: #eef3ff; padding: 50px 40px; text-align: center; color: #7ea3d3;">
+                        <table cellpadding="0" cellspacing="0" border="0" align="center">
+                            <tr>
+                                <!-- SVG -->
+                                <td align="center" valign="middle" style="padding-right: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#7ea3d3">
+                                        <path d="M360-500v-60h240v60H360Zm40 120v-60h160v60H400Zm20-420h120-120Zm0 640h120-120Zm-60 80-54-182q-48-38-77-95t-29-123q0-66 29-123t77-95l54-182h240l54 182q48 38 77 95t29 123q0 66-29 123t-77 95L600-80H360Zm120-200q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Zm-76-470q20-5 38.5-8t37.5-3q19 0 37.5 3t38.5 8l-16-50H420l-16 50Zm16 590h120l16-50q-20 5-38.5 7.5T480-200q-19 0-37.5-2.5T404-210l16 50Z"/>
+                                    </svg>
+                                </td>
+                                <td align="center" valign="middle">
+                                    <h1 style="margin: 0; font-size: 48px; font-weight: 700; letter-spacing: -0.5px; font-style: italic; color: #7ea3d3;">
+                                        Itemite
+                                    </h1>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="margin: 10px 0 0 0; font-size: 16px; color: #7ea3d3;">
+                            @Model.Title
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Content -->
+                <tr>
+                    <td style="padding: 50px 40px;">
+                        <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600;">
+                            Hello @Model.RecipientUsername! 👋
+                        </h2>
+
+                        <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6;">
+                            @Model.Message
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="background-color: #cbd7e2; color:#171717; padding: 30px 40px; text-align: center; border-top: 1px solid #e2e8f0;">
+                        <p style="margin: 0 0 10px 0; font-size: 14px;">
+                            Need help? Contact us at <a href="mailto:itemite.app@gmail.com" style="color: #3a81f6; text-decoration: none;">itemite.app@gmail.com</a>
+                        </p>
+                        <p style="margin: 0; font-size: 12px;">
+                            &copy; 2025 Itemite. All rights reserved.
+                        </p>
+                        <div style="margin-top: 15px;">
+                            <a href="https://mojo.generalmills.com/api/public/content/_pLFRXFETcuXWg_Z0MhZPw_gmi_hi_res_jpeg.jpeg?v=693b292b&t=466b54bb264e48b199fc8e83ef1136b4" style="color: #2563ef; text-decoration: none; margin: 0 10px; font-size: 12px;">Cookie Policy</a>
+                            <a href="#" style="color: #2563ef; text-decoration: none; margin: 0 10px; font-size: 12px;">Terms of Service</a>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

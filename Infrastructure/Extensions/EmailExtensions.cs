@@ -12,10 +12,10 @@ public static class EmailExtensions
     public static void AddFluentEmail(this IServiceCollection services, IConfiguration configuration)
     {
         var defaultFromEmail = configuration["EmailSettings:DefaultFromEmail"];
-        var host = configuration["SMTPSetting:Host"];
-        var port = configuration.GetValue<int>("SMTPSetting:Port");
-        var username = configuration["SMTPSetting:Username"]; 
-        var password = configuration["SMTPSetting:Password"];
+        var host = configuration["SMTPSettings:Host"];
+        var port = configuration.GetValue<int>("SMTPSettings:Port");
+        var username = configuration["SMTPSettings:Username"]; 
+        var password = configuration["SMTPSettings:Password"];
 
         services.AddFluentEmail(defaultFromEmail)
             .AddSmtpSender(() => new SmtpClient(host)
