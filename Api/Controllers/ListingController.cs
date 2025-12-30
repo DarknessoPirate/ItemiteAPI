@@ -86,7 +86,7 @@ public class ListingController(IMediator mediator, IRequestContextService reques
 
 
     [Authorize]
-    [HttpDelete("archive/{listingId}")]
+    [HttpPut("archive/{listingId}")]
     public async Task<IActionResult> ArchiveListing([FromRoute] int listingId)
     {
         var command = new ArchiveListingCommand
