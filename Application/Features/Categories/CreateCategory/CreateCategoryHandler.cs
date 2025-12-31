@@ -17,10 +17,10 @@ public class CreateCategoryHandler(
     ICacheService cache
 ) : IRequestHandler<CreateCategoryCommand, int>
 {
-    public async Task<int> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = mapper.Map<Category>(command.CreateCategoryDto);
-        var dto = command.CreateCategoryDto;
+        var category = mapper.Map<Category>(request.CreateCategoryDto);
+        var dto = request.CreateCategoryDto;
 
         // check if creating a root category
         if (dto.ParentCategoryId == null)
@@ -29,23 +29,23 @@ public class CreateCategoryHandler(
             var rootExists = await categoryRepository.RootCategoryExistsByName(dto.Name);
             if (rootExists)
                 throw new BadRequestException("A root category with that name already exists");
-            if (command.Image == null)
+            if (request.Image == null)
             {
                 throw new BadRequestException("Root category must have an image");
             }
             
-            if (command.Image.ContentType != "image/svg+xml")
+            if (request.Image.ContentType != "image/svg+xml")
             {
                 throw new BadRequestException("Image must be an SVG file");
             }
 
-            var fileExtension = Path.GetExtension(command.Image.FileName).ToLowerInvariant();
+            var fileExtension = Path.GetExtension(request.Image.FileName).ToLowerInvariant();
             if (fileExtension != ".svg")
             {
                 throw new BadRequestException("File must have .svg extension");
             }
             
-            using var reader = new StreamReader(command.Image.FileStream);
+            using var reader = new StreamReader(request.Image.FileStream);
             var svgContent = await reader.ReadToEndAsync(cancellationToken);
             
             if (string.IsNullOrWhiteSpace(svgContent))
@@ -57,7 +57,7 @@ public class CreateCategoryHandler(
         }
         else
         {
-            if (command.Image != null)
+            if (request.Image != null)
             {
                 throw new BadRequestException("Non root category cannot have an image");
             }

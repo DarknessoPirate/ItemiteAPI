@@ -34,6 +34,32 @@ public class UpdateCategoryHandler(
                 await categoryRepository.RootCategoryExistsByNameExcludingId(request.Dto.Name, request.CategoryId);
             if (rootExists)
                 throw new BadRequestException($"A root category with name '{request.Dto.Name}' already exists");
+            
+            if (request.Image == null)
+            {
+                throw new BadRequestException("Root category must have an image");
+            }
+            
+            if (request.Image.ContentType != "image/svg+xml")
+            {
+                throw new BadRequestException("Image must be an SVG file");
+            }
+
+            var fileExtension = Path.GetExtension(request.Image.FileName).ToLowerInvariant();
+            if (fileExtension != ".svg")
+            {
+                throw new BadRequestException("File must have .svg extension");
+            }
+            
+            using var reader = new StreamReader(request.Image.FileStream);
+            var svgContent = await reader.ReadToEndAsync(cancellationToken);
+            
+            if (string.IsNullOrWhiteSpace(svgContent))
+            {
+                throw new BadRequestException("SVG file cannot be empty");
+            }
+
+            categoryToUpdate.SvgImage = svgContent;
         }
         else
         {
@@ -51,6 +77,11 @@ public class UpdateCategoryHandler(
             if (nameExistsInTree)
                 throw new BadRequestException(
                     $"A category with name '{request.Dto.Name}' already exists in this category tree");
+            
+            if (request.Image != null)
+            {
+                throw new BadRequestException("Non root category cannot have an image");
+            }
         }
 
 

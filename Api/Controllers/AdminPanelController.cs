@@ -47,12 +47,12 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     
     [HttpPost("category")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> CreateCategory([FromForm] FullCategoryRequest request)
+    public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryRequest request, IFormFile? image)
     {
         var command = new CreateCategoryCommand
         {
-            CreateCategoryDto = request.Dto,
-            Image = request.Image != null ? new FileWrapper(request.Image.FileName, request.Image.Length, request.Image.ContentType, request.Image.OpenReadStream()) : null
+            CreateCategoryDto = request,
+            Image = image != null ? new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()) : null
         };
 
         int categoryId = await mediator.Send(command);
@@ -61,12 +61,13 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     }
     
     [HttpPut("category/{categoryId:int}")]
-    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromBody] UpdateCategoryRequest updateCategoryRequest)
+    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromForm] UpdateCategoryRequest updateCategoryRequest, IFormFile? image)
     {
         var command = new UpdateCategoryCommand
         {
             CategoryId = categoryId,
-            Dto = updateCategoryRequest
+            Dto = updateCategoryRequest,
+            Image = image != null ? new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()) : null
         };
 
         var result = await mediator.Send(command);

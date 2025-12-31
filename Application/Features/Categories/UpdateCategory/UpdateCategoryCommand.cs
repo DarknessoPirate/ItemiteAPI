@@ -8,4 +8,5 @@ public class UpdateCategoryCommand : IRequest<CategoryResponse>
 {
     public int CategoryId { get; set; }
     public UpdateCategoryRequest Dto;
+    public FileWrapper? Image {get; set;}
 }
