@@ -20,7 +20,6 @@ using Application.Features.Users.UnlockUser;
 using Domain.DTOs.Category;
 using Domain.DTOs.File;
 using Domain.DTOs.Banners;
-using Domain.DTOs.File;
 using Domain.DTOs.Notifications;
 using Domain.DTOs.Pagination;
 using Domain.DTOs.Payments;
@@ -39,11 +38,6 @@ namespace Api.Controllers;
 [Authorize(Roles = "Admin,Moderator")]
 public class AdminPanelController(IMediator mediator, IRequestContextService requestContextService) : ControllerBase
 {
-    public sealed class FullCategoryRequest
-    {
-        public CreateCategoryRequest Dto { get; set; }
-        public IFormFile? Image { get; set; }
-    }
     
     [HttpPost("category")]
     [Consumes("multipart/form-data")]
