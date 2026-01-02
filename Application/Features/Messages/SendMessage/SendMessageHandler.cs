@@ -26,8 +26,7 @@ public class SendMessageHandler(
     IUnitOfWork unitOfWork,
     IMapper mapper,
     INotificationService notificationService,
-    ILogger<SendMessageHandler> logger,
-    ICacheService cacheService
+    ILogger<SendMessageHandler> logger
 ) : IRequestHandler<SendMessageCommand, SendMessageResult>
 {
     public async Task<SendMessageResult> Handle(SendMessageCommand request, CancellationToken cancellationToken)
@@ -186,7 +185,7 @@ public class SendMessageHandler(
                     Message = $"You received new message for listing {listing.Name} from {sender.UserName}.",
                     ListingId = request.SendMessageDto.ListingId,
                     UserId = sender.Id,
-                    ResourceType = ResourceType.ChatPage,
+                    ResourceType = ResourceType.ChatPage.ToString(),
                     NotificationImageUrl = sender.ProfilePhoto?.Url,
                     UserInfo = new ChatMemberInfo
                     {

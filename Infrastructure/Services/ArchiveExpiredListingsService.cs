@@ -75,7 +75,7 @@ public class ArchiveExpiredListingsService(
                 {
                     Message = $"Your listing {listing.Name} has been archived",
                     ListingId = listing.Id,
-                    ResourceType = listing is ProductListing ? ResourceType.Product : ResourceType.Auction
+                    ResourceType = listing is ProductListing ? ResourceType.Product.ToString() : ResourceType.Auction.ToString()
                 };
             }
             await notificationService.SendNotificationsBatch(userNotifications);

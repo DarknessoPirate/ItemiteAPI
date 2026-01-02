@@ -50,7 +50,7 @@ public class ArchiveListingHandler(
             {
                 Message = $"Listing {listingToArchive.Name} has been archived.",
                 ListingId = listingToArchive.Id,
-                ResourceType = listingType,
+                ResourceType = listingType.ToString(),
                 NotificationImageUrl = listingToArchive.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             };
             

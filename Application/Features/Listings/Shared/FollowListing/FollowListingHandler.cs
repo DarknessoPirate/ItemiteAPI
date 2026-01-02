@@ -63,7 +63,7 @@ public class FollowListingHandler(
         {
             Message = $"User {user.UserName} has followed your listing {listingToFollow.Name}.",
             UserId = user.Id,
-            ResourceType = ResourceType.User,
+            ResourceType = ResourceType.User.ToString(),
             NotificationImageUrl = user.ProfilePhoto?.Url,
             UserInfo = new ChatMemberInfo
             {

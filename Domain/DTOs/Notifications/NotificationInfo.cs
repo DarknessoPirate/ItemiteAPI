@@ -12,7 +12,7 @@ public class NotificationInfo
     public int? UserId { get; set; }
     public ChatMemberInfo? UserInfo { get; set; }
     public int? ListingId { get; set; }
-    public ResourceType? ResourceType { get; set; }
+    public string? ResourceType { get; set; }
     
     public DateTime NotificationSent { get; set; } = DateTime.UtcNow;
     public DateTime? ReadAt { get; set; }

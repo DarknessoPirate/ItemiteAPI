@@ -50,7 +50,7 @@ public class UnfollowListingHandler(
         {
             Message = $"User {user.UserName} has unfollowed your listing {listingToUnfollow.Name}.",
             UserId = user.Id,
-            ResourceType = ResourceType.User,
+            ResourceType = ResourceType.User.ToString(),
             NotificationImageUrl = user.ProfilePhoto?.Url,
             UserInfo = new ChatMemberInfo
             {

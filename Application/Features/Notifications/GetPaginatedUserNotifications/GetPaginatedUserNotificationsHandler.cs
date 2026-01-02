@@ -36,13 +36,13 @@ public class GetPaginatedUserNotificationsHandler(
         });
         
         var listingIds = mappedNotifications
-            .Where(n => n.ResourceType is ResourceType.Auction or ResourceType.Product && n.ListingId.HasValue)
+            .Where(n => (n.ResourceType == "Auction" || n.ResourceType == "Product") && n.ListingId.HasValue)
             .Select(n => n.ListingId!.Value)
             .Distinct()
             .ToList();
 
         var userIds = mappedNotifications
-            .Where(n => n.ResourceType is ResourceType.ChatPage or ResourceType.User && n.UserId.HasValue)
+            .Where(n => (n.ResourceType == "ChatPage" || n.ResourceType == "User") && n.UserId.HasValue)
             .Select(n => n.UserId!.Value)
             .Distinct()
             .ToList();
@@ -59,10 +59,10 @@ public class GetPaginatedUserNotificationsHandler(
         {
             switch (notification.ResourceType)
             {
-                case ResourceType.Auction or ResourceType.Product when notification.ListingId.HasValue:
+                case "Auction" or "Product" when notification.ListingId.HasValue:
                     notification.NotificationImageUrl = listingUrls.GetValueOrDefault(notification.ListingId.Value);
                     break;
-                case ResourceType.ChatPage or ResourceType.User when notification.UserId.HasValue:
+                case "ChatPage" or "User" when notification.UserId.HasValue:
                     var userInfo = userInfos.GetValueOrDefault(notification.UserId.Value);
                     if (userInfo != null)
                     {
