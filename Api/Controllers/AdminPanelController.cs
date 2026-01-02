@@ -41,12 +41,12 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     
     [HttpPost("category")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryRequest request, IFormFile? image)
+    public async Task<IActionResult> CreateCategory([FromForm] CreateCategoryRequest request, IFormFile? svgImage)
     {
         var command = new CreateCategoryCommand
         {
             CreateCategoryDto = request,
-            Image = image != null ? new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()) : null
+            Image = svgImage != null ? new FileWrapper(svgImage.FileName, svgImage.Length, svgImage.ContentType, svgImage.OpenReadStream()) : null
         };
 
         int categoryId = await mediator.Send(command);
@@ -55,13 +55,13 @@ public class AdminPanelController(IMediator mediator, IRequestContextService req
     }
     
     [HttpPut("category/{categoryId:int}")]
-    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromForm] UpdateCategoryRequest updateCategoryRequest, IFormFile? image)
+    public async Task<ActionResult<CategoryResponse>> UpdateCategory(int categoryId,[FromForm] UpdateCategoryRequest updateCategoryRequest, IFormFile? svgImage)
     {
         var command = new UpdateCategoryCommand
         {
             CategoryId = categoryId,
             Dto = updateCategoryRequest,
-            Image = image != null ? new FileWrapper(image.FileName, image.Length, image.ContentType, image.OpenReadStream()) : null
+            Image = svgImage != null ? new FileWrapper(svgImage.FileName, svgImage.Length, svgImage.ContentType, svgImage.OpenReadStream()) : null
         };
 
         var result = await mediator.Send(command);
