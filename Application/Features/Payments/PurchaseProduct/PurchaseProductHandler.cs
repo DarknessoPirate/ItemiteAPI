@@ -124,8 +124,9 @@ public class PurchaseProductHandler(
 
             await paymentRepository.AddAsync(payment);
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
+            
             product.IsSold = true;
+            product.IsArchived = true;
             product.PaymentId = payment.Id;
             productListingRepository.UpdateListing(product);
 
