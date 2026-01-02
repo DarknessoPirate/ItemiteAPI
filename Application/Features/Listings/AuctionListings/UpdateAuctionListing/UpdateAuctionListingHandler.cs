@@ -182,7 +182,7 @@ public class UpdateAuctionListingHandler(
             {
                 Message = $"Auction {auctionListingToUpdate.Name} has been updated.",
                 ListingId = auctionListingToUpdate.Id,
-                ResourceType = ResourceType.Auction,
+                ResourceType = ResourceType.Auction.ToString(),
                 NotificationImageUrl = auctionListingToUpdate.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             };
             

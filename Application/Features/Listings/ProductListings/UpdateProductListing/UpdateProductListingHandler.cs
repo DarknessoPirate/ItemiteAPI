@@ -171,7 +171,7 @@ public class UpdateProductListingHandler(
             {
                 Message = $"Product listing {productListingToUpdate.Name} has been updated.",
                 ListingId = productListingToUpdate.Id,
-                ResourceType = ResourceType.Product,
+                ResourceType = ResourceType.Product.ToString(),
                 NotificationImageUrl = productListingToUpdate.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             };
             

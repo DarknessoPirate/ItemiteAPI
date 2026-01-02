@@ -55,7 +55,7 @@ public class DeleteListingHandler(
             var notificationInfo = new NotificationInfo
             {
                 Message = $"Listing {listingName} has been deleted.",
-                ResourceType = listingToDelete is ProductListing ? ResourceType.Product : ResourceType.Auction,
+                ResourceType = listingToDelete is ProductListing ? ResourceType.Product.ToString() : ResourceType.Auction.ToString(),
             };
 
             await unitOfWork.CommitTransactionAsync();

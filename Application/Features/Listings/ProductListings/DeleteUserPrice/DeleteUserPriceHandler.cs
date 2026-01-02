@@ -43,7 +43,7 @@ public class DeleteUserPriceHandler(
         await notificationService.SendNotification([request.UserId], request.OwnerId, new NotificationInfo
         {
             Message = $"Your specific price of the product listing {productListing.Name} has been deleted.",
-            ResourceType = ResourceType.Product,
+            ResourceType = ResourceType.Product.ToString(),
             ListingId = productListing.Id,
             NotificationImageUrl = productListing.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
         });

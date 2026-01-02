@@ -171,7 +171,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
                 Message =
                     $"Your auction '{auction.Name}' ended but no payment could be processed. Please contact support.",
                 ListingId = auction.Id,
-                ResourceType = ResourceType.Auction,
+                ResourceType = ResourceType.Auction.ToString(),
                 NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             });
     }
@@ -282,7 +282,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
                     $"Congratulations! You won the auction '{auction.Name}' with a bid of {winningBid.BidPrice} PLN. " +
                     $"Payment has been processed and funds will be transferred to the seller within {payment.ScheduledTransferDate?.Subtract(DateTime.UtcNow).Days ?? 0} days.",
                 ListingId = auction.Id,
-                ResourceType = ResourceType.Auction,
+                ResourceType = ResourceType.Auction.ToString(),
                 NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             });
 
@@ -296,7 +296,7 @@ public class AuctionCompletionBackgroundService : BackgroundService
                           $"Final bid: {winningBid.BidPrice} PLN. You will receive {payment.SellerAmount} PLN " +
                           $"(after {payment.PlatformFeePercentage}% platform fee).",
                 ListingId = auction.Id,
-                ResourceType = ResourceType.Auction,
+                ResourceType = ResourceType.Auction.ToString(),
                 NotificationImageUrl = auction.ListingPhotos.FirstOrDefault(lp => lp.Order == 1)?.Photo.Url
             });
 
