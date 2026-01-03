@@ -22,7 +22,9 @@ public class UserAutoMapper : Profile
          .ForMember(u => u.BackgroundUrl, o =>
             o.MapFrom(u => u.BackgroundPhoto != null ? u.BackgroundPhoto.Url : null))
          .ForMember(u => u.Location, opt =>
-            opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null));
+            opt.MapFrom(src => IsLocationComplete(src.Location) ? src.Location : null))
+         .ForMember(dest => dest.AuthProvider, opt =>
+            opt.MapFrom(src => src.AuthProvider.ToString()));
    }
    
    private bool IsLocationComplete(Location? location)
