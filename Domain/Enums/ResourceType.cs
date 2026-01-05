@@ -5,5 +5,6 @@ public enum ResourceType
     Auction,
     Product,
     User,
-    ChatPage
+    ChatPage,
+    Admin
 }

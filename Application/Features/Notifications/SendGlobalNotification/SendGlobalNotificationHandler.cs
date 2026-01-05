@@ -1,5 +1,6 @@
 using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -25,7 +26,8 @@ public class SendGlobalNotificationHandler(
 
         var notificationInfo = new NotificationInfo
         {
-            Message = request.Dto.Message
+            Message = request.Dto.Message,
+            ResourceType = ResourceType.Admin.ToString()
         };
 
         var recipients = await userRepository.GetAllUsers();

@@ -1,5 +1,6 @@
 using Domain.DTOs.Notifications;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Exceptions;
 using Infrastructure.Interfaces.Repositories;
 using Infrastructure.Interfaces.Services;
@@ -30,7 +31,8 @@ public class SendNotificationHandler(
 
         var notificationInfo = new NotificationInfo
         {
-            Message = request.SendNotificationDto.Message
+            Message = request.SendNotificationDto.Message,
+            ResourceType = ResourceType.Admin.ToString()
         };
 
         await notificationService.SendNotification([recipient.Id], request.UserId,
