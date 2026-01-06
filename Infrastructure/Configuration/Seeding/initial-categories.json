@@ -23,7 +23,7 @@
               "SubCategories": []
             },
             {
-              "Name": "seeders",
+              "Name": "Seeders",
               "Description": "Equipment used to plant seeds into soil.",
               "ImageName": null,
               "SubCategories": []
@@ -231,49 +231,49 @@
           "ImageName": null,
           "SubCategories": [
             {
-              "Name": "Tops",
+              "Name": "Men's tops",
               "Description": "Tops and upper body clothing for men.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Shirts",
+              "Name": "Men's shirts",
               "Description": "Shirts designed for everyday and formal wear.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Pants",
+              "Name": "Men's pants",
               "Description": "Pants and trousers designed for men.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Shorts",
+              "Name": "Men's shorts",
               "Description": "Shorts designed for casual and summer wear.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Jackets",
+              "Name": "Men's jackets",
               "Description": "Jackets and outerwear designed for men.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Shoes",
+              "Name": "Men's shoes",
               "Description": "Footwear designed specifically for men.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Activewear",
+              "Name": "Men's activewear",
               "Description": "Sports and active clothing for men.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Underwear",
+              "Name": "Men's underwear",
               "Description": "Underwear and base layers designed for men.",
               "ImageName": null,
               "SubCategories": []
@@ -286,49 +286,49 @@
           "ImageName": null,
           "SubCategories": [
             {
-              "Name": "Tops",
+              "Name": "Women's tops",
               "Description": "Tops and upper body clothing for women.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Dresses",
+              "Name": "Women's dresses",
               "Description": "Dresses designed for various occasions.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Pants",
+              "Name": "Women's pants",
               "Description": "Pants and trousers designed for women.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Skirts",
+              "Name": "Women's skirts",
               "Description": "Skirts in different styles and lengths.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Jackets",
+              "Name": "Women's jackets",
               "Description": "Jackets and outerwear for women.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Shoes",
+              "Name": "Women's shoes",
               "Description": "Footwear designed for women.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Activewear",
+              "Name": "Women's activewear",
               "Description": "Sports and active clothing for women.",
               "ImageName": null,
               "SubCategories": []
             },
             {
-              "Name": "Underwear",
+              "Name": "Women's underwear",
               "Description": "Underwear and lingerie for women.",
               "ImageName": null,
               "SubCategories": []
