@@ -73,6 +73,12 @@ public class PlaceBidHandler(
 
         var formerHighestBid = await bidRepository.GetCurrentHighestBid(auction.Id);
 
+
+        if (formerHighestBid?.BidderId == request.UserId)
+        {
+            throw new BadRequestException("You can't outbid your own bid");
+        }
+        
         var currentHighestBidValue = auction.CurrentBid ?? auction.StartingBid;
 
         if (request.BidDto.Price <= currentHighestBidValue)
