@@ -9,6 +9,7 @@ public class Category
     [MinLength(2)]
     [MaxLength(50)]
     public string Name { get; set; } = string.Empty;
+    public string PolishName { get; set; } = string.Empty;
     [MaxLength(100)]
     public string? Description { get; set; }
     public string? SvgImage { get; set; }

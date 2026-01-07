@@ -11,6 +11,9 @@ public class CreateCategoryValidator : AbstractValidator<CreateCategoryCommand>
         RuleFor(x => x.CreateCategoryDto.Name)
             .NotEmpty().WithMessage("Name cannot be empty")
             .Length(2, 50).WithMessage("Name must be between 2 and 50 characters");
+        RuleFor(x => x.CreateCategoryDto.PolishName)
+            .NotEmpty().WithMessage("Name cannot be empty")
+            .Length(2, 50).WithMessage("Name must be between 2 and 50 characters");
 
         RuleFor(x => x.CreateCategoryDto.Description)
             .MaximumLength(100).WithMessage("Description must be at max 100 characters");

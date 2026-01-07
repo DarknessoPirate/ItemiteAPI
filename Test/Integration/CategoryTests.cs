@@ -33,6 +33,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = name,
                 Description = description,
                 ParentCategoryId = parentCategoryId
@@ -52,6 +53,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = name,
                 Description = description,
                 ParentCategoryId = parentCategoryId
@@ -68,6 +70,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = InitialCategories.First(c => c.RootCategoryId == null).Name,
                 Description = "test",
                 ParentCategoryId = null
@@ -87,6 +90,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = name,
                 Description = description,
                 ParentCategoryId = parentCategoryId
@@ -149,6 +153,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CategoryId = categoryId,
             Dto = new UpdateCategoryRequest()
             {
+                PolishName = "",
                 Name = "test",
                 Description = "test",
                 ParentCategoryId = null
@@ -168,6 +173,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CategoryId = categoryId,
             Dto = new UpdateCategoryRequest()
             {
+                PolishName = "",
                 Name = name,
                 Description = description,
                 ParentCategoryId = parentCategoryId
@@ -186,6 +192,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             Dto = new UpdateCategoryRequest()
             {
                 // same name as parent
+                PolishName = "",
                 Name = "test1",
                 Description = "test",
                 ParentCategoryId = savedCategoriesIds[0]
@@ -198,6 +205,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CategoryId = savedCategoriesIds[0],
             Dto = new UpdateCategoryRequest()
             {
+                PolishName = "",
                 Name = "test1",
                 Description = "test",
                 // categoryId = ParentCategoryId 
@@ -216,6 +224,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
             CategoryId = savedCategoriesIds[2],
             Dto = new UpdateCategoryRequest()
             {
+                PolishName = "",
                 Name = "test_modified",
                 Description = "test_desc_modified",
                 ParentCategoryId = savedCategoriesIds[1]
@@ -355,6 +364,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = "test4",
                 Description = "test"
             }
@@ -387,6 +397,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         {
             CreateCategoryDto = new CreateCategoryRequest()
             {
+                PolishName = "",
                 Name = "test5",
                 Description = "test",
                 ParentCategoryId = getSubCommand.ParentCategoryId
@@ -508,12 +519,14 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
     {
         var createCategoryDto1 = new CreateCategoryRequest()
         {
+            PolishName = "",
             Name = "test1",
             Description = "test1",
         };
         
         var createCategoryDto2 = new CreateCategoryRequest()
         {
+            PolishName = "",
             Name = "test2",
             Description = "test2",
         };
@@ -527,6 +540,7 @@ public class CategoryTests : BaseIntegrationTest, IAsyncLifetime
         
         var createCategoryDto3 = new CreateCategoryRequest()
         {
+            PolishName = "",
             Name = "test3",
             Description = "test3",
             ParentCategoryId = categoryId1

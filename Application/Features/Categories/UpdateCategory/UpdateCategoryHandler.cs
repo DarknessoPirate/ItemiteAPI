@@ -101,6 +101,7 @@ public class UpdateCategoryHandler(
         var oldRootCategoryId = categoryToUpdate.RootCategoryId;
 
         categoryToUpdate.Name = request.Dto.Name;
+        categoryToUpdate.PolishName = request.Dto.PolishName;
         categoryToUpdate.Description = request.Dto.Description;
         categoryToUpdate.ParentCategoryId = request.Dto.ParentCategoryId;
 

@@ -472,12 +472,19 @@ public class DatabaseSeeder(
             logger.LogWarning("Skipping category with empty name");
             return;
         }
+        
+        if (string.IsNullOrWhiteSpace(categoryData.PolishName))
+        {
+            logger.LogWarning("Skipping category with empty polish name");
+            return;
+        }
 
         if (categoryData.Name.Length < 2 || categoryData.Name.Length > 50)
         {
             logger.LogError("Category name '{Name}' must be between 2 and 50 characters. Skipping.", categoryData.Name);
             return;
         }
+        
 
         if (categoryData.Description?.Length > 100)
         {
@@ -511,6 +518,7 @@ public class DatabaseSeeder(
         var newCategory = new Category
         {
             Name = categoryData.Name,
+            PolishName = categoryData.PolishName,
             Description = categoryData.Description,
             ParentCategoryId = parentId,
             RootCategoryId = rootId,

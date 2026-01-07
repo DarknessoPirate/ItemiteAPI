@@ -2,6 +2,7 @@
   "Categories": [
     {
       "Name": "Agriculture",
+      "PolishName": "Agrokultura",
       "Description": "Products, equipment and supplies used in agriculture and farming.",
       "ImageName": "Agriculture.svg",
       "SubCategories": [
@@ -14,33 +15,39 @@
               "Name": "Tractors",
               "Description": "Agricultural vehicles used to pull or power farming equipment.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Ciągniki"
             },
             {
               "Name": "Harvesters",
               "Description": "Machines designed for efficient crop harvesting.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Kombajny"
             },
             {
               "Name": "Seeders",
               "Description": "Equipment used to plant seeds into soil.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Siewniki"
             }
-          ]
+          ],
+          "PolishName": "Sprzęt rolniczy"
         },
         {
           "Name": "Seeds & plants",
           "Description": "Seeds, plants and seedlings for agricultural use.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Nasiona i rośliny"
         },
         {
           "Name": "Fertilizers",
           "Description": "Products used to enrich soil and improve crop growth.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Nawozy"
         },
         {
           "Name": "Farm tools",
@@ -51,15 +58,18 @@
               "Name": "Hand tools",
               "Description": "Handheld tools for basic agricultural tasks.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Narzędzia ręczne"
             },
             {
               "Name": "Power tools",
               "Description": "Powered tools used to perform farming and agricultural tasks more efficiently.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Narzędzia elektryczne"
             }
-          ]
+          ],
+          "PolishName": "Narzędzia rolnicze"
         },
         {
           "Name": "Livestock",
@@ -70,21 +80,25 @@
               "Name": "Cattle",
               "Description": "Cows and bulls raised for meat or dairy production.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Bydło"
             },
             {
               "Name": "Poultry",
               "Description": "Birds such as chickens and turkeys raised on farms.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Drób"
             },
             {
               "Name": "Pigs",
               "Description": "Farm animals raised mainly for meat production.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Świnie"
             }
-          ]
+          ],
+          "PolishName": "Zwierzęta hodowlane"
         }
       ]
     },
@@ -102,21 +116,25 @@
               "Name": "Laptops",
               "Description": "Portable computers designed for mobile use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Laptopy"
             },
             {
               "Name": "Desktops",
               "Description": "Stationary computers for home or office use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Komputery stacjonarne"
             },
             {
               "Name": "All in one",
               "Description": "Computers with integrated monitor and hardware.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Komputery All-in-One"
             }
-          ]
+          ],
+          "PolishName": "Komputery"
         },
         {
           "Name": "Computer accessories",
@@ -127,27 +145,32 @@
               "Name": "Mice",
               "Description": "Pointing devices used to control computers.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Myszki"
             },
             {
               "Name": "Keyboards",
               "Description": "Input devices used for typing and commands.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Klawiatury"
             },
             {
               "Name": "Monitors",
               "Description": "Display screens used with computers.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Monitory"
             },
             {
               "Name": "Headsets",
               "Description": "Audio devices with headphones and microphones.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zestawy słuchawkowe"
             }
-          ]
+          ],
+          "PolishName": "Akcesoria komputerowe"
         },
         {
           "Name": "Phones",
@@ -158,21 +181,25 @@
               "Name": "Smartphones",
               "Description": "Advanced mobile phones with smart features.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Smartfony"
             },
             {
               "Name": "Feature phones",
               "Description": "Basic mobile phones with limited functions.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Telefony klasyczne"
             },
             {
               "Name": "Phone accessories",
               "Description": "Accessories for mobile phones such as chargers and cases.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Akcesoria do telefonów"
             }
-          ]
+          ],
+          "PolishName": "Telefony"
         },
         {
           "Name": "Audio",
@@ -183,21 +210,25 @@
               "Name": "Speakers",
               "Description": "Devices used to output sound.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Głośniki"
             },
             {
               "Name": "Headphones",
               "Description": "Personal audio devices worn on the head.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Słuchawki"
             }
-          ]
+          ],
+          "PolishName": "Audio"
         },
         {
           "Name": "Tv & Video",
           "Description": "Television and video display equipment.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "TV i wideo"
         },
         {
           "Name": "Gaming",
@@ -208,17 +239,21 @@
               "Name": "Console games",
               "Description": "Games designed for gaming consoles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Gry konsolowe"
             },
             {
               "Name": "Computer games",
               "Description": "Games designed for computers and laptops.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Gry komputerowe"
             }
-          ]
+          ],
+          "PolishName": "Gaming"
         }
-      ]
+      ],
+      "PolishName": "Elektronika"
     },
     {
       "Name": "Fashion",
@@ -234,51 +269,60 @@
               "Name": "Men's tops",
               "Description": "Tops and upper body clothing for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Bluzki męskie"
             },
             {
               "Name": "Men's shirts",
               "Description": "Shirts designed for everyday and formal wear.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Koszule męskie"
             },
             {
               "Name": "Men's pants",
               "Description": "Pants and trousers designed for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Spodnie męskie"
             },
             {
               "Name": "Men's shorts",
               "Description": "Shorts designed for casual and summer wear.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Szorty męskie"
             },
             {
               "Name": "Men's jackets",
               "Description": "Jackets and outerwear designed for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Kurtki męskie"
             },
             {
               "Name": "Men's shoes",
               "Description": "Footwear designed specifically for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Buty męskie"
             },
             {
               "Name": "Men's activewear",
               "Description": "Sports and active clothing for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Odzież sportowa męska"
             },
             {
               "Name": "Men's underwear",
               "Description": "Underwear and base layers designed for men.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Bielizna męska"
             }
-          ]
+          ],
+          "PolishName": "Odzież męska"
         },
         {
           "Name": "Women clothing",
@@ -289,51 +333,60 @@
               "Name": "Women's tops",
               "Description": "Tops and upper body clothing for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Bluzki damskie"
             },
             {
               "Name": "Women's dresses",
               "Description": "Dresses designed for various occasions.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Sukienki damskie"
             },
             {
               "Name": "Women's pants",
               "Description": "Pants and trousers designed for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Spodnie damskie"
             },
             {
               "Name": "Women's skirts",
               "Description": "Skirts in different styles and lengths.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Spódnice damskie"
             },
             {
               "Name": "Women's jackets",
               "Description": "Jackets and outerwear for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Kurtki damskie"
             },
             {
               "Name": "Women's shoes",
               "Description": "Footwear designed for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Buty damskie"
             },
             {
               "Name": "Women's activewear",
               "Description": "Sports and active clothing for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Odzież sportowa damska"
             },
             {
               "Name": "Women's underwear",
               "Description": "Underwear and lingerie for women.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Bielizna damska"
             }
-          ]
+          ],
+          "PolishName": "Odzież damska"
         },
         {
           "Name": "Fashion accessories",
@@ -344,41 +397,49 @@
               "Name": "Jewelry",
               "Description": "Decorative items such as rings and necklaces.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Biżuteria"
             },
             {
               "Name": "Watches",
               "Description": "Timepieces worn on the wrist.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zegarki"
             },
             {
               "Name": "Belts",
               "Description": "Accessories used to secure clothing.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Paski"
             },
             {
               "Name": "Hats",
               "Description": "Headwear designed for fashion and protection.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Kapelusze"
             },
             {
               "Name": "Bags",
               "Description": "Bags and purses to complement outfits.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Torby"
             },
             {
               "Name": "Scarves",
               "Description": "Scarves and shawls for style and warmth.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Szaliki"
             }
-          ]
+          ],
+          "PolishName": "Akcesoria modowe"
         }
-      ]
+      ],
+      "PolishName": "Moda"
     },
     {
       "Name": "Health & Beauty",
@@ -394,15 +455,18 @@
               "Name": "Face care",
               "Description": "Skincare products designed for facial use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pielęgnacja twarzy"
             },
             {
               "Name": "Body care",
               "Description": "Products used to care for the skin of the body.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pielęgnacja ciała"
             }
-          ]
+          ],
+          "PolishName": "Pielęgnacja skóry"
         },
         {
           "Name": "Makeup",
@@ -413,21 +477,25 @@
               "Name": "Face makeup",
               "Description": "Makeup products designed for facial application.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Makijaż twarzy"
             },
             {
               "Name": "Eye makeup",
               "Description": "Cosmetics used for eye makeup.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Makijaż oczu"
             },
             {
               "Name": "Lip makeup",
               "Description": "Products designed for lip makeup.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Makijaż ust"
             }
-          ]
+          ],
+          "PolishName": "Makijaż"
         },
         {
           "Name": "Hair care",
@@ -438,21 +506,25 @@
               "Name": "Shampoos",
               "Description": "Hair cleansing products for regular use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Szampony"
             },
             {
               "Name": "Conditioners",
               "Description": "Products used to nourish and soften hair.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Odżywki"
             },
             {
               "Name": "Hair styling",
               "Description": "Products used to style and shape hair.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Stylizacja włosów"
             }
-          ]
+          ],
+          "PolishName": "Pielęgnacja włosów"
         },
         {
           "Name": "Vitamins supplements",
@@ -463,15 +535,18 @@
               "Name": "Vitamins",
               "Description": "Vitamin products supporting daily nutrition.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Witaminy"
             },
             {
               "Name": "Minerals",
               "Description": "Mineral supplements supporting body functions.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Minerały"
             }
-          ]
+          ],
+          "PolishName": "Witaminy i suplementy"
         },
         {
           "Name": "Medical equipment",
@@ -482,17 +557,21 @@
               "Name": "Diagnostic devices",
               "Description": "Devices used to measure and monitor health conditions.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Urządzenia diagnostyczne"
             },
             {
               "Name": "Mobility aids",
               "Description": "Equipment designed to assist movement and mobility.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pomoce do poruszania się"
             }
-          ]
+          ],
+          "PolishName": "Sprzęt medyczny"
         }
-      ]
+      ],
+      "PolishName": "Zdrowie i uroda"
     },
     {
       "Name": "Home garden",
@@ -508,27 +587,32 @@
               "Name": "Living room",
               "Description": "Furniture designed for living room spaces.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Salon"
             },
             {
               "Name": "Bedroom",
               "Description": "Furniture designed for bedrooms.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Sypialnia"
             },
             {
               "Name": "Office",
               "Description": "Furniture designed for home offices.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Biuro"
             },
             {
               "Name": "Outdoor",
               "Description": "Furniture designed for gardens and outdoor areas.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Ogród"
             }
-          ]
+          ],
+          "PolishName": "Meble"
         },
         {
           "Name": "Home decorative",
@@ -539,15 +623,18 @@
               "Name": "Wall",
               "Description": "Decorations designed for walls and vertical surfaces.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Ściana"
             },
             {
               "Name": "Textiles",
               "Description": "Decorative textiles such as rugs and curtains.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Tekstylia"
             }
-          ]
+          ],
+          "PolishName": "Dekoracje domowe"
         },
         {
           "Name": "Kitchen & dining",
@@ -558,21 +645,25 @@
               "Name": "Kitchen appliances",
               "Description": "Appliances used for cooking and food preparation.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "AGD kuchenne"
             },
             {
               "Name": "Cookware",
               "Description": "Pots, pans and cookware for kitchen use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Naczynia kuchenne"
             },
             {
               "Name": "Tableware",
               "Description": "Plates, glasses and dining accessories.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zastawa stołowa"
             }
-          ]
+          ],
+          "PolishName": "Kuchnia i jadalnia"
         },
         {
           "Name": "Garden tools",
@@ -583,23 +674,28 @@
               "Name": "Manual",
               "Description": "Hand tools used for basic gardening tasks.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Ręczne"
             },
             {
               "Name": "Power",
               "Description": "Powered tools used for advanced garden maintenance.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Elektryczne"
             }
-          ]
+          ],
+          "PolishName": "Narzędzia ogrodowe"
         },
         {
           "Name": "Lighting",
           "Description": "Lighting solutions for indoor and outdoor spaces.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Oświetlenie"
         }
-      ]
+      ],
+      "PolishName": "Dom i ogród"
     },
     {
       "Name": "Industry",
@@ -610,27 +706,32 @@
           "Name": "Construction equipment",
           "Description": "Heavy machinery and equipment used in construction projects.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sprzęt budowlany"
         },
         {
           "Name": "Manufacturing tools",
           "Description": "Tools and machines used in manufacturing processes.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Narzędzia produkcyjne"
         },
         {
           "Name": "Safety equipment",
           "Description": "Protective gear and equipment used to ensure workplace safety.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sprzęt ochronny"
         },
         {
           "Name": "Warehouse equipment",
           "Description": "Equipment used for storage, handling and logistics operations.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Wyposażenie magazynowe"
         }
-      ]
+      ],
+      "PolishName": "Przemysł"
     },
     {
       "Name": "Kids & baby",
@@ -646,21 +747,25 @@
               "Name": "Bodysuits",
               "Description": "One-piece clothing items for babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Body"
             },
             {
               "Name": "Sleepwear",
               "Description": "Clothing designed for sleeping and nightwear.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Piżamy"
             },
             {
               "Name": "Outerwear",
               "Description": "Jackets and warm clothing for babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Odzież wierzchnia"
             }
-          ]
+          ],
+          "PolishName": "Odzież dla niemowląt"
         },
         {
           "Name": "Toys",
@@ -671,21 +776,25 @@
               "Name": "Educational toys",
               "Description": "Toys designed to support learning and development.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zabawki edukacyjne"
             },
             {
               "Name": "Outdoor toys",
               "Description": "Toys intended for outdoor play.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zabawki ogrodowe"
             },
             {
               "Name": "Plush toys",
               "Description": "Soft toys designed for children.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pluszaki"
             }
-          ]
+          ],
+          "PolishName": "Zabawki"
         },
         {
           "Name": "Strollers & car seats",
@@ -696,15 +805,18 @@
               "Name": "Strollers",
               "Description": "Wheeled devices used to transport babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Wózki"
             },
             {
               "Name": "Car seats",
               "Description": "Safety seats designed for children in vehicles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Foteliki samochodowe"
             }
-          ]
+          ],
+          "PolishName": "Wózki i foteliki"
         },
         {
           "Name": "Nursery furniture",
@@ -715,15 +827,18 @@
               "Name": "Cribs",
               "Description": "Beds designed specifically for babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Łóżeczka"
             },
             {
               "Name": "Changing tables",
               "Description": "Furniture used for changing baby diapers.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Przewijaki"
             }
-          ]
+          ],
+          "PolishName": "Meble do pokoju dziecięcego"
         },
         {
           "Name": "Baby care",
@@ -734,23 +849,28 @@
               "Name": "Diapers",
               "Description": "Disposable or reusable diapers for babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pieluchy"
             },
             {
               "Name": "Feeding accessories",
               "Description": "Accessories used for feeding babies.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Akcesoria do karmienia"
             },
             {
               "Name": "Bath care",
               "Description": "Products used for baby bathing and hygiene.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Pielęgnacja podczas kąpieli"
             }
-          ]
+          ],
+          "PolishName": "Pielęgnacja niemowląt"
         }
-      ]
+      ],
+      "PolishName": "Dzieci i niemowlęta"
     },
     {
       "Name": "Motorization",
@@ -761,7 +881,8 @@
           "Name": "Cars",
           "Description": "Passenger cars of various makes and models.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Samochody"
         },
         {
           "Name": "Motorcycles",
@@ -772,21 +893,25 @@
               "Name": "Scooters",
               "Description": "Lightweight two-wheeled motor vehicles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Skutery"
             },
             {
               "Name": "Sport bikes",
               "Description": "Motorcycles designed for speed and performance.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Motocykle sportowe"
             },
             {
               "Name": "Cruisers",
               "Description": "Motorcycles designed for comfortable long rides.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Motocykle cruiser"
             }
-          ]
+          ],
+          "PolishName": "Motocykle"
         },
         {
           "Name": "Auto parts",
@@ -797,21 +922,25 @@
               "Name": "Engine parts",
               "Description": "Components for vehicle engines.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Części silnika"
             },
             {
               "Name": "Brakes",
               "Description": "Brake system parts and accessories.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Hamulce"
             },
             {
               "Name": "Suspension",
               "Description": "Suspension and steering components.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zawieszenie"
             }
-          ]
+          ],
+          "PolishName": "Części samochodowe"
         },
         {
           "Name": "Tires wheels",
@@ -822,23 +951,28 @@
               "Name": "Tires",
               "Description": "Tires for cars and motorcycles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Opony"
             },
             {
               "Name": "Rims",
               "Description": "Rims and wheel hubs for vehicles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Felgi"
             }
-          ]
+          ],
+          "PolishName": "Opony i felgi"
         },
         {
           "Name": "Car accessories",
           "Description": "Accessories for vehicles.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Akcesoria samochodowe"
         }
-      ]
+      ],
+      "PolishName": "Motoryzacja"
     },
     {
       "Name": "Pets",
@@ -854,21 +988,25 @@
               "Name": "Dog food",
               "Description": "Food and treats specifically for dogs.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Karma dla psów"
             },
             {
               "Name": "Cat food",
               "Description": "Food and treats specifically for cats.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Karma dla kotów"
             },
             {
               "Name": "Small pet food",
               "Description": "Food for rabbits, hamsters, guinea pigs, and other small pets.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Karma dla małych zwierząt"
             }
-          ]
+          ],
+          "PolishName": "Karma dla zwierząt"
         },
         {
           "Name": "Pet toys",
@@ -879,15 +1017,18 @@
               "Name": "Chew toys",
               "Description": "Toys designed for chewing and dental health.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zabawki do gryzienia"
             },
             {
               "Name": "Interactive toys",
               "Description": "Toys designed to stimulate pets mentally and physically.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Zabawki interaktywne"
             }
-          ]
+          ],
+          "PolishName": "Zabawki dla zwierząt"
         },
         {
           "Name": "Pet care",
@@ -898,15 +1039,18 @@
               "Name": "Grooming products",
               "Description": "Shampoos, brushes and grooming tools for pets.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Produkty pielęgnacyjne"
             },
             {
               "Name": "Health products",
               "Description": "Vitamins, supplements, and medications for pets.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Produkty zdrowotne"
             }
-          ]
+          ],
+          "PolishName": "Pielęgnacja zwierząt"
         },
         {
           "Name": "Cages habitats",
@@ -917,15 +1061,18 @@
               "Name": "Bird cages",
               "Description": "Cages designed for pet birds.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Klatki dla ptaków"
             },
             {
               "Name": "Small pet habitats",
               "Description": "Cages and enclosures for small animals like hamsters and rabbits.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Klatki dla gryzoni"
             }
-          ]
+          ],
+          "PolishName": "Klatki i siedliska"
         },
         {
           "Name": "Pet accessories",
@@ -936,17 +1083,21 @@
               "Name": "Collars & leashes",
               "Description": "Collars and leashes for pets.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Obroże i smycze"
             },
             {
               "Name": "Pet clothing",
               "Description": "Clothing and wearable accessories for pets.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Ubranka dla zwierząt"
             }
-          ]
+          ],
+          "PolishName": "Akcesoria dla zwierząt"
         }
-      ]
+      ],
+      "PolishName": "Zwierzęta"
     },
     {
       "Name": "Real estate",
@@ -962,15 +1113,18 @@
               "Name": "Apartments",
               "Description": "Apartments and condominiums for sale or rent.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Mieszkania"
             },
             {
               "Name": "Houses",
               "Description": "Detached or semi-detached houses for sale or rent.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Domy"
             }
-          ]
+          ],
+          "PolishName": "Nieruchomości mieszkalne"
         },
         {
           "Name": "Commercial",
@@ -981,15 +1135,18 @@
               "Name": "Offices",
               "Description": "Office spaces and buildings for business use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Biura"
             },
             {
               "Name": "Warehouses",
               "Description": "Warehouses and storage facilities for commercial purposes.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Magazyny"
             }
-          ]
+          ],
+          "PolishName": "Nieruchomości komercyjne"
         },
         {
           "Name": "Land",
@@ -1000,17 +1157,21 @@
               "Name": "Building plots",
               "Description": "Land plots designated for construction purposes.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Działki budowlane"
             },
             {
               "Name": "Agricultural land",
               "Description": "Land designated for agricultural or farming use.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Grunty rolne"
             }
-          ]
+          ],
+          "PolishName": "Grunty"
         }
-      ]
+      ],
+      "PolishName": "Nieruchomości"
     },
     {
       "Name": "Services & education",
@@ -1026,21 +1187,25 @@
               "Name": "Construction services",
               "Description": "Services related to construction projects and building works.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Usługi budowlane"
             },
             {
               "Name": "It services",
               "Description": "Information technology services and support.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Usługi IT"
             },
             {
               "Name": "Repairs",
               "Description": "Repair and maintenance services for different products.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Naprawy"
             }
-          ]
+          ],
+          "PolishName": "Usługi"
         },
         {
           "Name": "Education",
@@ -1051,23 +1216,28 @@
               "Name": "Courses",
               "Description": "Structured educational courses for different topics.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Kursy"
             },
             {
               "Name": "Trainings",
               "Description": "Professional training programs for skills development.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Szkolenia"
             },
             {
               "Name": "Online learning",
               "Description": "Learning programs delivered online.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Nauka online"
             }
-          ]
+          ],
+          "PolishName": "Edukacja"
         }
-      ]
+      ],
+      "PolishName": "Usługi i edukacja"
     },
     {
       "Name": "Sports & hobbies",
@@ -1078,25 +1248,29 @@
           "Name": "Fitness equipment",
           "Description": "Exercise and fitness gear for home and gym.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sprzęt fitness"
         },
         {
           "Name": "Sports equipment",
           "Description": "Equipment for various sports and outdoor activities.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sprzęt sportowy"
         },
         {
           "Name": "Team sports",
           "Description": "Equipment and gear for team sports like football and basketball.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sporty zespołowe"
         },
         {
           "Name": "Cycling",
           "Description": "Bicycles and accessories for cycling enthusiasts.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Kolarstwo"
         },
         {
           "Name": "Video games",
@@ -1107,21 +1281,25 @@
               "Name": "Console games",
               "Description": "Games designed for gaming consoles.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Gry konsolowe"
             },
             {
               "Name": "Computer games",
               "Description": "Games designed for computers and laptops.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Gry komputerowe"
             }
-          ]
+          ],
+          "PolishName": "Gry wideo"
         },
         {
           "Name": "Arts & crafts",
           "Description": "Supplies for creative hobbies like painting and crafting.",
           "ImageName": null,
-          "SubCategories": []
+          "SubCategories": [],
+          "PolishName": "Sztuka i rękodzieło"
         },
         {
           "Name": "Collectibles",
@@ -1132,29 +1310,35 @@
               "Name": "Coins",
               "Description": "Collectible coins from around the world.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Monety"
             },
             {
               "Name": "Badges",
               "Description": "Collectible badges and pins.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Odznaki"
             },
             {
               "Name": "Figurines",
               "Description": "Collectible figurines and statues.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Figurki"
             },
             {
               "Name": "Trading cards",
               "Description": "Trading cards for games and collections.",
               "ImageName": null,
-              "SubCategories": []
+              "SubCategories": [],
+              "PolishName": "Karty kolekcjonerskie"
             }
-          ]
+          ],
+          "PolishName": "Kolekcje"
         }
-      ]
+      ],
+      "PolishName": "Sport i hobby"
     }
   ]
 }
