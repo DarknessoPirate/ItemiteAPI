@@ -31,6 +31,16 @@ public class ArchiveListingHandler(
         {
             throw new ForbiddenException("You are not the owner of this listing");
         }
+
+        if (listingToArchive.IsArchived)
+        {
+            throw new BadRequestException("Listing is already archived");
+        }
+
+        if (listingToArchive is AuctionListing)
+        {
+            throw new BadRequestException("You can't archive auctions");
+        }
         
       
         var followers = await listingRepository.GetListingFollowersAsync(request.ListingId);
