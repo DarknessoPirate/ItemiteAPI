@@ -59,12 +59,11 @@ public class ArchiveListingHandler(
                 await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
             else
                 await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
-                
-
-            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId,
-                notificationInfo);
 
             await unitOfWork.CommitTransactionAsync();
+            
+            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId,
+                notificationInfo);
         }
         catch (Exception ex)
         {
