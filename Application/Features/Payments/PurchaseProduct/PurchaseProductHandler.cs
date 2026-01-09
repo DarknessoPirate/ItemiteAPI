@@ -1,4 +1,5 @@
 using Domain.Configs;
+using Domain.DTOs.Notifications;
 using Domain.DTOs.Payments;
 using Domain.Entities;
 using Domain.Enums;
@@ -20,10 +21,12 @@ namespace Application.Features.Payments.PurchaseProduct;
 /// </summary>
 public class PurchaseProductHandler(
     IListingRepository<ProductListing> productListingRepository,
+    IUserRepository userRepository,
     IPaymentRepository paymentRepository,
     IStripeConnectService stripeConnectService,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
+    INotificationService notificationService,
     IOptions<PaymentSettings> paymentSettings,
     ILogger<PurchaseProductCommand> logger
 ) : IRequestHandler<PurchaseProductCommand, PurchaseProductResponse>
@@ -47,6 +50,13 @@ public class PurchaseProductHandler(
             throw new BadRequestException("This product has already been sold");
         }
 
+        var buyer = await userRepository.GetUserWithProfilePhotoAsync(request.BuyerId);
+
+        if (buyer == null)
+        {
+            throw new NotFoundException($"Buyer with id {request.BuyerId} not found");
+        }
+        
         if (product.OwnerId == request.BuyerId)
         {
             throw new BadRequestException("You cannot purchase your own product");
@@ -129,8 +139,7 @@ public class PurchaseProductHandler(
             product.IsArchived = true;
             product.PaymentId = payment.Id;
             productListingRepository.UpdateListing(product);
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            
             await unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{product.Id}");
@@ -140,6 +149,14 @@ public class PurchaseProductHandler(
                 "Product purchase successful - Product: {ProductId}, Buyer: {BuyerId}, " +
                 "Amount: {Amount} PLN, PaymentIntent: {PaymentIntentId}",
                 product.Id, request.BuyerId, finalPrice, paymentIntent.Id);
+
+            await notificationService.SendNotification([product.OwnerId], request.BuyerId, new NotificationInfo
+            {
+                Message =  $"User {buyer.UserName} has bought your product {product.Name}",
+                ListingId =  product.Id,
+                ResourceType = ResourceType.Product.ToString(),
+                NotificationImageUrl = product.ListingPhotos.First(lp => lp.Order == 1).Photo.Url
+            });
 
             return new PurchaseProductResponse
             {
