@@ -77,17 +77,16 @@ public class ListingRepository<T>(ItemiteDbContext dbContext) : IListingReposito
 
     public IQueryable<ListingBase> GetUserListingsQueryable(int userId, bool? areArchived)
     {
-        var listingsQuery = dbContext.Set<T>().Include(p => p.Categories)
+        var listingsQuery = dbContext.Set<T>().Where(l => l.OwnerId == userId).Include(p => p.Categories)
             .Include(p => p.ListingPhotos).ThenInclude(l => l.Photo);
 
         if (areArchived != null)
         {
-            return listingsQuery.Where(l => l.OwnerId == userId && areArchived == false ? !l.IsArchived : l.IsArchived)
+            return listingsQuery.Where(l => areArchived == false ? !l.IsArchived : l.IsArchived)
                 .OrderByDescending(l => l.DateCreated);
         }
 
-        return listingsQuery.Where(l => l.OwnerId == userId)
-            .OrderByDescending(l => l.DateCreated);
+        return listingsQuery.OrderByDescending(l => l.DateCreated);
     }
 
 
