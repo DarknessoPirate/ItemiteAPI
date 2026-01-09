@@ -31,11 +31,7 @@ public class DeleteListingHandler(
             throw new NotFoundException($"Listing with id: {request.ListingId} not found");
         }
 
-        var payment = await paymentRepository.FindByListingIdAsync(request.ListingId);
-        if (payment != null)
-        {
-            throw new BadRequestException("Listing cannot be deleted because it has some related payments");
-        }
+        
         
         var photosToDelete = listingToDelete.ListingPhotos.Select(p => p.Photo).ToList();
         
@@ -44,28 +40,38 @@ public class DeleteListingHandler(
         var followers = await listingRepository.GetListingFollowersAsync(request.ListingId);
         var ownerId = listingToDelete.OwnerId;
         var listingType = listingToDelete is ProductListing ? ResourceType.Product : ResourceType.Auction;
-        
+
+        bool hasBeenArchived;
         await unitOfWork.BeginTransactionAsync();
         try
         {
-            foreach (var listingPhoto in photosToDelete)
+            var payment = await paymentRepository.FindByListingIdAsync(request.ListingId);
+            if (payment != null)
             {
-                var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.PublicId);
-                if (deletionResult.Error != null)
+                listingToDelete.IsArchived = true;
+                listingToDelete.IsFeatured = false;
+                listingToDelete.FeaturedAt = null;
+                
+                listingRepository.UpdateListing(listingToDelete);
+                
+                hasBeenArchived = true;
+            }
+            else
+            {
+                foreach (var listingPhoto in photosToDelete)
                 {
-                    throw new CloudinaryException($"An error occured while deleting the photo: {deletionResult.Error.Message}");
+                    var deletionResult = await mediaService.DeleteImageAsync(listingPhoto.PublicId);
+                    if (deletionResult.Error != null)
+                    {
+                        throw new CloudinaryException($"An error occured while deleting the photo: {deletionResult.Error.Message}");
+                    }
+                    await photoRepository.DeletePhotoAsync(listingPhoto.Id);
                 }
-                await photoRepository.DeletePhotoAsync(listingPhoto.Id);
+            
+                listingRepository.DeleteListing(listingToDelete);
+                hasBeenArchived = false;
             }
             
-            listingRepository.DeleteListing(listingToDelete);
-            
-            var notificationInfo = new NotificationInfo
-            {
-                Message = $"Listing {listingName} has been deleted.",
-                ResourceType = listingToDelete is ProductListing ? ResourceType.Product.ToString() : ResourceType.Auction.ToString(),
-            };
-
             await unitOfWork.CommitTransactionAsync();
             
             await cacheService.RemoveByPatternAsync($"{CacheKeys.LISTINGS}*");
@@ -76,6 +82,12 @@ public class DeleteListingHandler(
 
             var notifiactionRecipients = followers.Select(f => f.Id).ToList();
             notifiactionRecipients.Add(ownerId);
+            
+            var notificationInfo = new NotificationInfo
+            {
+                Message = hasBeenArchived ? $"Listing {listingName} has been deleted" : $"Listing {listingName} has been archived",
+                ResourceType = listingToDelete is ProductListing ? ResourceType.Product.ToString() : ResourceType.Auction.ToString(),
+            };
             
             await notificationService.SendNotification(notifiactionRecipients, request.UserId, notificationInfo);
         }
