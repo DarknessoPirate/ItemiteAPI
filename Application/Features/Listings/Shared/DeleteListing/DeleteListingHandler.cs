@@ -42,6 +42,7 @@ public class DeleteListingHandler(
         // get listing name and followers before deleting a listing
         var listingName = listingToDelete.Name;
         var followers = await listingRepository.GetListingFollowersAsync(request.ListingId);
+        var ownerId = listingToDelete.OwnerId;
         var listingType = listingToDelete is ProductListing ? ResourceType.Product : ResourceType.Auction;
         
         await unitOfWork.BeginTransactionAsync();
@@ -72,8 +73,11 @@ public class DeleteListingHandler(
                 await cacheService.RemoveAsync($"{CacheKeys.PRODUCT_LISTING}{request.ListingId}");
             else
                 await cacheService.RemoveAsync($"{CacheKeys.AUCTION_LISTING}{request.ListingId}");
+
+            var notifiactionRecipients = followers.Select(f => f.Id).ToList();
+            notifiactionRecipients.Add(ownerId);
             
-            await notificationService.SendNotification(followers.Select(f => f.Id).ToList(), request.UserId, notificationInfo);
+            await notificationService.SendNotification(notifiactionRecipients, request.UserId, notificationInfo);
         }
         catch (Exception ex)
         {
