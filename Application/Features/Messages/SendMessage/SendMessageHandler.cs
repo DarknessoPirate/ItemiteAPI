@@ -46,9 +46,7 @@ public class SendMessageHandler(
         var listing = await listingRepository.GetListingByIdAsync(request.SendMessageDto.ListingId);
         if (listing == null)
             throw new BadRequestException("Listing does not exist");
-
-        if (listing.IsArchived)
-            throw new BadRequestException("Cannot send messages to archived listings");
+        
 
         if (listing.OwnerId != request.SenderId && listing.OwnerId != request.SendMessageDto.RecipientId)
             throw new BadRequestException("Either sender or recipient must be the listing owner");

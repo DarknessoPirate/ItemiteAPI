@@ -35,10 +35,6 @@ public class DeleteMessageHandler(
             throw new BadRequestException("Message is already deleted");
         
 
-        var listing = await listingRepository.GetListingByIdAsync(message.ListingId);
-        if (listing.IsArchived)
-            throw new BadRequestException("Cannot delete archived messages");
-
         message.Content = "User deleted the message";
         message.IsDeleted = true;
         messageRepository.Update(message);
