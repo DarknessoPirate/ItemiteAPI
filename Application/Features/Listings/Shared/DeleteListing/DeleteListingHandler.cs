@@ -14,6 +14,7 @@ namespace Application.Features.Listings.Shared.DeleteListing;
 
 public class DeleteListingHandler(
     IListingRepository<ListingBase> listingRepository,
+    IPaymentRepository paymentRepository,
     IPhotoRepository photoRepository,
     IUnitOfWork unitOfWork,
     ICacheService cacheService,
@@ -28,6 +29,12 @@ public class DeleteListingHandler(
         if (listingToDelete == null)
         {
             throw new NotFoundException($"Listing with id: {request.ListingId} not found");
+        }
+
+        var payment = await paymentRepository.FindByListingIdAsync(request.ListingId);
+        if (payment != null)
+        {
+            throw new BadRequestException("Listing cannot be deleted because it has some related payments");
         }
         
         var photosToDelete = listingToDelete.ListingPhotos.Select(p => p.Photo).ToList();
