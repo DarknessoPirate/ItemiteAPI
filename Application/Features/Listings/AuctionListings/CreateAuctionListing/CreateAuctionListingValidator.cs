@@ -11,7 +11,7 @@ public class CreateAuctionListingValidator : AbstractValidator<CreateAuctionList
         RuleFor(x => x.AuctionListingDto.Name)
             .NotEmpty().WithMessage("Auction name is empty")
             .NotNull().WithMessage("Auction name is null")
-            .Length(2, 30).WithMessage("Auction name must be between 2 and 50 characters");
+            .Length(2, 50).WithMessage("Auction name must be between 2 and 50 characters");
         RuleFor(x => x.AuctionListingDto.Description)
             .NotEmpty().WithMessage("Auction description is empty")
             .NotNull().WithMessage("Auction description is null")
